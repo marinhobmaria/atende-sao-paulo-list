@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -29,6 +28,9 @@ export const EscutaInicialForm = ({ onSubmit, onCancel, isLoading }: EscutaInici
       // Antropometria
       peso: "",
       altura: "",
+      circunferenciaAbdominal: "",
+      perimetroCefalico: "",
+      perimetroPanturrilha: "",
       
       // Sinais vitais
       pressaoSistolica: "",
@@ -109,6 +111,15 @@ export const EscutaInicialForm = ({ onSubmit, onCancel, isLoading }: EscutaInici
     
     if (novosValores.peso && novosValores.altura) {
       procedimentos.push("Aferição de peso e altura");
+    }
+    if (novosValores.circunferenciaAbdominal) {
+      procedimentos.push("Medição de circunferência abdominal");
+    }
+    if (novosValores.perimetroCefalico) {
+      procedimentos.push("Medição de perímetro cefálico");
+    }
+    if (novosValores.perimetroPanturrilha) {
+      procedimentos.push("Medição de perímetro da panturrilha");
     }
     if (novosValores.pressaoSistolica || novosValores.pressaoDiastolica) {
       procedimentos.push("Verificação de pressão arterial");
