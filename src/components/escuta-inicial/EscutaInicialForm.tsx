@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -9,6 +9,10 @@ import { SinaisVitaisSection } from "./SinaisVitaisSection";
 import { ProcedimentosSection } from "./ProcedimentosSection";
 import { ClassificacaoRiscoSection } from "./ClassificacaoRiscoSection";
 import { DesfechoSection } from "./DesfechoSection";
+import { FormActions } from "./FormActions";
+import { useProcedimentosAutomaticos } from "./hooks/useProcedimentosAutomaticos";
+import { validateEscutaInicialForm } from "./utils/FormValidation";
+import { getFormDefaultValues } from "./utils/FormDefaults";
 
 interface EscutaInicialFormProps {
   onSubmit: (data: any) => void;
@@ -17,109 +21,20 @@ interface EscutaInicialFormProps {
 }
 
 export const EscutaInicialForm = ({ onSubmit, onCancel, isLoading }: EscutaInicialFormProps) => {
-  const [procedimentosAutomaticos, setProcedimentosAutomaticos] = useState<string[]>([]);
+  const { procedimentosAutomaticos, updateProcedimentosAutomaticos } = useProcedimentosAutomaticos();
 
   const form = useForm({
-    defaultValues: {
-      // Motivo da consulta
-      ciap2: "",
-      descricaoLivre: "",
-      
-      // Antropometria
-      peso: "",
-      altura: "",
-      circunferenciaAbdominal: "",
-      perimetroCefalico: "",
-      perimetroPanturrilha: "",
-      
-      // Sinais vitais
-      pressaoSistolica: "",
-      pressaoDiastolica: "",
-      frequenciaCardiaca: "",
-      frequenciaRespiratoria: "",
-      temperatura: "",
-      saturacaoOxigenio: "",
-      glicemiaCapilar: "",
-      momentoColeta: "",
-      
-      // Procedimentos
-      procedimentosManuais: [],
-      
-      // Classificação de risco
-      classificacaoRisco: "",
-      
-      // Desfecho
-      desfecho: "",
-      profissionalDesfecho: "",
-      equipeDesfecho: "",
-      tipoServicoDesfecho: "",
-      tipoServicoAgendamento: "",
-      dataAgendamento: "",
-      horarioAgendamento: "",
-      observacoesAgendamento: ""
-    }
+    defaultValues: getFormDefaultValues()
   });
 
   const handleFormSubmit = (data: any) => {
-    // Validações finais
-    if (!data.ciap2) {
-      form.setError("ciap2", { message: "Campo obrigatório" });
+    // Validate form data
+    const isValid = validateEscutaInicialForm(data, form.setError);
+    if (!isValid) {
       return;
     }
 
-    if (!data.classificacaoRisco) {
-      form.setError("classificacaoRisco", { message: "Campo obrigatório" });
-      return;
-    }
-
-    if (!data.desfecho) {
-      form.setError("desfecho", { message: "Campo obrigatório" });
-      return;
-    }
-
-    // Validações específicas por desfecho
-    if (data.desfecho === "adicionar_lista") {
-      if (!data.profissionalDesfecho && !data.equipeDesfecho) {
-        form.setError("profissionalDesfecho", { 
-          message: "Selecione um profissional ou equipe" 
-        });
-        return;
-      }
-      if (!data.tipoServicoDesfecho) {
-        form.setError("tipoServicoDesfecho", { 
-          message: "Selecione o tipo de serviço" 
-        });
-        return;
-      }
-    }
-
-    if (data.desfecho === "agendar") {
-      if (!data.tipoServicoAgendamento || !data.profissionalDesfecho || !data.dataAgendamento || !data.horarioAgendamento) {
-        if (!data.tipoServicoAgendamento) {
-          form.setError("tipoServicoAgendamento", { 
-            message: "Campo obrigatório" 
-          });
-        }
-        if (!data.profissionalDesfecho) {
-          form.setError("profissionalDesfecho", { 
-            message: "Campo obrigatório" 
-          });
-        }
-        if (!data.dataAgendamento) {
-          form.setError("dataAgendamento", { 
-            message: "Campo obrigatório" 
-          });
-        }
-        if (!data.horarioAgendamento) {
-          form.setError("horarioAgendamento", { 
-            message: "Campo obrigatório" 
-          });
-        }
-        return;
-      }
-    }
-
-    // Incluir procedimentos automáticos
+    // Include automatic procedures and timestamps
     const dadosCompletos = {
       ...data,
       procedimentosAutomaticos,
@@ -128,40 +43,6 @@ export const EscutaInicialForm = ({ onSubmit, onCancel, isLoading }: EscutaInici
     };
 
     onSubmit(dadosCompletos);
-  };
-
-  const updateProcedimentosAutomaticos = (novosValores: any) => {
-    const procedimentos: string[] = [];
-    
-    if (novosValores.peso && novosValores.altura) {
-      procedimentos.push("Aferição de peso e altura");
-    }
-    if (novosValores.circunferenciaAbdominal) {
-      procedimentos.push("Medição de circunferência abdominal");
-    }
-    if (novosValores.perimetroCefalico) {
-      procedimentos.push("Medição de perímetro cefálico");
-    }
-    if (novosValores.perimetroPanturrilha) {
-      procedimentos.push("Medição de perímetro da panturrilha");
-    }
-    if (novosValores.pressaoSistolica || novosValores.pressaoDiastolica) {
-      procedimentos.push("Verificação de pressão arterial");
-    }
-    if (novosValores.frequenciaCardiaca || novosValores.frequenciaRespiratoria) {
-      procedimentos.push("Verificação de sinais vitais");
-    }
-    if (novosValores.temperatura) {
-      procedimentos.push("Verificação de temperatura corporal");
-    }
-    if (novosValores.saturacaoOxigenio) {
-      procedimentos.push("Verificação de saturação periférica de oxigênio");
-    }
-    if (novosValores.glicemiaCapilar) {
-      procedimentos.push("Verificação de glicemia capilar");
-    }
-
-    setProcedimentosAutomaticos(procedimentos);
   };
 
   return (
@@ -205,23 +86,7 @@ export const EscutaInicialForm = ({ onSubmit, onCancel, isLoading }: EscutaInici
         <DesfechoSection form={form} />
 
         {/* Botões de ação */}
-        <div className="flex justify-end gap-4 pt-6">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            disabled={isLoading}
-          >
-            Cancelar Atendimento
-          </Button>
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="min-w-[200px]"
-          >
-            {isLoading ? "Finalizando..." : "Finalizar Escuta Inicial"}
-          </Button>
-        </div>
+        <FormActions onCancel={onCancel} isLoading={isLoading} />
       </form>
     </Form>
   );
