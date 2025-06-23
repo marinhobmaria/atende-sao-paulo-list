@@ -1,3 +1,4 @@
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -75,6 +76,10 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
 
   const handleEscutaInicial = () => {
     navigate(`/escuta-inicial?cidadao=${attendance.id}`);
+  };
+
+  const handleAtendimento = () => {
+    navigate(`/atendimento?cidadao=${attendance.id}`);
   };
 
   return (
@@ -172,6 +177,7 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
                     size="sm" 
                     variant={attendance.isCompleted ? "outline" : "default"}
                     className="flex items-center gap-2"
+                    onClick={handleAtendimento}
                   >
                     {attendance.serviceTypes.includes("VACINA") ? (
                       <Syringe className="h-4 w-4" />
