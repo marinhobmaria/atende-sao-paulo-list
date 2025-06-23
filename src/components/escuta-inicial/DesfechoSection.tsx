@@ -4,7 +4,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
@@ -34,9 +33,21 @@ export const DesfechoSection = ({ form }: DesfechoSectionProps) => {
     }
   ];
 
-  const tiposServico = [
+  const tiposServicoAgendamento = [
     "ADM. MEDICAMENTO",
     "ESCUTA INICIAL",
+    "ODONTOLOGIA",
+    "CURATIVO",
+    "EXAMES",
+    "PROCEDIMENTOS",
+    "DEMANDA ESPONTÂNEA",
+    "NEBULIZAÇÃO",
+    "VACINA"
+  ];
+
+  const tiposServicoLista = [
+    "ADM. MEDICAMENTO",
+    "ESCUTA INICIAL", 
     "ODONTOLOGIA",
     "CURATIVO",
     "EXAMES",
@@ -170,37 +181,23 @@ export const DesfechoSection = ({ form }: DesfechoSectionProps) => {
             <FormField
               control={form.control}
               name="tipoServicoDesfecho"
-              render={() => (
+              render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo de Serviço</FormLabel>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {tiposServico.map((tipo) => (
-                      <FormField
-                        key={tipo}
-                        control={form.control}
-                        name="tipoServicoDesfecho"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(tipo)}
-                                onCheckedChange={(checked) => {
-                                  const currentValue = field.value || [];
-                                  const newValue = checked
-                                    ? [...currentValue, tipo]
-                                    : currentValue.filter((item: string) => item !== tipo);
-                                  field.onChange(newValue);
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="text-sm font-normal">
-                              {tipo}
-                            </FormLabel>
-                          </FormItem>
-                        )}
-                      />
-                    ))}
-                  </div>
+                  <FormLabel>Tipo de Serviço *</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o tipo de serviço" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {tiposServicoLista.map((tipo) => (
+                        <SelectItem key={tipo} value={tipo}>
+                          {tipo}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -212,6 +209,32 @@ export const DesfechoSection = ({ form }: DesfechoSectionProps) => {
           <div className="space-y-4 p-4 border rounded-lg bg-muted/20">
             <h4 className="font-medium">Dados para agendamento:</h4>
             
+            <FormField
+              control={form.control}
+              name="tipoServicoAgendamento"
+              rules={{ required: selectedDesfecho === "agendar" ? "Campo obrigatório" : false }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tipo de Serviço *</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o tipo de serviço" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {tiposServicoAgendamento.map((tipo) => (
+                        <SelectItem key={tipo} value={tipo}>
+                          {tipo}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="profissionalDesfecho"

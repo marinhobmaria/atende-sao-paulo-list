@@ -52,7 +52,8 @@ export const EscutaInicialForm = ({ onSubmit, onCancel, isLoading }: EscutaInici
       desfecho: "",
       profissionalDesfecho: "",
       equipeDesfecho: "",
-      tipoServicoDesfecho: [],
+      tipoServicoDesfecho: "",
+      tipoServicoAgendamento: "",
       dataAgendamento: "",
       horarioAgendamento: "",
       observacoesAgendamento: ""
@@ -84,13 +85,36 @@ export const EscutaInicialForm = ({ onSubmit, onCancel, isLoading }: EscutaInici
         });
         return;
       }
+      if (!data.tipoServicoDesfecho) {
+        form.setError("tipoServicoDesfecho", { 
+          message: "Selecione o tipo de serviço" 
+        });
+        return;
+      }
     }
 
     if (data.desfecho === "agendar") {
-      if (!data.profissionalDesfecho || !data.dataAgendamento || !data.horarioAgendamento) {
-        form.setError("profissionalDesfecho", { 
-          message: "Preencha todos os campos obrigatórios para agendamento" 
-        });
+      if (!data.tipoServicoAgendamento || !data.profissionalDesfecho || !data.dataAgendamento || !data.horarioAgendamento) {
+        if (!data.tipoServicoAgendamento) {
+          form.setError("tipoServicoAgendamento", { 
+            message: "Campo obrigatório" 
+          });
+        }
+        if (!data.profissionalDesfecho) {
+          form.setError("profissionalDesfecho", { 
+            message: "Campo obrigatório" 
+          });
+        }
+        if (!data.dataAgendamento) {
+          form.setError("dataAgendamento", { 
+            message: "Campo obrigatório" 
+          });
+        }
+        if (!data.horarioAgendamento) {
+          form.setError("horarioAgendamento", { 
+            message: "Campo obrigatório" 
+          });
+        }
         return;
       }
     }
