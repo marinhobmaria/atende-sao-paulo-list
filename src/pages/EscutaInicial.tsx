@@ -3,8 +3,9 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, ArrowLeft } from "lucide-react";
+import { Home, ArrowLeft, User, Edit } from "lucide-react";
 import { EscutaInicialForm } from "@/components/escuta-inicial/EscutaInicialForm";
 import { toast } from "@/hooks/use-toast";
 
@@ -14,14 +15,19 @@ const EscutaInicial = () => {
   const cidadaoId = searchParams.get("cidadao");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Mock data do cidadão
+  // Mock data do cidadão baseado na imagem de referência
   const cidadao = {
     id: cidadaoId || "1",
-    name: "Maria Silva Santos",
-    age: 45,
-    birthDate: "12/03/1979",
-    cpf: "123.456.789-00",
-    cns: "123456789012345"
+    name: "Maria Antonieta Albuquerque Soares",
+    socialName: "Mário Henrique da Silva Oliveira Gomes dos Santos Albuquerque Soares",
+    cpf: "094556799-80",
+    birthDate: "10/02/2004",
+    age: "20a 8m e 2d",
+    sex: "Feminino",
+    motherName: "Llian Cristina de Souza Guimarães",
+    status: "Escuta inicial realizada",
+    healthConditions: ["Hipertenso", "Diabético", "Gestante"],
+    allergies: ["Dipirona", "Leite", "Mofo"]
   };
 
   const handleFinalizarEscuta = async (data: any) => {
@@ -63,7 +69,7 @@ const EscutaInicial = () => {
 
   return (
     <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Breadcrumb */}
         <Breadcrumb>
           <BreadcrumbList>
@@ -85,18 +91,99 @@ const EscutaInicial = () => {
         </Breadcrumb>
 
         {/* Header com informações do cidadão */}
-        <Card>
-          <CardHeader className="pb-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-xl text-primary">Escuta Inicial</CardTitle>
-                <div className="mt-2 space-y-1 text-sm text-muted-foreground">
-                  <p><span className="font-medium">Nome:</span> {cidadao.name}</p>
-                  <p><span className="font-medium">Data de Nascimento:</span> {cidadao.birthDate} ({cidadao.age} anos)</p>
-                  <p><span className="font-medium">CPF:</span> {cidadao.cpf}</p>
-                  <p><span className="font-medium">CNS:</span> {cidadao.cns}</p>
+        <Card className="shadow-lg">
+          <CardHeader className="pb-6">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start gap-4">
+                {/* Avatar */}
+                <div className="w-16 h-16 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  <User className="h-8 w-8" />
+                </div>
+                
+                {/* Informações principais */}
+                <div className="space-y-4 flex-1">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Coluna 1 */}
+                    <div className="space-y-2">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h1 className="text-xl font-semibold text-gray-900">{cidadao.name}</h1>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        <p className="text-sm text-gray-600 font-medium">Nome social</p>
+                        <p className="text-sm text-gray-800">({cidadao.socialName})</p>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">CPF</p>
+                          <p className="text-sm text-gray-900">{cidadao.cpf}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Nome da mãe</p>
+                          <p className="text-sm text-gray-900">{cidadao.motherName}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Data de nascimento</p>
+                          <p className="text-sm text-gray-900">{cidadao.birthDate} {cidadao.age}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Escuta inicial realizada</p>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Sexo</p>
+                        <p className="text-sm text-gray-900">{cidadao.sex}</p>
+                      </div>
+                    </div>
+
+                    {/* Coluna 2 - Condições de Saúde */}
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600 mb-2">Condições e situações de saúde</p>
+                        <div className="flex flex-wrap gap-2">
+                          {cidadao.healthConditions.map((condition, index) => (
+                            <Badge 
+                              key={index} 
+                              className={`text-white text-xs px-2 py-1 ${
+                                condition === "Hipertenso" ? "bg-green-600" : 
+                                condition === "Diabético" ? "bg-green-600" : 
+                                condition === "Gestante" ? "bg-blue-500" : "bg-gray-500"
+                              }`}
+                            >
+                              {condition}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Coluna 3 - Alergias */}
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600 mb-2">Alergias/Reações adversas</p>
+                        <div className="flex flex-wrap gap-2">
+                          {cidadao.allergies.map((allergy, index) => (
+                            <Badge 
+                              key={index} 
+                              className="bg-red-500 text-white text-xs px-2 py-1"
+                            >
+                              ⚠ {allergy}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
+              
               <Button
                 variant="outline"
                 onClick={() => navigate("/")}
