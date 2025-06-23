@@ -6,6 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Home, ArrowLeft, User, FileText, Syringe, Clock, Calendar } from "lucide-react";
+import { SOAPSubjetivo } from "@/components/atendimento/SOAPSubjetivo";
+import { SOAPAntecedentes } from "@/components/atendimento/SOAPAntecedentes";
+import { SOAPObjetivo } from "@/components/atendimento/SOAPObjetivo";
+import { SOAPAvaliacao } from "@/components/atendimento/SOAPAvaliacao";
+import { SOAPPlano } from "@/components/atendimento/SOAPPlano";
 
 const Atendimento = () => {
   const navigate = useNavigate();
@@ -140,29 +145,35 @@ const Atendimento = () => {
                     <CardTitle>SOAP (Subjetivo, Objetivo, Avaliação, Plano)</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <p className="text-muted-foreground">
-                        Registro estruturado do atendimento seguindo a metodologia SOAP.
-                      </p>
-                      <div className="grid grid-cols-1 gap-4">
-                        <div className="space-y-2">
-                          <h4 className="font-medium">S - Subjetivo</h4>
-                          <p className="text-sm text-muted-foreground">Relato do paciente sobre sintomas e queixas.</p>
-                        </div>
-                        <div className="space-y-2">
-                          <h4 className="font-medium">O - Objetivo</h4>
-                          <p className="text-sm text-muted-foreground">Dados objetivos coletados durante exame físico.</p>
-                        </div>
-                        <div className="space-y-2">
-                          <h4 className="font-medium">A - Avaliação</h4>
-                          <p className="text-sm text-muted-foreground">Análise e diagnóstico clínico.</p>
-                        </div>
-                        <div className="space-y-2">
-                          <h4 className="font-medium">P - Plano</h4>
-                          <p className="text-sm text-muted-foreground">Plano terapêutico e condutas.</p>
-                        </div>
-                      </div>
-                    </div>
+                    <Tabs defaultValue="antecedentes" className="w-full">
+                      <TabsList className="grid w-full grid-cols-5">
+                        <TabsTrigger value="antecedentes">Antecedentes</TabsTrigger>
+                        <TabsTrigger value="subjetivo">Subjetivo</TabsTrigger>
+                        <TabsTrigger value="objetivo">Objetivo</TabsTrigger>
+                        <TabsTrigger value="avaliacao">Avaliação</TabsTrigger>
+                        <TabsTrigger value="plano">Plano</TabsTrigger>
+                      </TabsList>
+
+                      <TabsContent value="antecedentes" className="mt-6">
+                        <SOAPAntecedentes />
+                      </TabsContent>
+
+                      <TabsContent value="subjetivo" className="mt-6">
+                        <SOAPSubjetivo />
+                      </TabsContent>
+
+                      <TabsContent value="objetivo" className="mt-6">
+                        <SOAPObjetivo />
+                      </TabsContent>
+
+                      <TabsContent value="avaliacao" className="mt-6">
+                        <SOAPAvaliacao />
+                      </TabsContent>
+
+                      <TabsContent value="plano" className="mt-6">
+                        <SOAPPlano />
+                      </TabsContent>
+                    </Tabs>
                   </CardContent>
                 </Card>
               </TabsContent>
