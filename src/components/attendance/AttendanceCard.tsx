@@ -1,9 +1,9 @@
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Clock, MoreVertical, Stethoscope, Syringe, Eye, EyeOff } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useNavigate } from "react-router-dom";
 
 interface AttendanceCardProps {
   attendance: {
@@ -27,6 +27,8 @@ interface AttendanceCardProps {
 }
 
 export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
+  const navigate = useNavigate();
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "waiting": return "bg-green-500";
@@ -69,6 +71,10 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
     if (attendance.isCompleted) return "Atendimento realizado";
     if (attendance.status === "in-service") return "Continuar atendimento";
     return "Realizar atendimento";
+  };
+
+  const handleEscutaInicial = () => {
+    navigate(`/escuta-inicial?cidadao=${attendance.id}`);
   };
 
   return (
@@ -147,6 +153,7 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
                     size="sm" 
                     variant={attendance.hasInitialListening ? "outline" : "default"}
                     className="flex items-center gap-2"
+                    onClick={handleEscutaInicial}
                   >
                     {attendance.hasInitialListening ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     {attendance.hasInitialListening ? "Ver escuta" : "Escuta inicial"}
