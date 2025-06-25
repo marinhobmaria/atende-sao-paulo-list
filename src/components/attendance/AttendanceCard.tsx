@@ -159,26 +159,26 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
                 </div>
               </div>
 
-              {/* Grid de informações profissionais */}
-              <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs">
-                <div className="text-gray-700">
+              {/* Informações profissionais centralizadas */}
+              <div className="text-center space-y-0.5 py-1">
+                <div className="text-xs text-gray-700">
                   <span className="font-medium text-gray-800">Profissional:</span> {professionalInfo.name}
                 </div>
                 
-                <div className="text-gray-700">
-                  <span className="font-medium text-gray-800">Equipe:</span> {attendance.team}
-                </div>
-
                 {professionalInfo.specialty && (
-                  <div className="text-gray-700 col-span-2">
+                  <div className="text-xs text-gray-700">
                     <span className="font-medium text-gray-800">Especialidade:</span> {professionalInfo.specialty}
                   </div>
                 )}
+
+                <div className="text-xs text-gray-700">
+                  <span className="font-medium text-gray-800">Equipe:</span> {attendance.team}
+                </div>
               </div>
 
               {/* Tipos de serviço compactos */}
               {attendance.serviceTypes.length > 0 && (
-                <div className="flex items-center gap-1 flex-wrap">
+                <div className="flex items-center gap-1 flex-wrap justify-center">
                   <span className="text-xs font-medium text-gray-800">Serviços:</span>
                   {attendance.serviceTypes.map((type, index) => (
                     <Badge key={index} variant="outline" className="text-xs px-1.5 py-0.5">

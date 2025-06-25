@@ -1,27 +1,30 @@
 
 import { useState } from "react";
-import { AttendanceList } from "@/components/attendance/AttendanceList";
+import { AttendanceList, getStatusCounts } from "@/components/attendance/AttendanceList";
 import { AttendanceHeader } from "@/components/attendance/AttendanceHeader";
 import { AddCitizen } from "@/components/attendance/AddCitizen";
+import { StatusCounters } from "@/components/attendance/StatusCounters";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Home } from "lucide-react";
 
 // Mock data for queue counts - in a real app this would come from a store/context
-const mockQueueCount = 15;
-const mockWaitingCount = 8;
+const mockQueueCount = 50;
+const mockWaitingCount = getStatusCounts().waiting;
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showMyAttendances, setShowMyAttendances] = useState(false);
   const [sortBy, setSortBy] = useState("arrival");
   const [filters, setFilters] = useState({
-    status: ["waiting", "in-service", "initial-listening"],
+    status: ["waiting", "in-service", "initial-listening", "vaccination"],
     period: { start: new Date(), end: new Date() },
     serviceType: [],
     team: [],
     professional: [],
     onlyUnfinished: false
   });
+
+  const statusCounts = getStatusCounts();
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -53,6 +56,16 @@ const Index = () => {
           filters={filters}
           setFilters={setFilters}
         />
+
+        {/* Status Counters */}
+        <div className="bg-white rounded-lg shadow-sm border p-4">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Status da Fila</h3>
+          <StatusCounters 
+            statusCounts={statusCounts}
+            filters={filters}
+            setFilters={setFilters}
+          />
+        </div>
 
         {/* Add Citizen Section */}
         <AddCitizen
