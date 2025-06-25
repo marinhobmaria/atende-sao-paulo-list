@@ -3,7 +3,6 @@ import { useState } from "react";
 import { AttendanceList, getStatusCounts } from "@/components/attendance/AttendanceList";
 import { AttendanceHeader } from "@/components/attendance/AttendanceHeader";
 import { AddCitizen } from "@/components/attendance/AddCitizen";
-import { StatusCounters } from "@/components/attendance/StatusCounters";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Home } from "lucide-react";
 
@@ -57,20 +56,13 @@ const Index = () => {
           setFilters={setFilters}
         />
 
-        {/* Status Counters */}
-        <div className="bg-white rounded-lg shadow-sm border p-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Status da Fila</h3>
-          <StatusCounters 
-            statusCounts={statusCounts}
-            filters={filters}
-            setFilters={setFilters}
-          />
-        </div>
-
-        {/* Add Citizen Section */}
+        {/* Add Citizen Section - now includes status counters */}
         <AddCitizen
           queueCount={mockQueueCount}
           waitingCount={mockWaitingCount}
+          statusCounts={statusCounts}
+          filters={filters}
+          setFilters={setFilters}
         />
 
         {/* Attendance List */}
