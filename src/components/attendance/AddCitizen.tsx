@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users, Clock, Plus } from "lucide-react";
 import { CitizenSearch } from "./CitizenSearch";
-import { ProfessionalSearch, Professional } from "./ProfessionalSearch";
-import { TeamSearch, Team } from "./TeamSearch";
+import { ProfessionalSearch } from "./ProfessionalSearch";
+import { TeamSearch } from "./TeamSearch";
 import { TodayAppointmentsList } from "./TodayAppointmentsList";
 import { Citizen, DayAppointment, addCitizenToQueue, mockAttendanceQueue } from "@/data/mockCitizens";
 import { useToast } from "@/hooks/use-toast";
@@ -87,14 +87,6 @@ export const AddCitizen = ({ queueCount, waitingCount }: AddCitizenProps) => {
     setServiceTypes(appointment.serviceType);
   };
 
-  const handleProfessionalSelect = (professional: Professional) => {
-    setSelectedProfessional(professional.name);
-  };
-
-  const handleTeamSelect = (team: Team) => {
-    setSelectedTeam(team.name);
-  };
-
   return (
     <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
       <CardContent className="p-6">
@@ -120,6 +112,7 @@ export const AddCitizen = ({ queueCount, waitingCount }: AddCitizenProps) => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
           <div className="relative">
             <CitizenSearch
+              selectedCitizen={selectedCitizen}
               onCitizenSelect={setSelectedCitizen}
               onShowAppointments={() => setShowAppointments(!showAppointments)}
             />
@@ -131,16 +124,14 @@ export const AddCitizen = ({ queueCount, waitingCount }: AddCitizenProps) => {
           </div>
           
           <ProfessionalSearch
-            value={selectedProfessional}
-            onChange={setSelectedProfessional}
-            onProfessionalSelect={handleProfessionalSelect}
+            selectedProfessional={selectedProfessional}
+            onProfessionalSelect={setSelectedProfessional}
             disabled={!!selectedAppointment}
           />
           
           <TeamSearch
-            value={selectedTeam}
-            onChange={setSelectedTeam}
-            onTeamSelect={handleTeamSelect}
+            selectedTeam={selectedTeam}
+            onTeamSelect={setSelectedTeam}
             disabled={!!selectedAppointment}
           />
           
