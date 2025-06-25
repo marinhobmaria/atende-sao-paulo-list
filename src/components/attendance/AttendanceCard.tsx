@@ -27,7 +27,6 @@ interface AttendanceCardProps {
     hasInitialListening: boolean;
     hasPreService: boolean;
     isCompleted: boolean;
-    scheduledAppointment?: any;
   };
 }
 
@@ -166,15 +165,15 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
                   <span className="font-medium text-gray-800">Profissional:</span> {professionalInfo.name}
                 </div>
                 
-                {professionalInfo.specialty && (
-                  <div className="text-gray-700">
-                    <span className="font-medium text-gray-800">Especialidade:</span> {professionalInfo.specialty}
-                  </div>
-                )}
-
                 <div className="text-gray-700">
                   <span className="font-medium text-gray-800">Equipe:</span> {attendance.team}
                 </div>
+
+                {professionalInfo.specialty && (
+                  <div className="text-gray-700 col-span-2">
+                    <span className="font-medium text-gray-800">Especialidade:</span> {professionalInfo.specialty}
+                  </div>
+                )}
               </div>
 
               {/* Tipos de serviço compactos */}
