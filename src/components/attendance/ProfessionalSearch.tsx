@@ -71,20 +71,19 @@ export const ProfessionalSearch = ({
   disabled = false
 }: ProfessionalSearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const searchRef = useRef<HTMLDivElement>(null);
 
   const filteredProfessionals = useMemo(() => {
-    if (!searchTerm.trim()) return [];
+    if (!value.trim()) return [];
     
-    const term = searchTerm.toLowerCase().trim();
+    const term = value.toLowerCase().trim();
     return mockProfessionals.filter(professional => 
       professional.name.toLowerCase().includes(term) ||
       professional.cpf.includes(term) ||
       professional.specialty.toLowerCase().includes(term) ||
       professional.team.toLowerCase().includes(term)
     );
-  }, [searchTerm]);
+  }, [value]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -99,14 +98,12 @@ export const ProfessionalSearch = ({
 
   const handleInputChange = (newValue: string) => {
     if (disabled) return;
-    setSearchTerm(newValue);
     onChange(newValue);
     setIsOpen(true);
   };
 
   const handleProfessionalSelect = (professional: Professional) => {
     onChange(professional.name);
-    setSearchTerm(professional.name);
     setIsOpen(false);
     onProfessionalSelect?.(professional);
   };
@@ -117,10 +114,10 @@ export const ProfessionalSearch = ({
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
           placeholder={disabled ? "Preenchido automaticamente" : "Nome, CPF, especialidade ou equipe"}
-          value={disabled ? value : searchTerm}
+          value={value}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => !disabled && setIsOpen(true)}
-          className="pl-10"
+          className="pl-10 pr-8"
           disabled={disabled}
         />
       </div>
@@ -165,7 +162,7 @@ export const ProfessionalSearch = ({
                 </Card>
               ))}
             </div>
-          ) : searchTerm.trim() && (
+          ) : value.trim() && (
             <div className="p-4 text-center">
               <p className="text-gray-500">Nenhum profissional encontrado</p>
             </div>

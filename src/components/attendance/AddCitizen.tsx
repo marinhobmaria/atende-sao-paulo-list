@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, X, Calendar, Search } from "lucide-react";
+import { Plus, X, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CitizenOnlySearch } from "./CitizenOnlySearch";
 import { TodayAppointmentsList } from "./TodayAppointmentsList";
@@ -26,8 +26,6 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
   const [serviceTypes, setServiceTypes] = useState<string[]>([]);
   const [isFromAppointment, setIsFromAppointment] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<DayAppointment | null>(null);
-  const [showAppointmentSelect, setShowAppointmentSelect] = useState(false);
-  const [searchMode, setSearchMode] = useState<'citizen' | 'appointment'>('citizen');
   const [showTodayAppointments, setShowTodayAppointments] = useState(false);
   const { toast } = useToast();
 
@@ -53,9 +51,39 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     setServiceTypes([]);
     setIsFromAppointment(false);
     setSelectedAppointment(null);
-    setShowAppointmentSelect(false);
-    setSearchMode('citizen');
     setShowTodayAppointments(false);
+  };
+
+  const clearCitizen = () => {
+    setCitizen("");
+    setSelectedCitizen(null);
+    setSelectedAppointment(null);
+    setIsFromAppointment(false);
+    setProfessional("");
+    setSelectedProfessional(null);
+    setTeam("");
+    setSelectedTeam(null);
+    setServiceTypes([]);
+  };
+
+  const clearProfessional = () => {
+    setProfessional("");
+    setSelectedProfessional(null);
+  };
+
+  const clearTeam = () => {
+    setTeam("");
+    setSelectedTeam(null);
+  };
+
+  const clearAppointment = () => {
+    setSelectedAppointment(null);
+    setIsFromAppointment(false);
+    setProfessional("");
+    setSelectedProfessional(null);
+    setTeam("");
+    setSelectedTeam(null);
+    setServiceTypes([]);
   };
 
   const handleServiceTypeChange = (serviceType: string, checked: boolean) => {
@@ -72,18 +100,12 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     setIsFromAppointment(false);
     setSelectedAppointment(null);
     
-    // Check if citizen has appointments today
-    if (citizenData.todayAppointments && citizenData.todayAppointments.length > 0) {
-      setShowAppointmentSelect(true);
-    } else {
-      setShowAppointmentSelect(false);
-      // Clear professional and team fields to allow manual input
-      setProfessional("");
-      setSelectedProfessional(null);
-      setTeam("");
-      setSelectedTeam(null);
-      setServiceTypes([]);
-    }
+    // Clear professional and team fields to allow manual input
+    setProfessional("");
+    setSelectedProfessional(null);
+    setTeam("");
+    setSelectedTeam(null);
+    setServiceTypes([]);
   };
 
   const handleAppointmentSelect = (appointment: DayAppointment, citizenData: Citizen) => {
@@ -94,7 +116,6 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     setTeam(appointment.team);
     setServiceTypes(appointment.serviceType);
     setIsFromAppointment(true);
-    setShowAppointmentSelect(false);
     setShowTodayAppointments(false);
   };
 
@@ -193,108 +214,107 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
 
       {showAddCitizen && (
         <div className="px-3 pb-3 space-y-3">
-          {/* Search Mode Selection */}
-          <div>
-            <label className="text-sm font-medium mb-2 block">Tipo de busca</label>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant={searchMode === 'citizen' ? "default" : "outline"}
-                size="sm"
-                onClick={() => {
-                  setSearchMode('citizen');
-                  setShowTodayAppointments(false);
-                  clearFields();
-                }}
-                className="flex items-center gap-2"
-              >
-                <Search className="h-4 w-4" />
-                Buscar Munícipe
-              </Button>
-              <Button
-                type="button"
-                variant={searchMode === 'appointment' ? "default" : "outline"}
-                size="sm"
-                onClick={() => {
-                  setSearchMode('appointment');
-                  setShowTodayAppointments(true);
-                  clearFields();
-                }}
-                className="flex items-center gap-2"
-              >
-                <Calendar className="h-4 w-4" />
-                Próximos Agendamentos
-              </Button>
-            </div>
-          </div>
-
           {/* Munícipe Search */}
-          {searchMode === 'citizen' && (
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                Munícipe <span className="text-red-500">*</span>
-              </label>
+          <div>
+            <label className="text-sm font-medium mb-1 block">
+              Munícipe <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
               <CitizenOnlySearch
                 value={citizen}
                 onChange={setCitizen}
                 onCitizenSelect={handleCitizenSelect}
                 onNewCitizen={handleNewCitizen}
               />
-              {!citizen.trim() && (
-                <p className="text-xs text-red-500 mt-1">Campo obrigatório</p>
-              )}
-            </div>
-          )}
-
-          {/* Today Appointments List */}
-          {searchMode === 'appointment' && (
-            <div className="relative">
-              <label className="text-sm font-medium mb-1 block">
-                Próximos agendamentos do dia <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
+              {citizen.trim() && (
                 <Button
                   type="button"
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal"
-                  onClick={() => setShowTodayAppointments(!showTodayAppointments)}
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearCitizen}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-gray-100"
                 >
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {selectedAppointment 
-                    ? `${selectedAppointment.time} - ${selectedCitizen?.name}`
-                    : "Selecione um agendamento do dia"
-                  }
+                  <X className="h-3 w-3" />
                 </Button>
-                <TodayAppointmentsList
-                  onAppointmentSelect={handleAppointmentSelect}
-                  isOpen={showTodayAppointments}
-                  onClose={() => setShowTodayAppointments(false)}
-                />
-              </div>
-              {!selectedAppointment && (
-                <p className="text-xs text-red-500 mt-1">Campo obrigatório</p>
               )}
             </div>
-          )}
+            {!citizen.trim() && (
+              <p className="text-xs text-red-500 mt-1">Campo obrigatório</p>
+            )}
+          </div>
 
-          {/* Select specific appointment if citizen has multiple appointments */}
-          {showAppointmentSelect && selectedCitizen?.todayAppointments && selectedCitizen.todayAppointments.length > 0 && (
+          {/* Show appointment field only if citizen has appointments */}
+          {selectedCitizen && selectedCitizen.todayAppointments && selectedCitizen.todayAppointments.length > 0 && (
             <div>
-              <label className="text-sm font-medium mb-1 block">Próximo agendamento do dia</label>
-              <Select onValueChange={handleSpecificAppointmentSelect}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um agendamento (opcional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  {selectedCitizen.todayAppointments.map((appointment) => (
-                    <SelectItem key={appointment.id} value={appointment.id}>
-                      {appointment.time} - {appointment.professional} - {appointment.serviceType.join(", ")}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium mb-1 block">Próximo agendamento do dia (opcional)</label>
+              
+              {selectedCitizen.todayAppointments.length === 1 ? (
+                <div className="relative">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                    onClick={() => {
+                      if (selectedAppointment) {
+                        clearAppointment();
+                      } else {
+                        const appointment = selectedCitizen.todayAppointments![0];
+                        setSelectedAppointment(appointment);
+                        setProfessional(appointment.professional);
+                        setTeam(appointment.team);
+                        setServiceTypes(appointment.serviceType);
+                        setIsFromAppointment(true);
+                      }
+                    }}
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {selectedAppointment 
+                      ? `${selectedAppointment.time} - ${selectedAppointment.professional} - ${selectedAppointment.serviceType.join(", ")}`
+                      : `${selectedCitizen.todayAppointments[0].time} - ${selectedCitizen.todayAppointments[0].professional} - ${selectedCitizen.todayAppointments[0].serviceType.join(", ")}`
+                    }
+                  </Button>
+                  {selectedAppointment && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearAppointment}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-gray-100"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="relative">
+                  <Select onValueChange={handleSpecificAppointmentSelect} value={selectedAppointment?.id || ""}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um agendamento (opcional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {selectedCitizen.todayAppointments.map((appointment) => (
+                        <SelectItem key={appointment.id} value={appointment.id}>
+                          {appointment.time} - {appointment.professional} - {appointment.serviceType.join(", ")}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedAppointment && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearAppointment}
+                      className="absolute right-8 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-gray-100 z-10"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+              )}
+              
               <p className="text-xs text-gray-500 mt-1">
-                Se não selecionado, você poderá preencher os campos manualmente
+                Se selecionado, preencherá automaticamente profissional, equipe e tipo de serviço
               </p>
             </div>
           )}
@@ -306,22 +326,48 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-sm font-medium mb-1 block">Profissional</label>
-                  <ProfessionalSearch
-                    value={professional}
-                    onChange={setProfessional}
-                    onProfessionalSelect={handleProfessionalSelect}
-                    disabled={isFromAppointment}
-                  />
+                  <div className="relative">
+                    <ProfessionalSearch
+                      value={professional}
+                      onChange={setProfessional}
+                      onProfessionalSelect={handleProfessionalSelect}
+                      disabled={isFromAppointment}
+                    />
+                    {professional.trim() && !isFromAppointment && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearProfessional}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-gray-100"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 <div>
                   <label className="text-sm font-medium mb-1 block">Equipe</label>
-                  <TeamSearch
-                    value={team}
-                    onChange={setTeam}
-                    onTeamSelect={handleTeamSelect}
-                    disabled={isFromAppointment}
-                  />
+                  <div className="relative">
+                    <TeamSearch
+                      value={team}
+                      onChange={setTeam}
+                      onTeamSelect={handleTeamSelect}
+                      disabled={isFromAppointment}
+                    />
+                    {team.trim() && !isFromAppointment && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearTeam}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-gray-100"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
 

@@ -21,13 +21,12 @@ export const CitizenOnlySearch = ({
   onNewCitizen 
 }: CitizenOnlySearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const searchRef = useRef<HTMLDivElement>(null);
 
   const filteredCitizens = useMemo(() => {
-    if (!searchTerm.trim()) return [];
+    if (!value.trim()) return [];
     
-    const term = searchTerm.toLowerCase().trim();
+    const term = value.toLowerCase().trim();
     return mockCitizens.filter(citizen => 
       citizen.name.toLowerCase().includes(term) ||
       citizen.cpf.includes(term) ||
@@ -35,7 +34,7 @@ export const CitizenOnlySearch = ({
       citizen.prontuario.includes(term) ||
       citizen.birthDate.includes(term)
     );
-  }, [searchTerm]);
+  }, [value]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -49,14 +48,12 @@ export const CitizenOnlySearch = ({
   }, []);
 
   const handleInputChange = (newValue: string) => {
-    setSearchTerm(newValue);
     onChange(newValue);
     setIsOpen(true);
   };
 
   const handleCitizenSelect = (citizen: Citizen) => {
     onChange(citizen.name);
-    setSearchTerm(citizen.name);
     setIsOpen(false);
     onCitizenSelect?.(citizen);
   };
@@ -67,10 +64,10 @@ export const CitizenOnlySearch = ({
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
           placeholder="Nome, CPF, CNS, Número do prontuário ou data de nascimento"
-          value={searchTerm}
+          value={value}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => setIsOpen(true)}
-          className="pl-10"
+          className="pl-10 pr-8"
         />
       </div>
 
@@ -126,7 +123,7 @@ export const CitizenOnlySearch = ({
                 </Card>
               ))}
             </div>
-          ) : searchTerm.trim() && (
+          ) : value.trim() && (
             <div className="p-4 text-center">
               <p className="text-gray-500 mb-3">Nenhum registro encontrado</p>
               <Button 

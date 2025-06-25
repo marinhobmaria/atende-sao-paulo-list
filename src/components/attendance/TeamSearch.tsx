@@ -19,7 +19,7 @@ const mockTeams: Team[] = [
   },
   {
     id: "team_2",
-    name: "Equipe APS 2",
+    name: "Equipe APS 2", 
     ine: "INE456"
   },
   {
@@ -31,6 +31,16 @@ const mockTeams: Team[] = [
     id: "team_4",
     name: "Equipe APS 4",
     ine: "INE457"
+  },
+  {
+    id: "team_5",
+    name: "Equipe ESF Vila Nova",
+    ine: "INE790"
+  },
+  {
+    id: "team_6",
+    name: "Equipe ESF Centro",
+    ine: "INE791"
   }
 ];
 
@@ -48,18 +58,17 @@ export const TeamSearch = ({
   disabled = false
 }: TeamSearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const searchRef = useRef<HTMLDivElement>(null);
 
   const filteredTeams = useMemo(() => {
-    if (!searchTerm.trim()) return [];
+    if (!value.trim()) return [];
     
-    const term = searchTerm.toLowerCase().trim();
+    const term = value.toLowerCase().trim();
     return mockTeams.filter(team => 
       team.name.toLowerCase().includes(term) ||
       team.ine.toLowerCase().includes(term)
     );
-  }, [searchTerm]);
+  }, [value]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -74,14 +83,12 @@ export const TeamSearch = ({
 
   const handleInputChange = (newValue: string) => {
     if (disabled) return;
-    setSearchTerm(newValue);
     onChange(newValue);
     setIsOpen(true);
   };
 
   const handleTeamSelect = (team: Team) => {
     onChange(team.name);
-    setSearchTerm(team.name);
     setIsOpen(false);
     onTeamSelect?.(team);
   };
@@ -92,10 +99,10 @@ export const TeamSearch = ({
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
           placeholder={disabled ? "Preenchido automaticamente" : "Nome da equipe ou INE"}
-          value={disabled ? value : searchTerm}
+          value={value}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => !disabled && setIsOpen(true)}
-          className="pl-10"
+          className="pl-10 pr-8"
           disabled={disabled}
         />
       </div>
@@ -134,7 +141,7 @@ export const TeamSearch = ({
                 </Card>
               ))}
             </div>
-          ) : searchTerm.trim() && (
+          ) : value.trim() && (
             <div className="p-4 text-center">
               <p className="text-gray-500">Nenhuma equipe encontrada</p>
             </div>
