@@ -1,12 +1,12 @@
 
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, ArrowLeft, User, Edit, CheckCircle } from "lucide-react";
+import { Home } from "lucide-react";
 import { EscutaInicialForm } from "@/components/escuta-inicial/EscutaInicialForm";
+import { CitizenCompactInfo } from "@/components/escuta-inicial/CitizenCompactInfo";
 import { FinalizacaoAtendimentoModal } from "@/components/finalizacao/FinalizacaoAtendimentoModal";
 import { toast } from "@/hooks/use-toast";
 
@@ -31,13 +31,13 @@ const EscutaInicial = () => {
     motherName: "Llian Cristina de Souza Guimarães",
     status: "Escuta inicial realizada",
     healthConditions: ["Hipertenso", "Diabético", "Gestante"],
-    allergies: ["Dipirona", "Leite", "Mofo"]
+    allergies: ["Dipirona", "Leite", "Mofo"],
+    photo: "https://images.unsplash.com/photo-1494790108755-2616b812e672?w=150&h=150&fit=crop&crop=face"
   };
 
   const handleFinalizarEscuta = async (data: any) => {
     setIsLoading(true);
     try {
-      // Aqui seria a chamada para salvar os dados da escuta inicial
       console.log("Dados da escuta inicial:", data);
       setEscutaData(data);
       
@@ -46,7 +46,6 @@ const EscutaInicial = () => {
         description: "Os dados foram salvos. Agora finalize o atendimento.",
       });
 
-      // Abrir modal de finalização
       setShowFinalizacao(true);
     } catch (error) {
       toast({
@@ -65,7 +64,6 @@ const EscutaInicial = () => {
       console.log("Dados da finalização:", data);
       console.log("Dados da escuta inicial:", escutaData);
       
-      // Simular processamento
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       toast({
@@ -75,7 +73,6 @@ const EscutaInicial = () => {
 
       setShowFinalizacao(false);
 
-      // Redirecionar baseado no desfecho da escuta inicial
       if (escutaData?.desfecho === "liberar") {
         navigate("/");
       } else if (escutaData?.desfecho === "adicionar_lista") {
@@ -125,117 +122,42 @@ const EscutaInicial = () => {
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Header com informações do cidadão */}
+        {/* Informações compactas do cidadão */}
+        <CitizenCompactInfo 
+          cidadao={cidadao}
+          onBack={() => navigate("/")}
+        />
+
+        {/* Tabs Container */}
         <Card className="shadow-lg">
-          <CardHeader className="pb-6">
-            <div className="flex items-start justify-between">
-              <div className="flex items-start gap-4">
-                {/* Avatar */}
-                <div className="w-16 h-16 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  <User className="h-8 w-8" />
+          <CardContent className="p-6">
+            <Tabs defaultValue="escuta-inicial" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="folha-rosto">Folha Rosto</TabsTrigger>
+                <TabsTrigger value="escuta-inicial">Escuta Inicial</TabsTrigger>
+                <TabsTrigger value="agendamentos">Agendamentos</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="folha-rosto" className="mt-6">
+                <div className="text-center py-8 text-gray-500">
+                  <p>Conteúdo da Folha Rosto será implementado aqui</p>
                 </div>
-                
-                {/* Informações principais */}
-                <div className="space-y-4 flex-1">
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Coluna 1 */}
-                    <div className="space-y-2">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h1 className="text-xl font-semibold text-gray-900">{cidadao.name}</h1>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                            <Edit className="h-3 w-3" />
-                          </Button>
-                        </div>
-                        <p className="text-sm text-gray-600 font-medium">Nome social</p>
-                        <p className="text-sm text-gray-800">({cidadao.socialName})</p>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium text-gray-600">CPF</p>
-                          <p className="text-sm text-gray-900">{cidadao.cpf}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-600">Nome da mãe</p>
-                          <p className="text-sm text-gray-900">{cidadao.motherName}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium text-gray-600">Data de nascimento</p>
-                          <p className="text-sm text-gray-900">{cidadao.birthDate} {cidadao.age}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-600">Escuta inicial realizada</p>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">Sexo</p>
-                        <p className="text-sm text-gray-900">{cidadao.sex}</p>
-                      </div>
-                    </div>
+              </TabsContent>
 
-                    {/* Coluna 2 - Condições de Saúde */}
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600 mb-2">Condições e situações de saúde</p>
-                        <div className="flex flex-wrap gap-2">
-                          {cidadao.healthConditions.map((condition, index) => (
-                            <Badge 
-                              key={index} 
-                              className={`text-white text-xs px-2 py-1 ${
-                                condition === "Hipertenso" ? "bg-green-600" : 
-                                condition === "Diabético" ? "bg-green-600" : 
-                                condition === "Gestante" ? "bg-blue-500" : "bg-gray-500"
-                              }`}
-                            >
-                              {condition}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+              <TabsContent value="escuta-inicial" className="mt-6">
+                <EscutaInicialForm
+                  onSubmit={handleFinalizarEscuta}
+                  onCancel={handleCancelar}
+                  isLoading={isLoading}
+                />
+              </TabsContent>
 
-                    {/* Coluna 3 - Alergias */}
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600 mb-2">Alergias/Reações adversas</p>
-                        <div className="flex flex-wrap gap-2">
-                          {cidadao.allergies.map((allergy, index) => (
-                            <Badge 
-                              key={index} 
-                              className="bg-red-500 text-white text-xs px-2 py-1"
-                            >
-                              ⚠ {allergy}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <TabsContent value="agendamentos" className="mt-6">
+                <div className="text-center py-8 text-gray-500">
+                  <p>Conteúdo dos Agendamentos será implementado aqui</p>
                 </div>
-              </div>
-              
-              <Button
-                variant="outline"
-                onClick={() => navigate("/")}
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Voltar
-              </Button>
-            </div>
-          </CardHeader>
-
-          <CardContent>
-            <EscutaInicialForm
-              onSubmit={handleFinalizarEscuta}
-              onCancel={handleCancelar}
-              isLoading={isLoading}
-            />
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
 

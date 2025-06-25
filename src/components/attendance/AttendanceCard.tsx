@@ -26,6 +26,7 @@ interface AttendanceCardProps {
     hasInitialListening: boolean;
     hasPreService: boolean;
     isCompleted: boolean;
+    addedBy?: string; // Add this property to fix the build error
   };
 }
 
@@ -100,6 +101,12 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
     console.log(`Status changed to: ${newStatus}`);
   };
 
+  // Create attendance object with addedBy property for AttendanceActions
+  const attendanceWithAddedBy = {
+    ...attendance,
+    addedBy: attendance.addedBy || "Sistema"
+  };
+
   return (
     <Card className="hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer">
       <CardContent className="p-4">
@@ -131,7 +138,7 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
               
               {/* Idade e horário */}
               <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
-                <span className="font-medium">{detailedAge}</span>
+                <span className="font-medium">{calculateDetailedAge(attendance.citizen.age)}</span>
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
                   <span>Inclusão: {attendance.arrivalTime}</span>
@@ -141,10 +148,10 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
               {/* Informações profissionais em linha */}
               <div className="flex flex-wrap gap-4 text-sm text-gray-700">
                 <div>
-                  <span className="font-medium text-gray-800">Profissional:</span> {professionalInfo.name}
+                  <span className="font-medium text-gray-800">Profissional:</span> {formatProfessionalInfo(attendance.professional).name}
                 </div>
                 <div>
-                  <span className="font-medium text-gray-800">Especialidade:</span> {professionalInfo.specialty || attendance.team}
+                  <span className="font-medium text-gray-800">Especialidade:</span> {formatProfessionalInfo(attendance.professional).specialty || attendance.team}
                 </div>
                 <div>
                   <span className="font-medium text-gray-800">Equipe:</span> {attendance.team}
@@ -159,7 +166,7 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
           {/* Right side - Action buttons */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <AttendanceActions 
-              attendance={attendance} 
+              attendance={attendanceWithAddedBy} 
               onStatusChange={handleStatusChange}
             />
           </div>
