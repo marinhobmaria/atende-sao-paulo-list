@@ -83,11 +83,11 @@ export const AddCitizen = ({ queueCount, waitingCount, statusCounts, filters, se
 
       {/* Modal de busca de cidadão */}
       <Dialog open={showCitizenSearch} onOpenChange={setShowCitizenSearch}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>Buscar Munícipe</DialogTitle>
+            <DialogTitle className="text-xl font-semibold">Buscar Munícipe</DialogTitle>
           </DialogHeader>
-          <div className="mt-4">
+          <div className="flex-1 overflow-hidden">
             <CitizenSearch
               value={searchValue}
               onChange={setSearchValue}
