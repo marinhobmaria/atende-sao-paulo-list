@@ -23,6 +23,7 @@ const Atendimento = () => {
     name: "Maria Antonieta Albuquerque Soares",
     socialName: "Mário Henrique da Silva Oliveira Gomes dos Santos Albuquerque Soares",
     cpf: "094556799-80",
+    cns: "123456789012345",
     birthDate: "10/02/2004",
     age: "20a 8m e 2d",
     sex: "Feminino",

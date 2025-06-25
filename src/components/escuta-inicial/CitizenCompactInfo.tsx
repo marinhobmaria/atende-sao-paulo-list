@@ -12,6 +12,7 @@ interface CitizenCompactInfoProps {
     name: string;
     socialName: string;
     cpf: string;
+    cns: string;
     birthDate: string;
     age: string;
     sex: string;
@@ -78,13 +79,13 @@ export const CitizenCompactInfo = ({ cidadao, onBack }: CitizenCompactInfoProps)
                     <span className="font-medium text-gray-600">CPF:</span> {cidadao.cpf}
                   </div>
                   <div>
+                    <span className="font-medium text-gray-600">CNS:</span> {cidadao.cns}
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Data de Nascimento:</span> {cidadao.birthDate}
+                  </div>
+                  <div>
                     <span className="font-medium text-gray-600">Idade:</span> {cidadao.age}
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-600">Sexo:</span> {cidadao.sex}
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-600">Nascimento:</span> {cidadao.birthDate}
                   </div>
                 </div>
 
