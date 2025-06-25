@@ -10,6 +10,18 @@ export interface Citizen {
   photo?: string;
 }
 
+export interface DayAppointment {
+  id: string;
+  citizenId: string;
+  time: string;
+  professional: string;
+  professionalCpf: string;
+  professionalCbo: string;
+  professionalIne: string;
+  team: string;
+  serviceType: string[];
+}
+
 const firstNames = [
   "Ana", "Carlos", "Maria", "João", "Fernanda", "Pedro", "Juliana", "Roberto", 
   "Camila", "Diego", "Larissa", "Bruno", "Patrícia", "Marcos", "Letícia", 
@@ -97,4 +109,52 @@ export const generateMockCitizens = (): Citizen[] => {
   return citizens;
 };
 
+// Generate some appointments for today
+export const generateDayAppointments = (): DayAppointment[] => {
+  const appointments: DayAppointment[] = [];
+  const citizens = generateMockCitizens();
+  
+  const professionals = [
+    { name: "Dr. João Silva", cpf: "123.456.789-00", cbo: "225125 - Médico clínico", ine: "INE123" },
+    { name: "Dra. Maria Santos", cpf: "987.654.321-00", cbo: "223505 - Enfermeiro", ine: "INE456" },
+    { name: "Enf. Ana Costa", cpf: "456.789.123-00", cbo: "225142 - Médico generalista", ine: "INE789" }
+  ];
+  
+  const teams = ["Equipe APS 1", "Equipe APS 2", "Equipe APS 3"];
+  
+  const serviceTypes = [
+    "CONSULTA MÉDICA",
+    "ENFERMAGEM", 
+    "ODONTOLOGIA",
+    "VACINA",
+    "CURATIVO"
+  ];
+  
+  // Generate 5 appointments for today
+  for (let i = 0; i < 5; i++) {
+    const citizen = citizens[Math.floor(Math.random() * citizens.length)];
+    const professional = professionals[Math.floor(Math.random() * professionals.length)];
+    const team = teams[Math.floor(Math.random() * teams.length)];
+    const serviceType = [serviceTypes[Math.floor(Math.random() * serviceTypes.length)]];
+    
+    const hour = 13 + i; // Starting from 13:00
+    const minutes = Math.floor(Math.random() * 6) * 10; // 00, 10, 20, 30, 40, 50
+    
+    appointments.push({
+      id: `appointment_${i + 1}`,
+      citizenId: citizen.id,
+      time: `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`,
+      professional: professional.name,
+      professionalCpf: professional.cpf,
+      professionalCbo: professional.cbo,
+      professionalIne: professional.ine,
+      team,
+      serviceType
+    });
+  }
+  
+  return appointments;
+};
+
 export const mockCitizens = generateMockCitizens();
+export const mockDayAppointments = generateDayAppointments();

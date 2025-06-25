@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CitizenSearch } from "./CitizenSearch";
-import { Citizen } from "@/data/mockCitizens";
+import { Citizen, DayAppointment } from "@/data/mockCitizens";
 
 interface AddCitizenProps {
   showAddCitizen: boolean;
@@ -19,6 +19,7 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
   const [professional, setProfessional] = useState("");
   const [team, setTeam] = useState("");
   const [serviceTypes, setServiceTypes] = useState<string[]>([]);
+  const [isFromAppointment, setIsFromAppointment] = useState(false);
   const { toast } = useToast();
 
   const serviceTypeOptions = [
@@ -47,6 +48,7 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     setProfessional("");
     setTeam("");
     setServiceTypes([]);
+    setIsFromAppointment(false);
   };
 
   const handleServiceTypeChange = (serviceType: string, checked: boolean) => {
@@ -60,10 +62,19 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
   const handleCitizenSelect = (citizenData: Citizen) => {
     setSelectedCitizen(citizenData);
     setCitizen(citizenData.name);
+    setIsFromAppointment(false);
+  };
+
+  const handleAppointmentSelect = (appointment: DayAppointment, citizenData: Citizen) => {
+    setSelectedCitizen(citizenData);
+    setCitizen(citizenData.name);
+    setProfessional(appointment.professional);
+    setTeam(appointment.team);
+    setServiceTypes(appointment.serviceType);
+    setIsFromAppointment(true);
   };
 
   const handleNewCitizen = () => {
-    // Aqui você pode abrir um modal ou formulário para cadastrar um novo munícipe
     toast({
       title: "Funcionalidade em desenvolvimento",
       description: "Cadastro de novo munícipe será implementado em breve",
@@ -122,6 +133,7 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
               value={citizen}
               onChange={setCitizen}
               onCitizenSelect={handleCitizenSelect}
+              onAppointmentSelect={handleAppointmentSelect}
               onNewCitizen={handleNewCitizen}
             />
             {!citizen.trim() && (
@@ -129,8 +141,8 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
             )}
           </div>
 
-          {/* Informações do munícipe selecionado */}
-          {selectedCitizen && (
+          {/* Don't show citizen info if selected from appointment */}
+          {selectedCitizen && !isFromAppointment && (
             <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
               <h4 className="font-medium text-blue-900 mb-2">Informações do Munícipe</h4>
               <div className="grid grid-cols-2 gap-2 text-sm">
