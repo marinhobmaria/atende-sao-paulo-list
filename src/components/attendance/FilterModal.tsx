@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, X } from "lucide-react";
+import { CalendarIcon, X, RotateCcw } from "lucide-react";
 import { format } from "date-fns";
 
 interface FilterModalProps {
