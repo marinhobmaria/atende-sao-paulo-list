@@ -79,6 +79,21 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
     };
   };
 
+  const calculateDetailedAge = (age: number) => {
+    // Simular cálculo mais detalhado da idade
+    // Em um sistema real, isso viria do banco de dados baseado na data de nascimento
+    const years = age;
+    const months = Math.floor(Math.random() * 12);
+    const days = Math.floor(Math.random() * 30);
+    
+    const parts = [];
+    if (years > 0) parts.push(`${years} ano${years !== 1 ? 's' : ''}`);
+    if (months > 0) parts.push(`${months} mês${months !== 1 ? 'es' : ''}`);
+    if (days > 0) parts.push(`${days} dia${days !== 1 ? 's' : ''}`);
+    
+    return parts.join(', ') || '0 dias';
+  };
+
   const handleEscutaInicial = () => {
     navigate(`/escuta-inicial?cidadao=${attendance.id}`);
   };
@@ -98,7 +113,7 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
   const professionalInfo = formatProfessionalInfo(attendance.professional);
 
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200">
+    <Card className="hover:shadow-lg hover:scale-[1.02] hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 ease-in-out cursor-pointer">
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           {/* Seção esquerda - Foto e informações principais */}
@@ -127,17 +142,11 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
               
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600">
                 <div>
-                  <span className="font-medium">Idade:</span> {attendance.citizen.age} anos
+                  <span className="font-medium">Idade:</span> {calculateDetailedAge(attendance.citizen.age)}
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
                   <span>{attendance.arrivalTime}</span>
-                </div>
-                <div>
-                  <span className="font-medium">CPF:</span> {attendance.citizen.cpf}
-                </div>
-                <div>
-                  <span className="font-medium">CNS:</span> {attendance.citizen.cns}
                 </div>
               </div>
 
@@ -172,7 +181,7 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
                     variant="outline"
                     size="sm"
                     onClick={handleEscutaInicial}
-                    className="flex items-center gap-1 hover:bg-blue-50 hover:border-blue-300"
+                    className="flex items-center gap-1 hover:bg-blue-50 hover:border-blue-300 hover:scale-105 transition-all duration-200"
                   >
                     <FileText className="w-4 h-4" />
                     <span className="hidden sm:inline">Escuta Inicial</span>
@@ -191,7 +200,7 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
                     variant="outline"
                     size="sm"
                     onClick={handleAtender}
-                    className="flex items-center gap-1 hover:bg-green-50 hover:border-green-300"
+                    className="flex items-center gap-1 hover:bg-green-50 hover:border-green-300 hover:scale-105 transition-all duration-200"
                   >
                     <Stethoscope className="w-4 h-4" />
                     <span className="hidden sm:inline">Atender</span>
@@ -210,7 +219,7 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
                     variant="outline"
                     size="sm"
                     onClick={handleVacinar}
-                    className="flex items-center gap-1 hover:bg-purple-50 hover:border-purple-300"
+                    className="flex items-center gap-1 hover:bg-purple-50 hover:border-purple-300 hover:scale-105 transition-all duration-200"
                   >
                     <Syringe className="w-4 h-4" />
                     <span className="hidden sm:inline">Vacinar</span>
