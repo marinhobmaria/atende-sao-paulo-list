@@ -1,3 +1,4 @@
+
 import { Badge } from "@/components/ui/badge";
 
 interface StatusCountersProps {
@@ -18,36 +19,36 @@ export const StatusCounters = ({ statusCounts, filters, setFilters, queueCount }
       key: 'all',
       label: 'Fila',
       count: queueCount,
-      color: 'bg-blue-500 hover:bg-blue-600',
-      textColor: 'text-white'
+      color: 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300',
+      activeColor: 'bg-blue-100 text-blue-700 border border-blue-300'
     },
     {
       key: 'waiting',
       label: 'Aguardando',
       count: statusCounts.waiting,
-      color: 'bg-green-500 hover:bg-green-600',
-      textColor: 'text-white'
+      color: 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300',
+      activeColor: 'bg-green-100 text-green-700 border border-green-300'
     },
     {
       key: 'in-service',
       label: 'Em atendimento',
       count: statusCounts['in-service'],
-      color: 'bg-purple-500 hover:bg-purple-600',
-      textColor: 'text-white'
+      color: 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300',
+      activeColor: 'bg-purple-100 text-purple-700 border border-purple-300'
     },
     {
       key: 'initial-listening',
       label: 'Em escuta inicial',
       count: statusCounts['initial-listening'],
-      color: 'bg-pink-500 hover:bg-pink-600',
-      textColor: 'text-white'
+      color: 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300',
+      activeColor: 'bg-pink-100 text-pink-700 border border-pink-300'
     },
     {
       key: 'vaccination',
       label: 'Em vacinação',
       count: statusCounts.vaccination,
-      color: 'bg-purple-500 hover:bg-purple-600',
-      textColor: 'text-white'
+      color: 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300',
+      activeColor: 'bg-purple-100 text-purple-700 border border-purple-300'
     }
   ];
 
@@ -75,6 +76,13 @@ export const StatusCounters = ({ statusCounts, filters, setFilters, queueCount }
     }
   };
 
+  const isActive = (status: string) => {
+    if (status === 'all') {
+      return filters.status.length === 4;
+    }
+    return filters.status.length === 1 && filters.status.includes(status);
+  };
+
   return (
     <div className="flex flex-wrap gap-2">
       {statusConfig.map((config) => (
@@ -82,15 +90,9 @@ export const StatusCounters = ({ statusCounts, filters, setFilters, queueCount }
           key={config.key}
           onClick={() => handleStatusFilter(config.key)}
           className={`
-            ${config.color} ${config.textColor}
-            px-3 py-1.5 rounded-full font-medium text-sm
+            px-3 py-1.5 rounded-lg font-medium text-sm
             transition-all duration-200 cursor-pointer
-            border-2 border-transparent
-            ${(config.key === 'all' && filters.status.length === 4) ||
-              (config.key !== 'all' && filters.status.length === 1 && filters.status.includes(config.key))
-              ? 'ring-2 ring-blue-300 border-blue-200' 
-              : ''
-            }
+            ${isActive(config.key) ? config.activeColor : config.color}
           `}
         >
           {config.label}: {config.count}

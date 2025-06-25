@@ -21,6 +21,7 @@ interface CitizenCompactInfoProps {
     healthConditions: string[];
     allergies: string[];
     photo?: string;
+    serviceTypes?: string[];
   };
   onBack: () => void;
 }
@@ -49,20 +50,36 @@ export const CitizenCompactInfo = ({ cidadao, onBack }: CitizenCompactInfoProps)
     return "bg-yellow-500";
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "waiting": return "bg-green-500";
+      case "in-service": return "bg-purple-500";
+      case "initial-listening": return "bg-pink-500";
+      case "vaccination": return "bg-purple-500";
+      case "completed": return "bg-blue-500";
+      case "did-not-wait": return "bg-gray-500";
+      default: return "bg-gray-500";
+    }
+  };
+
   return (
     <TooltipProvider>
       <Card className="shadow-lg mb-6">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {/* Avatar */}
-              <Avatar className="w-16 h-16 flex-shrink-0">
-                <AvatarImage src={cidadao.photo} alt={cidadao.name} />
-                <AvatarFallback className="bg-teal-600 text-white font-bold text-xl">
-                  {cidadao.photo ? null : <User className="h-8 w-8" />}
-                  {!cidadao.photo && getInitials(cidadao.name)}
-                </AvatarFallback>
-              </Avatar>
+              {/* Avatar com indicador de status */}
+              <div className="relative">
+                <Avatar className="w-16 h-16 flex-shrink-0">
+                  <AvatarImage src={cidadao.photo} alt={cidadao.name} />
+                  <AvatarFallback className="bg-teal-600 text-white font-bold text-xl">
+                    {cidadao.photo ? null : <User className="h-8 w-8" />}
+                    {!cidadao.photo && getInitials(cidadao.name)}
+                  </AvatarFallback>
+                </Avatar>
+                {/* Indicador de status */}
+                <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full border-2 border-white ${getStatusColor(cidadao.status)}`}></div>
+              </div>
               
               {/* Informações compactas em linha */}
               <div className="flex-1">
@@ -87,6 +104,20 @@ export const CitizenCompactInfo = ({ cidadao, onBack }: CitizenCompactInfoProps)
                 </div>
 
                 <div className="mt-3 flex flex-wrap gap-4">
+                  {/* Serviços como tags cinza */}
+                  {cidadao.serviceTypes && cidadao.serviceTypes.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-600">Serviços:</span>
+                      <div className="flex flex-wrap gap-1">
+                        {cidadao.serviceTypes.map((service, index) => (
+                          <Badge key={index} className="bg-gray-500 text-white text-xs px-2 py-1">
+                            {service}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Condições de Saúde */}
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-gray-600">Condições:</span>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,9 +29,10 @@ const EscutaInicial = () => {
     age: "20a 8m e 2d",
     sex: "Feminino",
     motherName: "Llian Cristina de Souza Guimarães",
-    status: "Escuta inicial realizada",
+    status: "initial-listening",
     healthConditions: ["Hipertenso", "Diabético", "Gestante"],
     allergies: ["Dipirona", "Leite", "Mofo"],
+    serviceTypes: ["Escuta Inicial", "Consulta Médica"],
     photo: "https://images.unsplash.com/photo-1494790108755-2616b812e672?w=150&h=150&fit=crop&crop=face"
   };
 
