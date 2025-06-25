@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -28,40 +27,51 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
   const isAddedByCurrentUser = attendance.addedBy === mockCurrentUser.id;
   const canStartService = attendance.status === "waiting";
 
-  // Regras para exibição dos botões baseado no perfil
-  const canSeeInitialListening = ["MEDICO", "ENFERMEIRO"].includes(currentUserProfile);
-  const canSeePreService = ["MEDICO", "ENFERMEIRO"].includes(currentUserProfile);
+  // Determinar se é agendamento
+  const isScheduledAppointment = !!attendance.scheduledAppointment;
 
-  // Tooltips baseados no status
-  const getInitialListeningTooltip = () => {
-    if (attendance.hasInitialListening) return "visualizar escuta inicial";
-    if (attendance.status === "in-service") return "o cidadão ainda não fez escuta inicial";
-    if (attendance.status === "completed") return "cidadão sem escuta inicial";
-    return "Realizar escuta inicial";
-  };
+  // Regras dos botões baseado nas novas especificações
+  const getButtonsForAttendance = () => {
+    const buttons = [];
 
-  const getPreServiceTooltip = () => {
-    if (attendance.hasPreService) return "visualizar pré-atendimento";
-    if (attendance.status === "in-service") return "cidadão sem pré-atendimento";
-    if (attendance.status === "completed") return "cidadão sem pré-atendimento";
-    return "Realizar pré-atendimento";
-  };
-
-  const getAttendanceTooltip = () => {
-    if (attendance.isCompleted) return "atendimento realizado";
-    return "continuar atendimento";
-  };
-
-  const getVaccinationTooltip = () => {
-    if (attendance.status === "completed") return "atendimento de vacinação realizado";
-    if (attendance.status === "vaccination" && attendance.currentAttendingProfessional === mockCurrentUser.id) {
-      return "continuar vacinação";
+    // Botão Escuta Inicial / Pré-Consulta
+    if (isScheduledAppointment) {
+      // Para agendamentos: Pré-Consulta
+      buttons.push({
+        key: 'pre-consulta',
+        label: 'Pré-Consulta',
+        icon: FileText,
+        action: () => navigate(`/pre-atendimento?cidadao=${attendance.id}`),
+        disabled: attendance.hasPreService,
+        tooltip: attendance.hasPreService ? "Pré-consulta já realizada" : "Realizar pré-consulta"
+      });
+    } else {
+      // Para demanda espontânea: Escuta Inicial
+      buttons.push({
+        key: 'escuta-inicial',
+        label: 'Escuta Inicial',
+        icon: FileText,
+        action: () => navigate(`/escuta-inicial?cidadao=${attendance.id}`),
+        disabled: attendance.hasInitialListening,
+        tooltip: attendance.hasInitialListening ? "Escuta inicial já realizada" : "Realizar escuta inicial"
+      });
     }
-    if (attendance.status === "vaccination" && attendance.currentAttendingProfessional !== mockCurrentUser.id) {
-      return "cidadão está em atendimento de vacinação";
-    }
-    return "Realizar vacinação";
+
+    // Botão Atender - sempre presente
+    const canAttend = isScheduledAppointment ? attendance.hasPreService : attendance.hasInitialListening;
+    buttons.push({
+      key: 'atender',
+      label: 'Atender',
+      icon: Stethoscope,
+      action: () => navigate(`/atendimento?cidadao=${attendance.id}`),
+      disabled: false, // Sempre habilitado
+      tooltip: attendance.isCompleted ? "Atendimento realizado" : "Realizar atendimento"
+    });
+
+    return buttons;
   };
+
+  const buttons = getButtonsForAttendance();
 
   // Ações dos botões
   const handleEscutaInicial = () => {
@@ -149,69 +159,32 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
 
   return (
     <div className="flex items-center space-x-2">
-      {/* Botão Escuta Inicial */}
-      {canSeeInitialListening && (
-        <TooltipProvider>
+      {/* Botões principais baseados nas novas regras */}
+      {buttons.map((button) => (
+        <TooltipProvider key={button.key}>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleEscutaInicial}
-                className="flex items-center gap-1 hover:bg-blue-50 hover:border-blue-300"
+                onClick={button.action}
+                disabled={button.disabled}
+                className={`flex items-center gap-1 ${
+                  button.key === 'escuta-inicial' || button.key === 'pre-consulta' 
+                    ? 'hover:bg-blue-50 hover:border-blue-300' 
+                    : 'hover:bg-green-50 hover:border-green-300'
+                } ${button.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <FileText className="w-4 h-4" />
-                <span className="hidden sm:inline">Escuta Inicial</span>
+                <button.icon className="w-4 h-4" />
+                <span className="hidden sm:inline">{button.label}</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{getInitialListeningTooltip()}</p>
+              <p>{button.tooltip}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-      )}
-
-      {/* Botão Pré-Atendimento - só para demanda agendada */}
-      {canSeePreService && attendance.scheduledAppointment && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handlePreAtendimento}
-                className="flex items-center gap-1 hover:bg-orange-50 hover:border-orange-300"
-              >
-                <FileText className="w-4 h-4" />
-                <span className="hidden sm:inline">Pré-Atendimento</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{getPreServiceTooltip()}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
-
-      {/* Botão Atender */}
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleAtender}
-              className="flex items-center gap-1 hover:bg-green-50 hover:border-green-300"
-            >
-              <Stethoscope className="w-4 h-4" />
-              <span className="hidden sm:inline">Atender</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{getAttendanceTooltip()}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      ))}
 
       {/* Botão Vacinar */}
       <TooltipProvider>
@@ -228,7 +201,7 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{getVaccinationTooltip()}</p>
+            <p>Realizar vacinação</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

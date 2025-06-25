@@ -1,15 +1,14 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, X, Calendar } from "lucide-react";
+import { Plus, X, Calendar, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CitizenOnlySearch } from "./CitizenOnlySearch";
-import { TodayAppointmentsList } from "./TodayAppointmentsList";
 import { ProfessionalSearch, Professional } from "./ProfessionalSearch";
 import { TeamSearch, Team } from "./TeamSearch";
-import { Citizen, DayAppointment, addCitizenToQueue } from "@/data/mockCitizens";
+import { Citizen, DayAppointment, addCitizenToQueue, attendanceQueue } from "@/data/mockCitizens";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 interface AddCitizenProps {
   showAddCitizen: boolean;
@@ -26,7 +25,7 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
   const [serviceTypes, setServiceTypes] = useState<string[]>([]);
   const [isFromAppointment, setIsFromAppointment] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<DayAppointment | null>(null);
-  const [showTodayAppointments, setShowTodayAppointments] = useState(false);
+  const [showServiceTypes, setShowServiceTypes] = useState(false);
   const { toast } = useToast();
 
   const serviceTypeOptions = [
@@ -51,7 +50,7 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     setServiceTypes([]);
     setIsFromAppointment(false);
     setSelectedAppointment(null);
-    setShowTodayAppointments(false);
+    setShowServiceTypes(false);
   };
 
   const clearCitizen = () => {
@@ -108,17 +107,6 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     setServiceTypes([]);
   };
 
-  const handleAppointmentSelect = (appointment: DayAppointment, citizenData: Citizen) => {
-    setSelectedCitizen(citizenData);
-    setCitizen(citizenData.name);
-    setSelectedAppointment(appointment);
-    setProfessional(appointment.professional);
-    setTeam(appointment.team);
-    setServiceTypes(appointment.serviceType);
-    setIsFromAppointment(true);
-    setShowTodayAppointments(false);
-  };
-
   const handleSpecificAppointmentSelect = (appointmentId: string) => {
     if (selectedCitizen && selectedCitizen.todayAppointments) {
       const appointment = selectedCitizen.todayAppointments.find(apt => apt.id === appointmentId);
@@ -138,7 +126,6 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     // Auto-select the team if professional has one
     if (professionalData.team) {
       setTeam(professionalData.team);
-      // Find the corresponding team data
       const teamData = {
         id: professionalData.ine,
         name: professionalData.team,
@@ -170,7 +157,6 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
       return;
     }
 
-    // Add citizen to queue using the imported function
     if (selectedCitizen) {
       const queueItem = addCitizenToQueue(
         selectedCitizen,
@@ -190,13 +176,26 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     }
   };
 
+  const queueCount = attendanceQueue.length;
+  const waitingCount = attendanceQueue.filter(item => item.status === "waiting").length;
+
   return (
     <div className="bg-white rounded-lg shadow-sm border">
-      <div className="flex items-center justify-end p-3">
+      <div className="flex items-center justify-between p-3">
+        <div className="flex items-center gap-3">
+          <Badge variant="secondary" className="flex items-center gap-1">
+            <Users className="h-3 w-3" />
+            Fila: {queueCount}
+          </Badge>
+          <Badge variant="outline" className="text-green-600 border-green-200">
+            Aguardando: {waitingCount}
+          </Badge>
+        </div>
         <Button
           onClick={() => setShowAddCitizen(!showAddCitizen)}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
           variant={showAddCitizen ? "outline" : "default"}
+          size="sm"
         >
           {showAddCitizen ? (
             <>
@@ -238,22 +237,19 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
                 </Button>
               )}
             </div>
-            {!citizen.trim() && (
-              <p className="text-xs text-red-500 mt-1">Campo obrigatório</p>
-            )}
           </div>
 
           {/* Show appointment field only if citizen has appointments */}
           {selectedCitizen && selectedCitizen.todayAppointments && selectedCitizen.todayAppointments.length > 0 && (
             <div>
-              <label className="text-sm font-medium mb-1 block">Próximo agendamento do dia (opcional)</label>
+              <label className="text-sm font-medium mb-1 block">Próximo agendamento do dia</label>
               
               {selectedCitizen.todayAppointments.length === 1 ? (
                 <div className="relative">
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full justify-start text-left font-normal"
+                    className="w-full justify-start text-left font-normal h-9"
                     onClick={() => {
                       if (selectedAppointment) {
                         clearAppointment();
@@ -269,8 +265,8 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
                   >
                     <Calendar className="mr-2 h-4 w-4" />
                     {selectedAppointment 
-                      ? `${selectedAppointment.time} - ${selectedAppointment.professional} - ${selectedAppointment.serviceType.join(", ")}`
-                      : `${selectedCitizen.todayAppointments[0].time} - ${selectedCitizen.todayAppointments[0].professional} - ${selectedCitizen.todayAppointments[0].serviceType.join(", ")}`
+                      ? `${selectedAppointment.time} - ${selectedAppointment.professional}`
+                      : `${selectedCitizen.todayAppointments[0].time} - ${selectedCitizen.todayAppointments[0].professional}`
                     }
                   </Button>
                   {selectedAppointment && (
@@ -288,13 +284,13 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
               ) : (
                 <div className="relative">
                   <Select onValueChange={handleSpecificAppointmentSelect} value={selectedAppointment?.id || ""}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione um agendamento (opcional)" />
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="Selecione um agendamento" />
                     </SelectTrigger>
                     <SelectContent>
                       {selectedCitizen.todayAppointments.map((appointment) => (
                         <SelectItem key={appointment.id} value={appointment.id}>
-                          {appointment.time} - {appointment.professional} - {appointment.serviceType.join(", ")}
+                          {appointment.time} - {appointment.professional}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -312,18 +308,14 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
                   )}
                 </div>
               )}
-              
-              <p className="text-xs text-gray-500 mt-1">
-                Se selecionado, preencherá automaticamente profissional, equipe e tipo de serviço
-              </p>
             </div>
           )}
 
           {/* Show other fields only when citizen is selected */}
           {selectedCitizen && (
             <>
-              {/* Profissional e Equipe em linha */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* Profissional e Equipe */}
+              <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="text-sm font-medium mb-1 block">Profissional</label>
                   <div className="relative">
@@ -371,24 +363,48 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
                 </div>
               </div>
 
-              {/* Tipo de Serviço */}
+              {/* Tipo de Serviço - Compacto */}
               <div>
-                <label className="text-sm font-medium mb-1 block">Tipo de serviço</label>
-                <div className="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto border rounded p-2">
-                  {serviceTypeOptions.map((serviceType) => (
-                    <div key={serviceType} className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={serviceTypes.includes(serviceType)}
-                        onCheckedChange={(checked) => handleServiceTypeChange(serviceType, checked as boolean)}
-                        disabled={isFromAppointment}
-                      />
-                      <span className="text-xs">{serviceType}</span>
-                    </div>
-                  ))}
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-sm font-medium">Tipo de serviço</label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowServiceTypes(!showServiceTypes)}
+                    className="h-6 text-xs"
+                  >
+                    {showServiceTypes ? "Ocultar" : "Mostrar"} ({serviceTypes.length})
+                  </Button>
                 </div>
+                
+                {serviceTypes.length > 0 && !showServiceTypes && (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {serviceTypes.map((type) => (
+                      <Badge key={type} variant="secondary" className="text-xs">
+                        {type}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                {showServiceTypes && (
+                  <div className="grid grid-cols-2 gap-1 max-h-24 overflow-y-auto border rounded p-2">
+                    {serviceTypeOptions.map((serviceType) => (
+                      <div key={serviceType} className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={serviceTypes.includes(serviceType)}
+                          onCheckedChange={(checked) => handleServiceTypeChange(serviceType, checked as boolean)}
+                          disabled={isFromAppointment}
+                        />
+                        <span className="text-xs">{serviceType}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {isFromAppointment && (
                   <p className="text-xs text-blue-600 mt-1">
-                    Tipos de serviço preenchidos automaticamente pelo agendamento
+                    Preenchido automaticamente pelo agendamento
                   </p>
                 )}
               </div>
