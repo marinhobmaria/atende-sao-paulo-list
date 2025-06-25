@@ -112,10 +112,16 @@ export const AddCitizen = ({ queueCount, waitingCount }: AddCitizenProps) => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
           <div className="relative">
             <CitizenSearch
-              selectedCitizen={selectedCitizen}
               onCitizenSelect={setSelectedCitizen}
-              onShowAppointments={() => setShowAppointments(!showAppointments)}
             />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAppointments(!showAppointments)}
+              className="mt-2 w-full"
+            >
+              {showAppointments ? "Ocultar" : "Ver"} Agendamentos
+            </Button>
             <TodayAppointmentsList
               onAppointmentSelect={handleAppointmentSelect}
               isOpen={showAppointments}
@@ -125,13 +131,13 @@ export const AddCitizen = ({ queueCount, waitingCount }: AddCitizenProps) => {
           
           <ProfessionalSearch
             selectedProfessional={selectedProfessional}
-            onProfessionalSelect={setSelectedProfessional}
+            onProfessionalSelect={(professional) => setSelectedProfessional(professional.name)}
             disabled={!!selectedAppointment}
           />
           
           <TeamSearch
             selectedTeam={selectedTeam}
-            onTeamSelect={setSelectedTeam}
+            onTeamSelect={(team) => setSelectedTeam(team.name)}
             disabled={!!selectedAppointment}
           />
           
@@ -144,6 +150,16 @@ export const AddCitizen = ({ queueCount, waitingCount }: AddCitizenProps) => {
             Incluir na Fila
           </Button>
         </div>
+
+        {selectedCitizen && (
+          <div className="mt-4 p-3 bg-green-100 rounded-lg border border-green-200">
+            <div className="flex items-center gap-2 text-sm text-green-800">
+              <Users className="w-4 h-4" />
+              <span className="font-medium">Cidadão selecionado:</span>
+              <span>{selectedCitizen.name}</span>
+            </div>
+          </div>
+        )}
 
         {selectedAppointment && (
           <div className="mt-4 p-3 bg-blue-100 rounded-lg border border-blue-200">
