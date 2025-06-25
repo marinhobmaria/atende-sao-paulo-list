@@ -37,6 +37,7 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
       case "waiting": return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "in-service": return "bg-green-100 text-green-800 border-green-200";
       case "initial-listening": return "bg-blue-100 text-blue-800 border-blue-200";
+      case "vaccination": return "bg-purple-100 text-purple-800 border-purple-200";
       default: return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
@@ -45,7 +46,8 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
     switch (status) {
       case "waiting": return "Aguardando";
       case "in-service": return "Em atendimento";
-      case "initial-listening": return "Escuta inicial";
+      case "initial-listening": return "Em escuta inicial";
+      case "vaccination": return "Em vacinação";
       default: return status;
     }
   };
@@ -60,6 +62,23 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
     }
   };
 
+  const formatProfessionalInfo = (professional: string) => {
+    // Extract parts from "MARIA MARINHO - MÉDICO CLÍNICO - EQUIPE APS 1"
+    const parts = professional.split(' - ');
+    if (parts.length >= 3) {
+      return {
+        name: parts[0],
+        specialty: parts[1],
+        team: parts[2]
+      };
+    }
+    return {
+      name: professional,
+      specialty: '',
+      team: ''
+    };
+  };
+
   const handleEscutaInicial = () => {
     navigate(`/escuta-inicial?cidadao=${attendance.id}`);
   };
@@ -69,13 +88,14 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
   };
 
   const handleVacinar = () => {
-    // Implementar navegação para vacinação
     console.log("Vacinar cidadão:", attendance.citizen.name);
   };
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
+
+  const professionalInfo = formatProfessionalInfo(attendance.professional);
 
   return (
     <Card className="hover:shadow-md transition-shadow duration-200">
@@ -121,6 +141,17 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
                 </div>
               </div>
 
+              {/* Informações do profissional - formatação melhorada */}
+              <div className="mt-2 text-sm text-gray-700 bg-gray-50 p-2 rounded">
+                <div className="font-medium text-gray-900">
+                  Profissional: {professionalInfo.name}
+                </div>
+                <div className="flex items-center gap-4 text-xs text-gray-600 mt-1">
+                  <span>Especialidade: {professionalInfo.specialty}</span>
+                  <span>Equipe: {professionalInfo.team}</span>
+                </div>
+              </div>
+
               {/* Tipos de serviço */}
               <div className="flex flex-wrap gap-1 mt-2">
                 {attendance.serviceTypes.map((type, index) => (
@@ -128,11 +159,6 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
                     {type}
                   </Badge>
                 ))}
-              </div>
-
-              {/* Profissional */}
-              <div className="mt-2 text-sm text-gray-600">
-                <span className="font-medium">Profissional:</span> {attendance.professional}
               </div>
             </div>
           </div>

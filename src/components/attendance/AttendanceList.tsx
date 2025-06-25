@@ -66,6 +66,25 @@ const mockAttendances = [
     hasInitialListening: false,
     hasPreService: false,
     isCompleted: false
+  },
+  {
+    id: "4",
+    citizen: {
+      name: "Carlos Pereira",
+      age: 28,
+      cpf: "789.123.456-00", 
+      cns: "789123456789123",
+      photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face"
+    },
+    arrivalTime: "10:30",
+    status: "vaccination",
+    serviceTypes: ["VACINA", "PROCEDIMENTOS"],
+    professional: "PEDRO SANTOS - ENFERMEIRO - EQUIPE APS 3",
+    team: "Equipe C",
+    vulnerability: "BAIXA",
+    hasInitialListening: true,
+    hasPreService: true,
+    isCompleted: false
   }
 ];
 
