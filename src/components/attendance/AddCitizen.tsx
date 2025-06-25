@@ -2,9 +2,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Calendar, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { CitizenSearch } from "./CitizenSearch";
+import { CitizenOnlySearch } from "./CitizenOnlySearch";
+import { TodayAppointmentsList } from "./TodayAppointmentsList";
 import { ProfessionalSearch, Professional } from "./ProfessionalSearch";
 import { TeamSearch, Team } from "./TeamSearch";
 import { Citizen, DayAppointment, addCitizenToQueue } from "@/data/mockCitizens";
@@ -26,6 +27,8 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
   const [isFromAppointment, setIsFromAppointment] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<DayAppointment | null>(null);
   const [showAppointmentSelect, setShowAppointmentSelect] = useState(false);
+  const [searchMode, setSearchMode] = useState<'citizen' | 'appointment'>('citizen');
+  const [showTodayAppointments, setShowTodayAppointments] = useState(false);
   const { toast } = useToast();
 
   const serviceTypeOptions = [
@@ -51,6 +54,8 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     setIsFromAppointment(false);
     setSelectedAppointment(null);
     setShowAppointmentSelect(false);
+    setSearchMode('citizen');
+    setShowTodayAppointments(false);
   };
 
   const handleServiceTypeChange = (serviceType: string, checked: boolean) => {
@@ -90,6 +95,7 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     setServiceTypes(appointment.serviceType);
     setIsFromAppointment(true);
     setShowAppointmentSelect(false);
+    setShowTodayAppointments(false);
   };
 
   const handleSpecificAppointmentSelect = (appointmentId: string) => {
@@ -187,22 +193,89 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
 
       {showAddCitizen && (
         <div className="px-3 pb-3 space-y-3">
-          {/* Munícipe com busca */}
+          {/* Search Mode Selection */}
           <div>
-            <label className="text-sm font-medium mb-1 block">
-              Munícipe <span className="text-red-500">*</span>
-            </label>
-            <CitizenSearch
-              value={citizen}
-              onChange={setCitizen}
-              onCitizenSelect={handleCitizenSelect}
-              onAppointmentSelect={handleAppointmentSelect}
-              onNewCitizen={handleNewCitizen}
-            />
-            {!citizen.trim() && (
-              <p className="text-xs text-red-500 mt-1">Campo obrigatório</p>
-            )}
+            <label className="text-sm font-medium mb-2 block">Tipo de busca</label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={searchMode === 'citizen' ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setSearchMode('citizen');
+                  setShowTodayAppointments(false);
+                  clearFields();
+                }}
+                className="flex items-center gap-2"
+              >
+                <Search className="h-4 w-4" />
+                Buscar Munícipe
+              </Button>
+              <Button
+                type="button"
+                variant={searchMode === 'appointment' ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setSearchMode('appointment');
+                  setShowTodayAppointments(true);
+                  clearFields();
+                }}
+                className="flex items-center gap-2"
+              >
+                <Calendar className="h-4 w-4" />
+                Próximos Agendamentos
+              </Button>
+            </div>
           </div>
+
+          {/* Munícipe Search */}
+          {searchMode === 'citizen' && (
+            <div>
+              <label className="text-sm font-medium mb-1 block">
+                Munícipe <span className="text-red-500">*</span>
+              </label>
+              <CitizenOnlySearch
+                value={citizen}
+                onChange={setCitizen}
+                onCitizenSelect={handleCitizenSelect}
+                onNewCitizen={handleNewCitizen}
+              />
+              {!citizen.trim() && (
+                <p className="text-xs text-red-500 mt-1">Campo obrigatório</p>
+              )}
+            </div>
+          )}
+
+          {/* Today Appointments List */}
+          {searchMode === 'appointment' && (
+            <div className="relative">
+              <label className="text-sm font-medium mb-1 block">
+                Próximos agendamentos do dia <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal"
+                  onClick={() => setShowTodayAppointments(!showTodayAppointments)}
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  {selectedAppointment 
+                    ? `${selectedAppointment.time} - ${selectedCitizen?.name}`
+                    : "Selecione um agendamento do dia"
+                  }
+                </Button>
+                <TodayAppointmentsList
+                  onAppointmentSelect={handleAppointmentSelect}
+                  isOpen={showTodayAppointments}
+                  onClose={() => setShowTodayAppointments(false)}
+                />
+              </div>
+              {!selectedAppointment && (
+                <p className="text-xs text-red-500 mt-1">Campo obrigatório</p>
+              )}
+            </div>
+          )}
 
           {/* Select specific appointment if citizen has multiple appointments */}
           {showAppointmentSelect && selectedCitizen?.todayAppointments && selectedCitizen.todayAppointments.length > 0 && (
@@ -226,50 +299,55 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
             </div>
           )}
 
-          {/* Profissional e Equipe em linha */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-sm font-medium mb-1 block">Profissional</label>
-              <ProfessionalSearch
-                value={professional}
-                onChange={setProfessional}
-                onProfessionalSelect={handleProfessionalSelect}
-                disabled={isFromAppointment}
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-1 block">Equipe</label>
-              <TeamSearch
-                value={team}
-                onChange={setTeam}
-                onTeamSelect={handleTeamSelect}
-                disabled={isFromAppointment}
-              />
-            </div>
-          </div>
-
-          {/* Tipo de Serviço */}
-          <div>
-            <label className="text-sm font-medium mb-1 block">Tipo de serviço</label>
-            <div className="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto border rounded p-2">
-              {serviceTypeOptions.map((serviceType) => (
-                <div key={serviceType} className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={serviceTypes.includes(serviceType)}
-                    onCheckedChange={(checked) => handleServiceTypeChange(serviceType, checked as boolean)}
+          {/* Show other fields only when citizen is selected */}
+          {selectedCitizen && (
+            <>
+              {/* Profissional e Equipe em linha */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Profissional</label>
+                  <ProfessionalSearch
+                    value={professional}
+                    onChange={setProfessional}
+                    onProfessionalSelect={handleProfessionalSelect}
                     disabled={isFromAppointment}
                   />
-                  <span className="text-xs">{serviceType}</span>
                 </div>
-              ))}
-            </div>
-            {isFromAppointment && (
-              <p className="text-xs text-blue-600 mt-1">
-                Tipos de serviço preenchidos automaticamente pelo agendamento
-              </p>
-            )}
-          </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Equipe</label>
+                  <TeamSearch
+                    value={team}
+                    onChange={setTeam}
+                    onTeamSelect={handleTeamSelect}
+                    disabled={isFromAppointment}
+                  />
+                </div>
+              </div>
+
+              {/* Tipo de Serviço */}
+              <div>
+                <label className="text-sm font-medium mb-1 block">Tipo de serviço</label>
+                <div className="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto border rounded p-2">
+                  {serviceTypeOptions.map((serviceType) => (
+                    <div key={serviceType} className="flex items-center space-x-2">
+                      <Checkbox
+                        checked={serviceTypes.includes(serviceType)}
+                        onCheckedChange={(checked) => handleServiceTypeChange(serviceType, checked as boolean)}
+                        disabled={isFromAppointment}
+                      />
+                      <span className="text-xs">{serviceType}</span>
+                    </div>
+                  ))}
+                </div>
+                {isFromAppointment && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    Tipos de serviço preenchidos automaticamente pelo agendamento
+                  </p>
+                )}
+              </div>
+            </>
+          )}
 
           {/* Buttons */}
           <div className="flex gap-2 pt-2">
