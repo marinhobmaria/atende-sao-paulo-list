@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -95,33 +96,6 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
     };
   };
 
-  const calculateDetailedAge = (age: number) => {
-    // Simular cálculo mais detalhado da idade
-    // Em um sistema real, isso viria do banco de dados baseado na data de nascimento
-    const years = age;
-    const months = Math.floor(Math.random() * 12);
-    const days = Math.floor(Math.random() * 30);
-    
-    const parts = [];
-    if (years > 0) parts.push(`${years} ano${years !== 1 ? 's' : ''}`);
-    if (months > 0) parts.push(`${months} mês${months !== 1 ? 'es' : ''}`);
-    if (days > 0) parts.push(`${days} dia${days !== 1 ? 's' : ''}`);
-    
-    return parts.join(', ') || '0 dias';
-  };
-
-  const handleEscutaInicial = () => {
-    navigate(`/escuta-inicial?cidadao=${attendance.id}`);
-  };
-
-  const handleAtender = () => {
-    navigate(`/atendimento?cidadao=${attendance.id}`);
-  };
-
-  const handleVacinar = () => {
-    console.log("Vacinar cidadão:", attendance.citizen.name);
-  };
-
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
@@ -134,68 +108,65 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
   };
 
   return (
-    <Card className="hover:shadow-lg hover:scale-[1.02] hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 ease-in-out cursor-pointer relative overflow-hidden">
+    <Card className="hover:shadow-lg hover:scale-[1.01] hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 ease-in-out cursor-pointer relative overflow-hidden">
       {/* Status indicator bar on the left */}
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${getStatusBarColor(attendance.status)}`} />
       
-      <CardContent className="p-3 ml-2">
-        <div className="flex items-center justify-between">
-          {/* Seção esquerda - Foto e informações principais */}
-          <div className="flex items-center space-x-4 flex-1 min-w-0">
-            {/* Avatar */}
-            <Avatar className="w-10 h-10 flex-shrink-0">
+      <CardContent className="p-2 ml-1">
+        <div className="flex items-center justify-between gap-2">
+          {/* Seção esquerda - Informações ultra compactas */}
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {/* Avatar mini */}
+            <Avatar className="w-8 h-8 flex-shrink-0">
               <AvatarImage src={attendance.citizen.photo} alt={attendance.citizen.name} />
-              <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-sm">
+              <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-xs">
                 {getInitials(attendance.citizen.name)}
               </AvatarFallback>
             </Avatar>
 
-            {/* Informações principais */}
+            {/* Informações principais compactas */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold text-gray-900 truncate text-sm">{attendance.citizen.name}</h3>
-                <Badge className={`text-xs px-2 py-1 ${getStatusColor(attendance.status)}`}>
+              <div className="flex items-center gap-1 mb-1">
+                <h3 className="font-semibold text-gray-900 truncate text-xs max-w-[120px]">
+                  {attendance.citizen.name}
+                </h3>
+                <span className="text-xs text-gray-500">{attendance.citizen.age}a</span>
+                <Badge className={`text-xs px-1 py-0 ${getStatusColor(attendance.status)}`}>
                   {getStatusText(attendance.status)}
                 </Badge>
-                <div className="flex items-center gap-1 text-xs text-gray-600">
+                <div className="flex items-center gap-1 text-xs text-gray-500">
                   <Clock className="w-3 h-3" />
                   <span>{attendance.arrivalTime}</span>
                 </div>
                 {attendance.vulnerability && (
-                  <Badge className={`text-white text-xs px-2 py-1 ${getVulnerabilityColor(attendance.vulnerability)}`}>
+                  <Badge className={`text-white text-xs px-1 py-0 ${getVulnerabilityColor(attendance.vulnerability)}`}>
                     {attendance.vulnerability}
                   </Badge>
                 )}
               </div>
               
-              <div className="text-sm text-gray-600 mb-2">
-                {calculateDetailedAge(attendance.citizen.age)}
-              </div>
-
-              {/* Informações do profissional - layout otimizado */}
-              <div className="text-xs text-gray-700 space-y-1">
-                <div className="font-medium text-gray-900">
-                  {professionalInfo.name}
+              {/* Profissional e serviços em linha única */}
+              <div className="flex items-center gap-2 text-xs text-gray-600">
+                <span className="truncate max-w-[100px]">{professionalInfo.name}</span>
+                <span className="text-gray-400">•</span>
+                <div className="flex gap-1">
+                  {attendance.serviceTypes.slice(0, 2).map((type, index) => (
+                    <Badge key={index} variant="outline" className="text-xs px-1 py-0">
+                      {type.length > 8 ? type.substring(0, 8) + '...' : type}
+                    </Badge>
+                  ))}
+                  {attendance.serviceTypes.length > 2 && (
+                    <Badge variant="outline" className="text-xs px-1 py-0">
+                      +{attendance.serviceTypes.length - 2}
+                    </Badge>
+                  )}
                 </div>
-                <div className="flex items-center gap-4">
-                  <span>{professionalInfo.specialty}</span>
-                  <span>{professionalInfo.team}</span>
-                </div>
-              </div>
-
-              {/* Tipos de serviço */}
-              <div className="flex flex-wrap gap-1 mt-2">
-                {attendance.serviceTypes.map((type, index) => (
-                  <Badge key={index} variant="outline" className="text-xs">
-                    {type}
-                  </Badge>
-                ))}
               </div>
             </div>
           </div>
 
-          {/* Seção direita - Botões de ação */}
-          <div className="ml-4">
+          {/* Seção direita - Botões de ação compactos */}
+          <div className="flex-shrink-0">
             <AttendanceActions 
               attendance={attendance as any} 
               onStatusChange={handleStatusChange}

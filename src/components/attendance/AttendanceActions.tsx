@@ -40,6 +40,7 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
       buttons.push({
         key: 'pre-consulta',
         label: 'Pré-Consulta',
+        shortLabel: 'Pré',
         icon: FileText,
         action: () => navigate(`/pre-atendimento?cidadao=${attendance.id}`),
         disabled: attendance.hasPreService,
@@ -50,6 +51,7 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
       buttons.push({
         key: 'escuta-inicial',
         label: 'Escuta Inicial',
+        shortLabel: 'Escuta',
         icon: FileText,
         action: () => navigate(`/escuta-inicial?cidadao=${attendance.id}`),
         disabled: attendance.hasInitialListening,
@@ -62,6 +64,7 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
     buttons.push({
       key: 'atender',
       label: 'Atender',
+      shortLabel: 'Atender',
       icon: Stethoscope,
       action: () => navigate(`/atendimento?cidadao=${attendance.id}`),
       disabled: false, // Sempre habilitado
@@ -158,8 +161,8 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
   };
 
   return (
-    <div className="flex items-center space-x-2">
-      {/* Botões principais baseados nas novas regras */}
+    <div className="flex items-center gap-1">
+      {/* Botões principais ultra compactos */}
       {buttons.map((button) => (
         <TooltipProvider key={button.key}>
           <Tooltip>
@@ -169,14 +172,14 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
                 size="sm"
                 onClick={button.action}
                 disabled={button.disabled}
-                className={`flex items-center gap-1 ${
+                className={`h-7 px-2 text-xs ${
                   button.key === 'escuta-inicial' || button.key === 'pre-consulta' 
                     ? 'hover:bg-blue-50 hover:border-blue-300' 
                     : 'hover:bg-green-50 hover:border-green-300'
                 } ${button.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <button.icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{button.label}</span>
+                <button.icon className="w-3 h-3 mr-1" />
+                <span className="hidden lg:inline">{button.shortLabel}</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -186,7 +189,7 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
         </TooltipProvider>
       ))}
 
-      {/* Botão Vacinar */}
+      {/* Botão Vacinar ultra compacto */}
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -194,10 +197,10 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
               variant="outline"
               size="sm"
               onClick={handleVacinar}
-              className="flex items-center gap-1 hover:bg-purple-50 hover:border-purple-300"
+              className="h-7 px-2 text-xs hover:bg-purple-50 hover:border-purple-300"
             >
-              <Syringe className="w-4 h-4" />
-              <span className="hidden sm:inline">Vacinar</span>
+              <Syringe className="w-3 h-3 mr-1" />
+              <span className="hidden lg:inline">Vacinar</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -206,14 +209,14 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
         </Tooltip>
       </TooltipProvider>
 
-      {/* Menu Mais Opções */}
+      {/* Menu Mais Opções compacto */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm">
-            <MoreHorizontal className="w-4 h-4" />
+          <Button variant="outline" size="sm" className="h-7 px-2">
+            <MoreHorizontal className="w-3 h-3" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="bg-white border shadow-lg">
           {getMoreOptionsItems().map((item, index) => (
             item.requiresConfirmation ? (
               <AlertDialog key={index}>
