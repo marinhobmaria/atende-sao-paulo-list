@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, X, Calendar } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface AddCitizenProps {
@@ -12,31 +12,8 @@ interface AddCitizenProps {
   setShowAddCitizen: (show: boolean) => void;
 }
 
-// Mock scheduling data
-const mockSchedulings = [
-  {
-    id: "1",
-    time: "09:00",
-    citizen: "Maria Silva Santos",
-    professional: "Dr. João Silva",
-    specialty: "Médico Clínico",
-    team: "Equipe APS 1",
-    serviceType: "CONSULTA"
-  },
-  {
-    id: "2", 
-    time: "14:30",
-    citizen: "José Oliveira",
-    professional: "Dra. Ana Costa",
-    specialty: "Enfermeiro",
-    team: "Equipe APS 2",
-    serviceType: "PROCEDIMENTOS"
-  }
-];
-
 export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProps) => {
   const [citizen, setCitizen] = useState("");
-  const [selectedScheduling, setSelectedScheduling] = useState("");
   const [professional, setProfessional] = useState("");
   const [team, setTeam] = useState("");
   const [serviceTypes, setServiceTypes] = useState<string[]>([]);
@@ -64,21 +41,9 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
 
   const clearFields = () => {
     setCitizen("");
-    setSelectedScheduling("");
     setProfessional("");
     setTeam("");
     setServiceTypes([]);
-  };
-
-  const handleSchedulingSelect = (schedulingId: string) => {
-    const scheduling = mockSchedulings.find(s => s.id === schedulingId);
-    if (scheduling) {
-      setCitizen(scheduling.citizen);
-      setProfessional(scheduling.professional);
-      // Find team based on professional
-      setTeam(scheduling.team);
-      setServiceTypes([scheduling.serviceType]);
-    }
   };
 
   const handleServiceTypeChange = (serviceType: string, checked: boolean) => {
@@ -109,17 +74,17 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-4">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-white rounded-lg shadow-sm border">
+      <div className="flex items-center justify-end p-3">
         <Button
           onClick={() => setShowAddCitizen(!showAddCitizen)}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
           variant={showAddCitizen ? "outline" : "default"}
         >
           {showAddCitizen ? (
             <>
               <X className="h-4 w-4" />
-              Cancelar adição
+              Cancelar
             </>
           ) : (
             <>
@@ -131,42 +96,14 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
       </div>
 
       {showAddCitizen && (
-        <div className="space-y-4">
-          {/* Agendamento do dia */}
-          <div>
-            <label className="text-sm font-medium mb-2 block flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Agendamento do dia (opcional)
-            </label>
-            <Select value={selectedScheduling} onValueChange={(value) => {
-              setSelectedScheduling(value);
-              handleSchedulingSelect(value);
-            }}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um agendamento" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockSchedulings.map((scheduling) => (
-                  <SelectItem key={scheduling.id} value={scheduling.id}>
-                    <div>
-                      <div className="font-medium">{scheduling.time} - {scheduling.citizen}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {scheduling.professional} • {scheduling.specialty} • {scheduling.team}
-                      </div>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
+        <div className="px-3 pb-3 space-y-3">
           {/* Munícipe */}
           <div>
-            <label className="text-sm font-medium mb-2 block">
+            <label className="text-sm font-medium mb-1 block">
               Munícipe <span className="text-red-500">*</span>
             </label>
             <Input
-              placeholder="Nome, CPF, CNS ou data de nascimento"
+              placeholder="Nome, CPF, CNS"
               value={citizen}
               onChange={(e) => setCitizen(e.target.value)}
               className={!citizen.trim() ? "border-red-300 focus:border-red-500" : ""}
@@ -176,67 +113,68 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
             )}
           </div>
 
-          {/* Profissional */}
-          <div>
-            <label className="text-sm font-medium mb-2 block">Profissional (opcional)</label>
-            <Select value={professional} onValueChange={setProfessional}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um profissional" />
-              </SelectTrigger>
-              <SelectContent>
-                {professionals.map((prof) => (
-                  <SelectItem key={prof.name} value={prof.name}>
-                    <div>
-                      <div className="font-medium">{prof.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {prof.cpf} • {prof.cbo} • {prof.ine}
+          {/* Profissional e Equipe em linha */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-sm font-medium mb-1 block">Profissional</label>
+              <Select value={professional} onValueChange={setProfessional}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  {professionals.map((prof) => (
+                    <SelectItem key={prof.name} value={prof.name}>
+                      <div>
+                        <div className="font-medium">{prof.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {prof.cbo}
+                        </div>
                       </div>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Equipe */}
-          <div>
-            <label className="text-sm font-medium mb-2 block">Equipe (opcional)</label>
-            <Select value={team} onValueChange={setTeam}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione uma equipe" />
-              </SelectTrigger>
-              <SelectContent>
-                {teams.map((teamName) => (
-                  <SelectItem key={teamName} value={teamName}>
-                    {teamName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div>
+              <label className="text-sm font-medium mb-1 block">Equipe</label>
+              <Select value={team} onValueChange={setTeam}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teams.map((teamName) => (
+                    <SelectItem key={teamName} value={teamName}>
+                      {teamName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Tipo de Serviço */}
           <div>
-            <label className="text-sm font-medium mb-2 block">Tipo de serviço (opcional)</label>
-            <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+            <label className="text-sm font-medium mb-1 block">Tipo de serviço</label>
+            <div className="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto border rounded p-2">
               {serviceTypeOptions.map((serviceType) => (
                 <div key={serviceType} className="flex items-center space-x-2">
                   <Checkbox
                     checked={serviceTypes.includes(serviceType)}
                     onCheckedChange={(checked) => handleServiceTypeChange(serviceType, checked as boolean)}
                   />
-                  <span className="text-sm">{serviceType}</span>
+                  <span className="text-xs">{serviceType}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-2 pt-4">
-            <Button variant="outline" onClick={clearFields}>
-              Limpar campos
+          <div className="flex gap-2 pt-2">
+            <Button variant="outline" onClick={clearFields} size="sm">
+              Limpar
             </Button>
-            <Button onClick={handleAddCitizen}>
+            <Button onClick={handleAddCitizen} size="sm" className="bg-blue-600 hover:bg-blue-700">
               Adicionar
             </Button>
           </div>
