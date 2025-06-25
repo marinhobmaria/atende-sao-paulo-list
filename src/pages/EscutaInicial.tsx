@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, ArrowLeft, User, Edit } from "lucide-react";
+import { Home, ArrowLeft, User, Edit, CheckCircle } from "lucide-react";
 import { EscutaInicialForm } from "@/components/escuta-inicial/EscutaInicialForm";
+import { FinalizacaoAtendimentoModal } from "@/components/finalizacao/FinalizacaoAtendimentoModal";
 import { toast } from "@/hooks/use-toast";
 
 const EscutaInicial = () => {
@@ -14,6 +15,9 @@ const EscutaInicial = () => {
   const [searchParams] = useSearchParams();
   const cidadaoId = searchParams.get("cidadao");
   const [isLoading, setIsLoading] = useState(false);
+  const [showFinalizacao, setShowFinalizacao] = useState(false);
+  const [isFinalizando, setIsFinalizando] = useState(false);
+  const [escutaData, setEscutaData] = useState<any>(null);
 
   // Mock data do cidadão baseado na imagem de referência
   const cidadao = {
@@ -33,31 +37,62 @@ const EscutaInicial = () => {
   const handleFinalizarEscuta = async (data: any) => {
     setIsLoading(true);
     try {
-      // Aqui seria a chamada para salvar os dados
+      // Aqui seria a chamada para salvar os dados da escuta inicial
       console.log("Dados da escuta inicial:", data);
+      setEscutaData(data);
       
       toast({
-        title: "Escuta inicial finalizada",
-        description: "Os dados foram salvos com sucesso.",
+        title: "Escuta inicial registrada",
+        description: "Os dados foram salvos. Agora finalize o atendimento.",
       });
 
-      // Redirecionar baseado no desfecho
-      if (data.desfecho === "liberar") {
-        navigate("/");
-      } else if (data.desfecho === "adicionar_lista") {
-        navigate("/");
-      } else if (data.desfecho === "agendar") {
-        // Redirecionaria para agendamento
-        navigate("/");
-      }
+      // Abrir modal de finalização
+      setShowFinalizacao(true);
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Não foi possível finalizar a escuta inicial.",
+        description: "Não foi possível registrar a escuta inicial.",
         variant: "destructive"
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleFinalizarAtendimento = async (data: any) => {
+    setIsFinalizando(true);
+    try {
+      console.log("Dados da finalização:", data);
+      console.log("Dados da escuta inicial:", escutaData);
+      
+      // Simular processamento
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      toast({
+        title: "Atendimento finalizado com sucesso",
+        description: "Escuta inicial e finalização foram registradas.",
+      });
+
+      setShowFinalizacao(false);
+
+      // Redirecionar baseado no desfecho da escuta inicial
+      if (escutaData?.desfecho === "liberar") {
+        navigate("/");
+      } else if (escutaData?.desfecho === "adicionar_lista") {
+        navigate("/");
+      } else if (escutaData?.desfecho === "agendar") {
+        navigate("/");
+      } else {
+        navigate("/");
+      }
+    } catch (error) {
+      toast({
+        title: "Erro ao finalizar",
+        description: "Não foi possível finalizar o atendimento. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsFinalizando(false);
     }
   };
 
@@ -203,6 +238,14 @@ const EscutaInicial = () => {
             />
           </CardContent>
         </Card>
+
+        {/* Modal de Finalização */}
+        <FinalizacaoAtendimentoModal
+          isOpen={showFinalizacao}
+          onClose={() => setShowFinalizacao(false)}
+          onSave={handleFinalizarAtendimento}
+          isLoading={isFinalizando}
+        />
       </div>
     </div>
   );

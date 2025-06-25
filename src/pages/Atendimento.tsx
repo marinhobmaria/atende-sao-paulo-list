@@ -6,13 +6,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, ArrowLeft, User, FileText, Syringe, Clock, Calendar, Edit } from "lucide-react";
+import { Home, ArrowLeft, User, FileText, Syringe, Clock, Calendar, Edit, CheckCircle } from "lucide-react";
 import { SOAPContainer } from "@/components/atendimento/SOAPContainer";
+import { FinalizacaoAtendimentoModal } from "@/components/finalizacao/FinalizacaoAtendimentoModal";
+import { toast } from "@/hooks/use-toast";
 
 const Atendimento = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const cidadaoId = searchParams.get("cidadao");
+  const [showFinalizacao, setShowFinalizacao] = useState(false);
+  const [isFinalizando, setIsFinalizando] = useState(false);
 
   // Mock data do cidadão baseado na imagem de referência
   const cidadao = {
@@ -27,6 +31,32 @@ const Atendimento = () => {
     status: "Escuta inicial realizada",
     healthConditions: ["Hipertenso", "Diabético", "Gestante"],
     allergies: ["Dipirona", "Leite", "Mofo"]
+  };
+
+  const handleFinalizarAtendimento = async (data: any) => {
+    setIsFinalizando(true);
+    try {
+      console.log("Dados da finalização:", data);
+      
+      // Simular processamento
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      toast({
+        title: "Atendimento finalizado com sucesso",
+        description: "Todos os dados foram salvos e o atendimento foi encerrado.",
+      });
+
+      setShowFinalizacao(false);
+      navigate("/");
+    } catch (error) {
+      toast({
+        title: "Erro ao finalizar",
+        description: "Não foi possível finalizar o atendimento. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsFinalizando(false);
+    }
   };
 
   return (
@@ -146,14 +176,23 @@ const Atendimento = () => {
                 </div>
               </div>
               
-              <Button
-                variant="outline"
-                onClick={() => navigate("/")}
-                className="flex items-center gap-2 ml-4"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Voltar
-              </Button>
+              <div className="flex gap-2 ml-4">
+                <Button
+                  onClick={() => setShowFinalizacao(true)}
+                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  Finalizar Atendimento
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate("/")}
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Voltar
+                </Button>
+              </div>
             </div>
           </CardHeader>
 
@@ -288,6 +327,14 @@ const Atendimento = () => {
             </Tabs>
           </CardContent>
         </Card>
+
+        {/* Modal de Finalização */}
+        <FinalizacaoAtendimentoModal
+          isOpen={showFinalizacao}
+          onClose={() => setShowFinalizacao(false)}
+          onSave={handleFinalizarAtendimento}
+          isLoading={isFinalizando}
+        />
       </div>
     </div>
   );
