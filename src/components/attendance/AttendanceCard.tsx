@@ -26,7 +26,7 @@ interface AttendanceCardProps {
     hasInitialListening: boolean;
     hasPreService: boolean;
     isCompleted: boolean;
-    addedBy?: string; // Add this property to fix the build error
+    addedBy?: string;
   };
 }
 
@@ -101,9 +101,28 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
     console.log(`Status changed to: ${newStatus}`);
   };
 
-  // Create attendance object with addedBy property for AttendanceActions
-  const attendanceWithAddedBy = {
-    ...attendance,
+  // Create a mock attendance object that matches AttendanceQueueItem structure
+  const mockAttendanceForActions = {
+    id: attendance.id,
+    citizen: {
+      id: attendance.id,
+      name: attendance.citizen.name,
+      age: attendance.citizen.age,
+      cpf: attendance.citizen.cpf,
+      cns: attendance.citizen.cns,
+      prontuario: "123456", // Mock data
+      birthDate: "10/02/2004", // Mock data
+      photo: attendance.citizen.photo
+    },
+    arrivalTime: attendance.arrivalTime,
+    status: attendance.status as any,
+    serviceTypes: attendance.serviceTypes,
+    professional: attendance.professional,
+    team: attendance.team,
+    vulnerability: attendance.vulnerability,
+    hasInitialListening: attendance.hasInitialListening,
+    hasPreService: attendance.hasPreService,
+    isCompleted: attendance.isCompleted,
     addedBy: attendance.addedBy || "Sistema"
   };
 
@@ -166,7 +185,7 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
           {/* Right side - Action buttons */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <AttendanceActions 
-              attendance={attendanceWithAddedBy} 
+              attendance={mockAttendanceForActions} 
               onStatusChange={handleStatusChange}
             />
           </div>
