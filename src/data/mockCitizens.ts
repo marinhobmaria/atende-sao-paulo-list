@@ -7,6 +7,8 @@ export interface Citizen {
   birthDate: string;
   age: number;
   photo?: string;
+  vulnerability?: string;
+  todayAppointments?: DayAppointment[];
 }
 
 export interface DayAppointment {
@@ -94,6 +96,9 @@ export const generateMockCitizens = (): Citizen[] => {
     
     const { date: birthDate, age } = generateBirthDate();
     
+    const vulnerabilities = ["BAIXA", "MÉDIA", "ALTA"];
+    const vulnerability = vulnerabilities[Math.floor(Math.random() * vulnerabilities.length)];
+    
     citizens.push({
       id: `citizen_${i + 1}`,
       name,
@@ -101,7 +106,8 @@ export const generateMockCitizens = (): Citizen[] => {
       cns: generateCNS(),
       prontuario: generateProntuario(),
       birthDate,
-      age
+      age,
+      vulnerability
     });
   }
   
@@ -193,7 +199,7 @@ export let mockAttendanceQueue: AttendanceQueueItem[] = [
     serviceTypes: ["DEMANDA ESPONTÂNEA"],
     professional: "Dr. João Silva",
     team: "Equipe APS 1",
-    vulnerability: "BAIXA",
+    vulnerability: mockCitizens[0].vulnerability || "BAIXA",
     hasInitialListening: false,
     hasPreService: false,
     isCompleted: false,
@@ -217,7 +223,7 @@ export const addCitizenToQueue = (
     serviceTypes,
     professional,
     team,
-    vulnerability: citizen.vulnerability,
+    vulnerability: citizen.vulnerability || null,
     hasInitialListening: false,
     hasPreService: false,
     isCompleted: false,

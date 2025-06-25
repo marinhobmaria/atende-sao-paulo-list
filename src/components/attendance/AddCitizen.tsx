@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CitizenSearch } from "./CitizenSearch";
 import { ProfessionalSearch, Professional } from "./ProfessionalSearch";
 import { TeamSearch, Team } from "./TeamSearch";
-import { Citizen, DayAppointment } from "@/data/mockCitizens";
+import { Citizen, DayAppointment, addCitizenToQueue } from "@/data/mockCitizens";
 
 interface AddCitizenProps {
   showAddCitizen: boolean;
@@ -108,7 +108,7 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
       return;
     }
 
-    // Add citizen to queue using the new function
+    // Add citizen to queue using the imported function
     if (selectedCitizen) {
       const queueItem = addCitizenToQueue(
         selectedCitizen,
