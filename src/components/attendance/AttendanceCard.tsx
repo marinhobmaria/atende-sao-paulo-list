@@ -133,14 +133,14 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
       {/* Status indicator bar on the left */}
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${getStatusBarColor(attendance.status)}`} />
       
-      <CardContent className="p-4 ml-2">
+      <CardContent className="p-3 ml-2">
         <div className="flex items-center justify-between">
           {/* Seção esquerda - Foto e informações principais */}
           <div className="flex items-center space-x-4 flex-1 min-w-0">
             {/* Avatar */}
-            <Avatar className="w-12 h-12 flex-shrink-0">
+            <Avatar className="w-10 h-10 flex-shrink-0">
               <AvatarImage src={attendance.citizen.photo} alt={attendance.citizen.name} />
-              <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold">
+              <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-sm">
                 {getInitials(attendance.citizen.name)}
               </AvatarFallback>
             </Avatar>
@@ -148,10 +148,14 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
             {/* Informações principais */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold text-gray-900 truncate">{attendance.citizen.name}</h3>
+                <h3 className="font-semibold text-gray-900 truncate text-sm">{attendance.citizen.name}</h3>
                 <Badge className={`text-xs px-2 py-1 ${getStatusColor(attendance.status)}`}>
                   {getStatusText(attendance.status)}
                 </Badge>
+                <div className="flex items-center gap-1 text-xs text-gray-600">
+                  <Clock className="w-3 h-3" />
+                  <span>{attendance.arrivalTime}</span>
+                </div>
                 {attendance.vulnerability && (
                   <Badge className={`text-white text-xs px-2 py-1 ${getVulnerabilityColor(attendance.vulnerability)}`}>
                     {attendance.vulnerability}
@@ -159,24 +163,18 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
                 )}
               </div>
               
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600">
-                <div>
-                  {calculateDetailedAge(attendance.citizen.age)}
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  <span>{attendance.arrivalTime}</span>
-                </div>
+              <div className="text-sm text-gray-600 mb-2">
+                {calculateDetailedAge(attendance.citizen.age)}
               </div>
 
-              {/* Informações do profissional - formatação melhorada */}
-              <div className="mt-2 text-sm text-gray-700 bg-gray-50 p-2 rounded">
+              {/* Informações do profissional - layout otimizado */}
+              <div className="text-xs text-gray-700 space-y-1">
                 <div className="font-medium text-gray-900">
-                  Profissional: {professionalInfo.name}
+                  {professionalInfo.name}
                 </div>
-                <div className="flex items-center gap-4 text-xs text-gray-600 mt-1">
-                  <span>Especialidade: {professionalInfo.specialty}</span>
-                  <span>Equipe: {professionalInfo.team}</span>
+                <div className="flex items-center gap-4">
+                  <span>{professionalInfo.specialty}</span>
+                  <span>{professionalInfo.team}</span>
                 </div>
               </div>
 
