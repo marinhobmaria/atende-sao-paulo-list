@@ -74,7 +74,7 @@ export const CitizenCompactInfo = ({ cidadao, onBack }: CitizenCompactInfoProps)
                   <span className="text-sm text-gray-600">({cidadao.socialName})</span>
                 </div>
                 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="font-medium text-gray-600">CPF:</span> {cidadao.cpf}
                   </div>
@@ -82,10 +82,7 @@ export const CitizenCompactInfo = ({ cidadao, onBack }: CitizenCompactInfoProps)
                     <span className="font-medium text-gray-600">CNS:</span> {cidadao.cns}
                   </div>
                   <div>
-                    <span className="font-medium text-gray-600">Data de Nascimento:</span> {cidadao.birthDate}
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-600">Idade:</span> {cidadao.age}
+                    <span className="font-medium text-gray-600">Data de nascimento:</span> {cidadao.birthDate} ({cidadao.age})
                   </div>
                 </div>
 
