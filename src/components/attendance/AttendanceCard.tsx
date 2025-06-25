@@ -1,10 +1,11 @@
 
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Clock, MoreVertical, Stethoscope, Syringe, Eye, EyeOff } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Clock, User, Stethoscope, Syringe, FileText } from "lucide-react";
 
 interface AttendanceCardProps {
   attendance: {
@@ -14,9 +15,10 @@ interface AttendanceCardProps {
       age: number;
       cpf: string;
       cns: string;
+      photo?: string;
     };
     arrivalTime: string;
-    status: string; 
+    status: string;
     serviceTypes: string[];
     professional: string;
     team: string;
@@ -32,140 +34,126 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "waiting": return "bg-green-500";
-      case "in-service": return "bg-purple-500";
-      case "initial-listening": return "bg-pink-500";
-      case "completed": return "bg-blue-500";
-      case "did-not-wait": return "bg-gray-500";
-      default: return "bg-gray-300";
+      case "waiting": return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "in-service": return "bg-green-100 text-green-800 border-green-200";
+      case "initial-listening": return "bg-blue-100 text-blue-800 border-blue-200";
+      default: return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
-  const getStatusLabel = (status: string) => {
+  const getStatusText = (status: string) => {
     switch (status) {
-      case "waiting": return "Aguardando atendimento";
+      case "waiting": return "Aguardando";
       case "in-service": return "Em atendimento";
-      case "initial-listening": return "Em escuta inicial";
-      case "completed": return "Atendimento realizado";
-      case "did-not-wait": return "Não aguardou";
+      case "initial-listening": return "Escuta inicial";
       default: return status;
     }
   };
 
   const getVulnerabilityColor = (vulnerability: string | null) => {
+    if (!vulnerability) return null;
     switch (vulnerability) {
       case "ALTA": return "bg-red-500";
       case "MÉDIA": return "bg-yellow-500";
       case "BAIXA": return "bg-green-500";
-      default: return "bg-gray-300";
+      default: return "bg-gray-500";
     }
-  };
-
-  const getInitialListeningTooltip = () => {
-    if (attendance.hasInitialListening) return "Visualizar escuta inicial";
-    if (attendance.status === "in-service") return "O cidadão ainda não fez escuta inicial";
-    if (attendance.isCompleted) return "Cidadão sem escuta inicial";
-    return "Realizar escuta inicial";
-  };
-
-  const getServiceTooltip = () => {
-    if (attendance.isCompleted) return "Atendimento realizado";
-    if (attendance.status === "in-service") return "Continuar atendimento";
-    return "Realizar atendimento";
   };
 
   const handleEscutaInicial = () => {
     navigate(`/escuta-inicial?cidadao=${attendance.id}`);
   };
 
-  const handleAtendimento = () => {
+  const handleAtender = () => {
     navigate(`/atendimento?cidadao=${attendance.id}`);
   };
 
+  const handleVacinar = () => {
+    // Implementar navegação para vacinação
+    console.log("Vacinar cidadão:", attendance.citizen.name);
+  };
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-4">
-      <div className="flex items-start gap-4">
-        {/* Status Indicator */}
-        <div className={`w-1 h-20 rounded ${getStatusColor(attendance.status)} flex-shrink-0`} />
-        
-        <div className="flex-1 space-y-2">
-          {/* Top Row */}
-          <div className="flex items-start justify-between">
-            <div>
+    <Card className="hover:shadow-md transition-shadow duration-200">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          {/* Seção esquerda - Foto e informações principais */}
+          <div className="flex items-center space-x-4 flex-1 min-w-0">
+            {/* Avatar */}
+            <Avatar className="w-12 h-12 flex-shrink-0">
+              <AvatarImage src={attendance.citizen.photo} alt={attendance.citizen.name} />
+              <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold">
+                {getInitials(attendance.citizen.name)}
+              </AvatarFallback>
+            </Avatar>
+
+            {/* Informações principais */}
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{attendance.arrivalTime}</span>
-                <span className="text-sm text-muted-foreground">•</span>
-                <span className="text-sm text-muted-foreground">{getStatusLabel(attendance.status)}</span>
+                <h3 className="font-semibold text-gray-900 truncate">{attendance.citizen.name}</h3>
+                <Badge className={`text-xs px-2 py-1 ${getStatusColor(attendance.status)}`}>
+                  {getStatusText(attendance.status)}
+                </Badge>
+                {attendance.vulnerability && (
+                  <Badge className={`text-white text-xs px-2 py-1 ${getVulnerabilityColor(attendance.vulnerability)}`}>
+                    {attendance.vulnerability}
+                  </Badge>
+                )}
               </div>
               
-              <h3 className="font-semibold text-lg">{attendance.citizen.name}</h3>
-              <p className="text-sm text-muted-foreground">{attendance.citizen.age} anos</p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600">
+                <div>
+                  <span className="font-medium">Idade:</span> {attendance.citizen.age} anos
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  <span>{attendance.arrivalTime}</span>
+                </div>
+                <div>
+                  <span className="font-medium">CPF:</span> {attendance.citizen.cpf}
+                </div>
+                <div>
+                  <span className="font-medium">CNS:</span> {attendance.citizen.cns}
+                </div>
+              </div>
+
+              {/* Tipos de serviço */}
+              <div className="flex flex-wrap gap-1 mt-2">
+                {attendance.serviceTypes.map((type, index) => (
+                  <Badge key={index} variant="outline" className="text-xs">
+                    {type}
+                  </Badge>
+                ))}
+              </div>
+
+              {/* Profissional */}
+              <div className="mt-2 text-sm text-gray-600">
+                <span className="font-medium">Profissional:</span> {attendance.professional}
+              </div>
             </div>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {attendance.status === "waiting" && (
-                  <>
-                    <DropdownMenuItem>Cidadão não aguardou</DropdownMenuItem>
-                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                    <DropdownMenuItem>Excluir</DropdownMenuItem>
-                  </>
-                )}
-                {attendance.status === "did-not-wait" && (
-                  <DropdownMenuItem>Cidadão retornou</DropdownMenuItem>
-                )}
-                <DropdownMenuItem>Gerar declaração de comparecimento</DropdownMenuItem>
-                <DropdownMenuItem>Visualizar prontuário</DropdownMenuItem>
-                {attendance.isCompleted && (
-                  <DropdownMenuItem>Visualizar atendimentos do dia</DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
 
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2">
-            {attendance.serviceTypes.map((type) => (
-              <Badge key={type} variant="secondary" className="text-xs">
-                {type}
-              </Badge>
-            ))}
-            {attendance.vulnerability && (
-              <Badge className={`text-white text-xs ${getVulnerabilityColor(attendance.vulnerability)}`}>
-                {attendance.vulnerability}
-              </Badge>
-            )}
-          </div>
-
-          {/* Professional */}
-          <div className="text-sm text-muted-foreground">
-            <span className="font-medium">Profissional:</span> {attendance.professional}
-            {attendance.team && <span> • {attendance.team}</span>}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-2 pt-2">
+          {/* Seção direita - Botões de ação */}
+          <div className="flex items-center space-x-2 ml-4">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button 
-                    size="sm" 
-                    variant={attendance.hasInitialListening ? "outline" : "default"}
-                    className="flex items-center gap-2"
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={handleEscutaInicial}
+                    className="flex items-center gap-1 hover:bg-blue-50 hover:border-blue-300"
                   >
-                    {attendance.hasInitialListening ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                    {attendance.hasInitialListening ? "Ver escuta" : "Escuta inicial"}
+                    <FileText className="w-4 h-4" />
+                    <span className="hidden sm:inline">Escuta Inicial</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{getInitialListeningTooltip()}</p>
+                  <p>Realizar escuta inicial</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -173,28 +161,43 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button 
-                    size="sm" 
-                    variant={attendance.isCompleted ? "outline" : "default"}
-                    className="flex items-center gap-2"
-                    onClick={handleAtendimento}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAtender}
+                    className="flex items-center gap-1 hover:bg-green-50 hover:border-green-300"
                   >
-                    {attendance.serviceTypes.includes("VACINA") ? (
-                      <Syringe className="h-4 w-4" />
-                    ) : (
-                      <Stethoscope className="h-4 w-4" />
-                    )}
-                    {attendance.serviceTypes.includes("VACINA") ? "Vacinar" : "Atender"}
+                    <Stethoscope className="w-4 h-4" />
+                    <span className="hidden sm:inline">Atender</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{getServiceTooltip()}</p>
+                  <p>Realizar atendimento</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleVacinar}
+                    className="flex items-center gap-1 hover:bg-purple-50 hover:border-purple-300"
+                  >
+                    <Syringe className="w-4 h-4" />
+                    <span className="hidden sm:inline">Vacinar</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Realizar vacinação</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };

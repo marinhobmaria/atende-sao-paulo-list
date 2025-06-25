@@ -8,7 +8,7 @@ interface AttendanceListProps {
   filters: any;
 }
 
-// Mock data para demonstração
+// Mock data para demonstração com fotos
 const mockAttendances = [
   {
     id: "1",
@@ -16,12 +16,13 @@ const mockAttendances = [
       name: "Maria Silva Santos",
       age: 45,
       cpf: "123.456.789-00",
-      cns: "123456789012345"
+      cns: "123456789012345",
+      photo: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=100&h=100&fit=crop&crop=face"
     },
     arrivalTime: "08:30",
     status: "waiting",
     serviceTypes: ["DEMANDA ESPONTÂNEA"],
-    professional: "Dr. João Silva",
+    professional: "MARIA MARINHO - MÉDICO CLÍNICO - EQUIPE APS 1",
     team: "Equipe A",
     vulnerability: null,
     hasInitialListening: false,
@@ -34,12 +35,13 @@ const mockAttendances = [
       name: "José Oliveira",
       age: 62,
       cpf: "987.654.321-00",
-      cns: "987654321098765"
+      cns: "987654321098765",
+      photo: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=100&h=100&fit=crop&crop=face"
     },
     arrivalTime: "09:15",
     status: "in-service",
     serviceTypes: ["CONSULTA", "EXAMES"],
-    professional: "Dra. Maria Santos",
+    professional: "JOÃO SILVA - ENFERMEIRO - EQUIPE APS 2",
     team: "Equipe B",
     vulnerability: "ALTA",
     hasInitialListening: true,
@@ -52,12 +54,13 @@ const mockAttendances = [
       name: "Ana Costa Lima",
       age: 33,
       cpf: "456.789.123-00", 
-      cns: "456789123456789"
+      cns: "456789123456789",
+      photo: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=100&h=100&fit=crop&crop=face"
     },
     arrivalTime: "10:00",
     status: "initial-listening",
     serviceTypes: ["VACINA"],
-    professional: "Enf. Ana Costa",
+    professional: "ANA COSTA - TÉCNICO EM ENFERMAGEM - EQUIPE APS 1",
     team: "Equipe A",
     vulnerability: null,
     hasInitialListening: false,
