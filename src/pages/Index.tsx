@@ -6,8 +6,11 @@ import { AddCitizen } from "@/components/attendance/AddCitizen";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Home } from "lucide-react";
 
+// Mock data for queue counts - in a real app this would come from a store/context
+const mockQueueCount = 15;
+const mockWaitingCount = 8;
+
 const Index = () => {
-  const [showAddCitizen, setShowAddCitizen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showMyAttendances, setShowMyAttendances] = useState(false);
   const [sortBy, setSortBy] = useState("arrival");
@@ -53,8 +56,8 @@ const Index = () => {
 
         {/* Add Citizen Section */}
         <AddCitizen
-          showAddCitizen={showAddCitizen}
-          setShowAddCitizen={setShowAddCitizen}
+          queueCount={mockQueueCount}
+          waitingCount={mockWaitingCount}
         />
 
         {/* Attendance List */}
