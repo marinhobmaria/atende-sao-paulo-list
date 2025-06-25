@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Clock, User, Stethoscope, Syringe, FileText } from "lucide-react";
+import { AttendanceActions } from "./AttendanceActions";
 
 interface AttendanceCardProps {
   attendance: {
@@ -128,6 +128,11 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
 
   const professionalInfo = formatProfessionalInfo(attendance.professional);
 
+  const handleStatusChange = (newStatus: string) => {
+    // This would update the attendance status in the real application
+    console.log(`Status changed to: ${newStatus}`);
+  };
+
   return (
     <Card className="hover:shadow-lg hover:scale-[1.02] hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 ease-in-out cursor-pointer relative overflow-hidden">
       {/* Status indicator bar on the left */}
@@ -190,63 +195,11 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
           </div>
 
           {/* Seção direita - Botões de ação */}
-          <div className="flex items-center space-x-2 ml-4">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleEscutaInicial}
-                    className="flex items-center gap-1 hover:bg-blue-50 hover:border-blue-300 hover:scale-105 transition-all duration-200"
-                  >
-                    <FileText className="w-4 h-4" />
-                    <span className="hidden sm:inline">Escuta Inicial</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Realizar escuta inicial</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleAtender}
-                    className="flex items-center gap-1 hover:bg-green-50 hover:border-green-300 hover:scale-105 transition-all duration-200"
-                  >
-                    <Stethoscope className="w-4 h-4" />
-                    <span className="hidden sm:inline">Atender</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Realizar atendimento</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleVacinar}
-                    className="flex items-center gap-1 hover:bg-purple-50 hover:border-purple-300 hover:scale-105 transition-all duration-200"
-                  >
-                    <Syringe className="w-4 h-4" />
-                    <span className="hidden sm:inline">Vacinar</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Realizar vacinação</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          <div className="ml-4">
+            <AttendanceActions 
+              attendance={attendance as any} 
+              onStatusChange={handleStatusChange}
+            />
           </div>
         </div>
       </CardContent>

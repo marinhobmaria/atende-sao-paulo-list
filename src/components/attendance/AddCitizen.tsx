@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -77,6 +76,13 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     // Auto-select the team if professional has one
     if (professionalData.team) {
       setTeam(professionalData.team);
+      // Find the corresponding team data
+      const teamData = {
+        id: professionalData.ine,
+        name: professionalData.team,
+        ine: professionalData.ine
+      };
+      setSelectedTeam(teamData);
     }
   };
 
@@ -102,13 +108,24 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
       return;
     }
 
-    toast({
-      title: "✅ Munícipe foi adicionado com sucesso",
-      description: `${citizen} foi adicionado à fila de atendimento`
-    });
+    // Add citizen to queue using the new function
+    if (selectedCitizen) {
+      const queueItem = addCitizenToQueue(
+        selectedCitizen,
+        professional || "Não informado",
+        team || "Não informado",
+        serviceTypes.length > 0 ? serviceTypes : ["DEMANDA ESPONTÂNEA"],
+        isFromAppointment ? selectedCitizen.todayAppointments?.[0] : undefined
+      );
 
-    clearFields();
-    setShowAddCitizen(false);
+      toast({
+        title: "✅ Munícipe foi adicionado com sucesso",
+        description: `${citizen} foi adicionado à fila de atendimento`
+      });
+
+      clearFields();
+      setShowAddCitizen(false);
+    }
   };
 
   return (

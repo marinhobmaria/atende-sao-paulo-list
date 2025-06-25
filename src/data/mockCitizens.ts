@@ -1,4 +1,3 @@
-
 export interface Citizen {
   id: string;
   name: string;
@@ -158,3 +157,74 @@ export const generateDayAppointments = (): DayAppointment[] => {
 
 export const mockCitizens = generateMockCitizens();
 export const mockDayAppointments = generateDayAppointments();
+
+// Mock data for current user profile
+export const mockCurrentUser = {
+  id: "user_1",
+  name: "Dr. João Silva",
+  profile: "MEDICO", // MEDICO, ENFERMEIRO, CIRURGIAO_DENTISTA
+  cbo: "225125"
+};
+
+// Mock data for attendance queue
+export interface AttendanceQueueItem {
+  id: string;
+  citizen: Citizen;
+  arrivalTime: string;
+  status: "waiting" | "in-service" | "initial-listening" | "pre-service" | "vaccination" | "completed" | "did-not-wait";
+  serviceTypes: string[];
+  professional: string;
+  team: string;
+  vulnerability: string | null;
+  hasInitialListening: boolean;
+  hasPreService: boolean;
+  isCompleted: boolean;
+  addedBy: string; // user ID who added the citizen
+  currentAttendingProfessional?: string; // who is currently attending
+  scheduledAppointment?: DayAppointment;
+}
+
+export let mockAttendanceQueue: AttendanceQueueItem[] = [
+  {
+    id: "queue_1",
+    citizen: mockCitizens[0],
+    arrivalTime: "08:30",
+    status: "waiting",
+    serviceTypes: ["DEMANDA ESPONTÂNEA"],
+    professional: "Dr. João Silva",
+    team: "Equipe APS 1",
+    vulnerability: "BAIXA",
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "user_1"
+  }
+];
+
+// Function to add citizen to queue
+export const addCitizenToQueue = (
+  citizen: Citizen,
+  professional: string,
+  team: string,
+  serviceTypes: string[],
+  scheduledAppointment?: DayAppointment
+): AttendanceQueueItem => {
+  const newQueueItem: AttendanceQueueItem = {
+    id: `queue_${Date.now()}`,
+    citizen,
+    arrivalTime: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+    status: "waiting",
+    serviceTypes,
+    professional,
+    team,
+    vulnerability: citizen.vulnerability,
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: mockCurrentUser.id,
+    scheduledAppointment
+  };
+
+  mockAttendanceQueue.push(newQueueItem);
+  return newQueueItem;
+};
