@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Clock, User, Stethoscope, Syringe, FileText, MoreHorizontal } from "lucide-react";
+import { Clock, FileText, Stethoscope, Syringe, MoreHorizontal } from "lucide-react";
 import { AttendanceActions } from "./AttendanceActions";
 
 interface AttendanceCardProps {
@@ -159,21 +158,10 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
 
           {/* Right side - Action buttons */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Button variant="outline" size="sm" className="text-xs">
-              <FileText className="w-4 h-4 mr-1" />
-              Escuta
-            </Button>
-            <Button variant="outline" size="sm" className="text-xs">
-              <Stethoscope className="w-4 h-4 mr-1" />
-              Atender
-            </Button>
-            <Button variant="outline" size="sm" className="text-xs">
-              <Syringe className="w-4 h-4 mr-1" />
-              Vacinar
-            </Button>
-            <Button variant="ghost" size="sm">
-              <MoreHorizontal className="w-4 h-4" />
-            </Button>
+            <AttendanceActions 
+              attendance={attendance} 
+              onStatusChange={handleStatusChange}
+            />
           </div>
         </div>
       </CardContent>
