@@ -1,11 +1,12 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CitizenSearch } from "./CitizenSearch";
+import { ProfessionalSearch, Professional } from "./ProfessionalSearch";
+import { TeamSearch, Team } from "./TeamSearch";
 import { Citizen, DayAppointment } from "@/data/mockCitizens";
 
 interface AddCitizenProps {
@@ -17,7 +18,9 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
   const [citizen, setCitizen] = useState("");
   const [selectedCitizen, setSelectedCitizen] = useState<Citizen | null>(null);
   const [professional, setProfessional] = useState("");
+  const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null);
   const [team, setTeam] = useState("");
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [serviceTypes, setServiceTypes] = useState<string[]>([]);
   const [isFromAppointment, setIsFromAppointment] = useState(false);
   const { toast } = useToast();
@@ -34,19 +37,13 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     "VACINA"
   ];
 
-  const professionals = [
-    { name: "Dr. João Silva", cpf: "123.456.789-00", cbo: "225125 - Médico clínico", ine: "INE123" },
-    { name: "Dra. Maria Santos", cpf: "987.654.321-00", cbo: "223505 - Enfermeiro", ine: "INE456" },
-    { name: "Enf. Ana Costa", cpf: "456.789.123-00", cbo: "225142 - Médico generalista", ine: "INE789" }
-  ];
-
-  const teams = ["Equipe APS 1", "Equipe APS 2", "Equipe APS 3"];
-
   const clearFields = () => {
     setCitizen("");
     setSelectedCitizen(null);
     setProfessional("");
+    setSelectedProfessional(null);
     setTeam("");
+    setSelectedTeam(null);
     setServiceTypes([]);
     setIsFromAppointment(false);
   };
@@ -72,6 +69,20 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     setTeam(appointment.team);
     setServiceTypes(appointment.serviceType);
     setIsFromAppointment(true);
+  };
+
+  const handleProfessionalSelect = (professionalData: Professional) => {
+    setSelectedProfessional(professionalData);
+    setProfessional(professionalData.name);
+    // Auto-select the team if professional has one
+    if (professionalData.team) {
+      setTeam(professionalData.team);
+    }
+  };
+
+  const handleTeamSelect = (teamData: Team) => {
+    setSelectedTeam(teamData);
+    setTeam(teamData.name);
   };
 
   const handleNewCitizen = () => {
@@ -141,57 +152,24 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
             )}
           </div>
 
-          {/* Don't show citizen info if selected from appointment */}
-          {selectedCitizen && !isFromAppointment && (
-            <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-              <h4 className="font-medium text-blue-900 mb-2">Informações do Munícipe</h4>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div><span className="font-medium">CPF:</span> {selectedCitizen.cpf}</div>
-                <div><span className="font-medium">CNS:</span> {selectedCitizen.cns}</div>
-                <div><span className="font-medium">Prontuário:</span> {selectedCitizen.prontuario}</div>
-                <div><span className="font-medium">Nascimento:</span> {selectedCitizen.birthDate}</div>
-                <div><span className="font-medium">Idade:</span> {selectedCitizen.age} anos</div>
-              </div>
-            </div>
-          )}
-
           {/* Profissional e Equipe em linha */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-sm font-medium mb-1 block">Profissional</label>
-              <Select value={professional} onValueChange={setProfessional}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  {professionals.map((prof) => (
-                    <SelectItem key={prof.name} value={prof.name}>
-                      <div>
-                        <div className="font-medium">{prof.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {prof.cbo}
-                        </div>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ProfessionalSearch
+                value={professional}
+                onChange={setProfessional}
+                onProfessionalSelect={handleProfessionalSelect}
+              />
             </div>
 
             <div>
               <label className="text-sm font-medium mb-1 block">Equipe</label>
-              <Select value={team} onValueChange={setTeam}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  {teams.map((teamName) => (
-                    <SelectItem key={teamName} value={teamName}>
-                      {teamName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <TeamSearch
+                value={team}
+                onChange={setTeam}
+                onTeamSelect={handleTeamSelect}
+              />
             </div>
           </div>
 

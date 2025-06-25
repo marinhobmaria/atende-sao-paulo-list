@@ -95,7 +95,6 @@ export const CitizenSearch = ({
             <div className="p-2 space-y-2">
               {citizenAppointments.map(({ citizen, appointments }) => (
                 <div key={citizen.id}>
-                  {/* Show appointments first if available */}
                   {appointments.length > 0 && (
                     <div className="mb-2">
                       <p className="text-xs font-medium text-gray-600 mb-1 px-2">
@@ -132,7 +131,6 @@ export const CitizenSearch = ({
                     </div>
                   )}
                   
-                  {/* Regular citizen card */}
                   <Card 
                     className="cursor-pointer hover:bg-gray-50 transition-colors"
                     onClick={() => handleCitizenSelect(citizen)}
@@ -183,7 +181,7 @@ export const CitizenSearch = ({
                 size="sm"
               >
                 <Plus className="h-4 w-4" />
-                Novo munícipe (adicionar)
+                Novo munícipe
               </Button>
             </div>
           )}
