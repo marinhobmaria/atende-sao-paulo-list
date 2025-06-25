@@ -1,11 +1,12 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { CitizenSearch } from "./CitizenSearch";
+import { Citizen } from "@/data/mockCitizens";
 
 interface AddCitizenProps {
   showAddCitizen: boolean;
@@ -14,6 +15,7 @@ interface AddCitizenProps {
 
 export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProps) => {
   const [citizen, setCitizen] = useState("");
+  const [selectedCitizen, setSelectedCitizen] = useState<Citizen | null>(null);
   const [professional, setProfessional] = useState("");
   const [team, setTeam] = useState("");
   const [serviceTypes, setServiceTypes] = useState<string[]>([]);
@@ -41,6 +43,7 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
 
   const clearFields = () => {
     setCitizen("");
+    setSelectedCitizen(null);
     setProfessional("");
     setTeam("");
     setServiceTypes([]);
@@ -52,6 +55,19 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     } else {
       setServiceTypes(serviceTypes.filter(type => type !== serviceType));
     }
+  };
+
+  const handleCitizenSelect = (citizenData: Citizen) => {
+    setSelectedCitizen(citizenData);
+    setCitizen(citizenData.name);
+  };
+
+  const handleNewCitizen = () => {
+    // Aqui você pode abrir um modal ou formulário para cadastrar um novo munícipe
+    toast({
+      title: "Funcionalidade em desenvolvimento",
+      description: "Cadastro de novo munícipe será implementado em breve",
+    });
   };
 
   const handleAddCitizen = () => {
@@ -97,21 +113,35 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
 
       {showAddCitizen && (
         <div className="px-3 pb-3 space-y-3">
-          {/* Munícipe */}
+          {/* Munícipe com busca */}
           <div>
             <label className="text-sm font-medium mb-1 block">
               Munícipe <span className="text-red-500">*</span>
             </label>
-            <Input
-              placeholder="Nome, CPF, CNS"
+            <CitizenSearch
               value={citizen}
-              onChange={(e) => setCitizen(e.target.value)}
-              className={!citizen.trim() ? "border-red-300 focus:border-red-500" : ""}
+              onChange={setCitizen}
+              onCitizenSelect={handleCitizenSelect}
+              onNewCitizen={handleNewCitizen}
             />
             {!citizen.trim() && (
               <p className="text-xs text-red-500 mt-1">Campo obrigatório</p>
             )}
           </div>
+
+          {/* Informações do munícipe selecionado */}
+          {selectedCitizen && (
+            <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+              <h4 className="font-medium text-blue-900 mb-2">Informações do Munícipe</h4>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div><span className="font-medium">CPF:</span> {selectedCitizen.cpf}</div>
+                <div><span className="font-medium">CNS:</span> {selectedCitizen.cns}</div>
+                <div><span className="font-medium">Prontuário:</span> {selectedCitizen.prontuario}</div>
+                <div><span className="font-medium">Nascimento:</span> {selectedCitizen.birthDate}</div>
+                <div><span className="font-medium">Idade:</span> {selectedCitizen.age} anos</div>
+              </div>
+            </div>
+          )}
 
           {/* Profissional e Equipe em linha */}
           <div className="grid grid-cols-2 gap-3">
