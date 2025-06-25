@@ -15,27 +15,22 @@ const mockTeams: Team[] = [
   {
     id: "team_1",
     name: "Equipe APS 1",
-    ine: "INE001"
+    ine: "INE123"
   },
   {
-    id: "team_2", 
+    id: "team_2",
     name: "Equipe APS 2",
-    ine: "INE002"
+    ine: "INE456"
   },
   {
     id: "team_3",
-    name: "Equipe APS 3", 
-    ine: "INE003"
+    name: "Equipe APS 3",
+    ine: "INE789"
   },
   {
     id: "team_4",
-    name: "Equipe Saúde da Família Centro",
-    ine: "INE004"
-  },
-  {
-    id: "team_5",
-    name: "Equipe Saúde da Família Bairro Norte",
-    ine: "INE005"
+    name: "Equipe APS 4",
+    ine: "INE457"
   }
 ];
 
@@ -43,12 +38,14 @@ interface TeamSearchProps {
   value: string;
   onChange: (value: string) => void;
   onTeamSelect?: (team: Team) => void;
+  disabled?: boolean;
 }
 
 export const TeamSearch = ({ 
   value, 
   onChange, 
-  onTeamSelect
+  onTeamSelect,
+  disabled = false
 }: TeamSearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -76,6 +73,7 @@ export const TeamSearch = ({
   }, []);
 
   const handleInputChange = (newValue: string) => {
+    if (disabled) return;
     setSearchTerm(newValue);
     onChange(newValue);
     setIsOpen(true);
@@ -93,47 +91,54 @@ export const TeamSearch = ({
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
-          placeholder="Nome da equipe"
-          value={searchTerm}
+          placeholder={disabled ? "Preenchido automaticamente" : "Nome da equipe ou INE"}
+          value={disabled ? value : searchTerm}
           onChange={(e) => handleInputChange(e.target.value)}
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => !disabled && setIsOpen(true)}
           className="pl-10"
+          disabled={disabled}
         />
       </div>
 
-      {isOpen && filteredTeams.length > 0 && (
+      {isOpen && !disabled && (
         <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
-          <div className="p-2 space-y-2">
-            {filteredTeams.map((team) => (
-              <Card 
-                key={team.id}
-                className="cursor-pointer hover:bg-gray-50 transition-colors"
-                onClick={() => handleTeamSelect(team)}
-              >
-                <CardContent className="p-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex-shrink-0">
-                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                        <Users className="w-4 h-4 text-green-600" />
+          {filteredTeams.length > 0 ? (
+            <div className="p-2 space-y-2">
+              {filteredTeams.map((team) => (
+                <Card 
+                  key={team.id}
+                  className="cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() => handleTeamSelect(team)}
+                >
+                  <CardContent className="p-3">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                          <Users className="w-4 h-4 text-purple-600" />
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 truncate">
-                        {team.name}
-                      </h4>
                       
-                      <div className="mt-1">
-                        <Badge variant="outline" className="text-xs px-2 py-0.5">
-                          INE: {team.ine}
-                        </Badge>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-900 truncate">
+                          {team.name}
+                        </h4>
+                        
+                        <div className="mt-1">
+                          <Badge variant="outline" className="text-xs px-2 py-0.5">
+                            INE: {team.ine}
+                          </Badge>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : searchTerm.trim() && (
+            <div className="p-4 text-center">
+              <p className="text-gray-500">Nenhuma equipe encontrada</p>
+            </div>
+          )}
         </div>
       )}
     </div>

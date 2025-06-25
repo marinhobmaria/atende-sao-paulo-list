@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -7,6 +8,7 @@ import { CitizenSearch } from "./CitizenSearch";
 import { ProfessionalSearch, Professional } from "./ProfessionalSearch";
 import { TeamSearch, Team } from "./TeamSearch";
 import { Citizen, DayAppointment, addCitizenToQueue } from "@/data/mockCitizens";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface AddCitizenProps {
   showAddCitizen: boolean;
@@ -22,6 +24,8 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [serviceTypes, setServiceTypes] = useState<string[]>([]);
   const [isFromAppointment, setIsFromAppointment] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<DayAppointment | null>(null);
+  const [showAppointmentSelect, setShowAppointmentSelect] = useState(false);
   const { toast } = useToast();
 
   const serviceTypeOptions = [
@@ -45,6 +49,8 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     setSelectedTeam(null);
     setServiceTypes([]);
     setIsFromAppointment(false);
+    setSelectedAppointment(null);
+    setShowAppointmentSelect(false);
   };
 
   const handleServiceTypeChange = (serviceType: string, checked: boolean) => {
@@ -59,15 +65,44 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     setSelectedCitizen(citizenData);
     setCitizen(citizenData.name);
     setIsFromAppointment(false);
+    setSelectedAppointment(null);
+    
+    // Check if citizen has appointments today
+    if (citizenData.todayAppointments && citizenData.todayAppointments.length > 0) {
+      setShowAppointmentSelect(true);
+    } else {
+      setShowAppointmentSelect(false);
+      // Clear professional and team fields to allow manual input
+      setProfessional("");
+      setSelectedProfessional(null);
+      setTeam("");
+      setSelectedTeam(null);
+      setServiceTypes([]);
+    }
   };
 
   const handleAppointmentSelect = (appointment: DayAppointment, citizenData: Citizen) => {
     setSelectedCitizen(citizenData);
     setCitizen(citizenData.name);
+    setSelectedAppointment(appointment);
     setProfessional(appointment.professional);
     setTeam(appointment.team);
     setServiceTypes(appointment.serviceType);
     setIsFromAppointment(true);
+    setShowAppointmentSelect(false);
+  };
+
+  const handleSpecificAppointmentSelect = (appointmentId: string) => {
+    if (selectedCitizen && selectedCitizen.todayAppointments) {
+      const appointment = selectedCitizen.todayAppointments.find(apt => apt.id === appointmentId);
+      if (appointment) {
+        setSelectedAppointment(appointment);
+        setProfessional(appointment.professional);
+        setTeam(appointment.team);
+        setServiceTypes(appointment.serviceType);
+        setIsFromAppointment(true);
+      }
+    }
   };
 
   const handleProfessionalSelect = (professionalData: Professional) => {
@@ -115,7 +150,7 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
         professional || "Não informado",
         team || "Não informado",
         serviceTypes.length > 0 ? serviceTypes : ["DEMANDA ESPONTÂNEA"],
-        isFromAppointment ? selectedCitizen.todayAppointments?.[0] : undefined
+        selectedAppointment || undefined
       );
 
       toast({
@@ -169,6 +204,28 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
             )}
           </div>
 
+          {/* Select specific appointment if citizen has multiple appointments */}
+          {showAppointmentSelect && selectedCitizen?.todayAppointments && selectedCitizen.todayAppointments.length > 0 && (
+            <div>
+              <label className="text-sm font-medium mb-1 block">Próximo agendamento do dia</label>
+              <Select onValueChange={handleSpecificAppointmentSelect}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um agendamento (opcional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {selectedCitizen.todayAppointments.map((appointment) => (
+                    <SelectItem key={appointment.id} value={appointment.id}>
+                      {appointment.time} - {appointment.professional} - {appointment.serviceType.join(", ")}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500 mt-1">
+                Se não selecionado, você poderá preencher os campos manualmente
+              </p>
+            </div>
+          )}
+
           {/* Profissional e Equipe em linha */}
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -177,6 +234,7 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
                 value={professional}
                 onChange={setProfessional}
                 onProfessionalSelect={handleProfessionalSelect}
+                disabled={isFromAppointment}
               />
             </div>
 
@@ -186,6 +244,7 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
                 value={team}
                 onChange={setTeam}
                 onTeamSelect={handleTeamSelect}
+                disabled={isFromAppointment}
               />
             </div>
           </div>
@@ -199,11 +258,17 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
                   <Checkbox
                     checked={serviceTypes.includes(serviceType)}
                     onCheckedChange={(checked) => handleServiceTypeChange(serviceType, checked as boolean)}
+                    disabled={isFromAppointment}
                   />
                   <span className="text-xs">{serviceType}</span>
                 </div>
               ))}
             </div>
+            {isFromAppointment && (
+              <p className="text-xs text-blue-600 mt-1">
+                Tipos de serviço preenchidos automaticamente pelo agendamento
+              </p>
+            )}
           </div>
 
           {/* Buttons */}

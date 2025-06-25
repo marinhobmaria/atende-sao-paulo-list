@@ -122,28 +122,34 @@ export const generateDayAppointments = (): DayAppointment[] => {
   const professionals = [
     { name: "Dr. João Silva", cpf: "123.456.789-00", cbo: "225125 - Médico clínico", ine: "INE123" },
     { name: "Dra. Maria Santos", cpf: "987.654.321-00", cbo: "223505 - Enfermeiro", ine: "INE456" },
-    { name: "Enf. Ana Costa", cpf: "456.789.123-00", cbo: "225142 - Médico generalista", ine: "INE789" }
+    { name: "Enf. Ana Costa", cpf: "456.789.123-00", cbo: "225142 - Médico generalista", ine: "INE789" },
+    { name: "Dr. Carlos Oliveira", cpf: "111.222.333-44", cbo: "225125 - Médico clínico", ine: "INE124" },
+    { name: "Dra. Fernanda Lima", cpf: "555.666.777-88", cbo: "223505 - Enfermeiro", ine: "INE457" },
+    { name: "Dr. Pedro Rodrigues", cpf: "999.888.777-66", cbo: "225142 - Médico generalista", ine: "INE790" }
   ];
   
-  const teams = ["Equipe APS 1", "Equipe APS 2", "Equipe APS 3"];
+  const teams = ["Equipe APS 1", "Equipe APS 2", "Equipe APS 3", "Equipe APS 4"];
   
   const serviceTypes = [
-    "CONSULTA MÉDICA",
-    "ENFERMAGEM", 
-    "ODONTOLOGIA",
-    "VACINA",
-    "CURATIVO"
+    ["CONSULTA MÉDICA"],
+    ["ENFERMAGEM"], 
+    ["ODONTOLOGIA"],
+    ["VACINA"],
+    ["CURATIVO"],
+    ["ADMINISTRAÇÃO DE MEDICAMENTO"],
+    ["EXAMES"],
+    ["NEBULIZAÇÃO"]
   ];
   
-  // Generate 5 appointments for today
-  for (let i = 0; i < 5; i++) {
-    const citizen = citizens[Math.floor(Math.random() * citizens.length)];
+  // Generate 15 appointments for today
+  for (let i = 0; i < 15; i++) {
+    const citizen = citizens[i]; // Use first 15 citizens to ensure we have enough
     const professional = professionals[Math.floor(Math.random() * professionals.length)];
     const team = teams[Math.floor(Math.random() * teams.length)];
-    const serviceType = [serviceTypes[Math.floor(Math.random() * serviceTypes.length)]];
+    const serviceType = serviceTypes[Math.floor(Math.random() * serviceTypes.length)];
     
-    const hour = 13 + i; // Starting from 13:00
-    const minutes = Math.floor(Math.random() * 6) * 10; // 00, 10, 20, 30, 40, 50
+    const hour = 13 + Math.floor(i / 3); // Distribute throughout the afternoon
+    const minutes = (i % 3) * 20; // 00, 20, 40
     
     appointments.push({
       id: `appointment_${i + 1}`,
@@ -234,3 +240,11 @@ export const addCitizenToQueue = (
   mockAttendanceQueue.push(newQueueItem);
   return newQueueItem;
 };
+
+// Update citizens to include their appointments
+mockCitizens.forEach(citizen => {
+  const citizenAppointments = mockDayAppointments.filter(apt => apt.citizenId === citizen.id);
+  if (citizenAppointments.length > 0) {
+    citizen.todayAppointments = citizenAppointments;
+  }
+});
