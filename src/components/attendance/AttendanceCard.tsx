@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Clock, User, Stethoscope, Syringe, FileText } from "lucide-react";
+import { Clock, User, Stethoscope, Syringe, FileText, MoreHorizontal } from "lucide-react";
 import { AttendanceActions } from "./AttendanceActions";
 
 interface AttendanceCardProps {
@@ -57,18 +57,6 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
     }
   };
 
-  const getStatusBarColor = (status: string) => {
-    switch (status) {
-      case "waiting": return "bg-green-500";
-      case "in-service": return "bg-purple-500";
-      case "initial-listening": return "bg-pink-500";
-      case "vaccination": return "bg-purple-500";
-      case "completed": return "bg-blue-500";
-      case "did-not-wait": return "bg-gray-500";
-      default: return "bg-gray-500";
-    }
-  };
-
   const getVulnerabilityColor = (vulnerability: string | null) => {
     if (!vulnerability) return null;
     switch (vulnerability) {
@@ -80,7 +68,6 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
   };
 
   const formatProfessionalInfo = (professional: string) => {
-    // Extract parts from "MARIA MARINHO - MÉDICO CLÍNICO - EQUIPE APS 1"
     const parts = professional.split(' - ');
     if (parts.length >= 3) {
       return {
@@ -101,7 +88,6 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
   };
 
   const calculateDetailedAge = (age: number) => {
-    // Mock calculation for demonstration - in real app this would be calculated from birth date
     const years = age;
     const months = Math.floor(Math.random() * 12);
     const days = Math.floor(Math.random() * 30);
@@ -112,20 +98,15 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
   const detailedAge = calculateDetailedAge(attendance.citizen.age);
 
   const handleStatusChange = (newStatus: string) => {
-    // This would update the attendance status in the real application
     console.log(`Status changed to: ${newStatus}`);
   };
 
   return (
-    <Card className="hover:shadow-lg hover:scale-[1.01] hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 ease-in-out cursor-pointer relative overflow-hidden">
-      {/* Status indicator bar on the left */}
-      <div className={`absolute left-0 top-0 bottom-0 w-1 ${getStatusBarColor(attendance.status)}`} />
-      
-      <CardContent className="p-3 ml-1">
-        <div className="flex items-start gap-3">
-          {/* Seção esquerda - Avatar e informações */}
-          <div className="flex items-start gap-3 flex-1 min-w-0">
-            {/* Avatar */}
+    <Card className="hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          {/* Left side - Avatar and basic info */}
+          <div className="flex items-center gap-3">
             <Avatar className="w-12 h-12 flex-shrink-0">
               <AvatarImage src={attendance.citizen.photo} alt={attendance.citizen.name} />
               <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-sm">
@@ -133,11 +114,10 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
               </AvatarFallback>
             </Avatar>
 
-            {/* Informações do munícipe */}
-            <div className="flex-1 min-w-0">
-              {/* Nome e badges */}
-              <div className="flex items-center gap-2 flex-wrap mb-2">
-                <h3 className="font-bold text-gray-900 text-lg leading-tight">
+            <div className="min-w-0">
+              {/* Nome e status */}
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-bold text-gray-900 text-base leading-tight">
                   {attendance.citizen.name}
                 </h3>
                 <Badge className={`text-xs px-2 py-0.5 ${getStatusColor(attendance.status)}`}>
@@ -151,53 +131,49 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
               </div>
               
               {/* Idade e horário */}
-              <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+              <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
                 <span className="font-medium">{detailedAge}</span>
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
                   <span>Inclusão: {attendance.arrivalTime}</span>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Seção central - Informações profissionais */}
-          <div className="flex-1 min-w-0 space-y-1">
-            <div className="text-sm text-gray-700">
-              <span className="font-medium text-gray-800">Profissional:</span> {professionalInfo.name}
-            </div>
-            
-            {professionalInfo.specialty && (
-              <div className="text-sm text-gray-700">
-                <span className="font-medium text-gray-800">Especialidade:</span> {professionalInfo.specialty}
-              </div>
-            )}
-
-            <div className="text-sm text-gray-700">
-              <span className="font-medium text-gray-800">Equipe:</span> {attendance.team}
-            </div>
-
-            {/* Tipos de serviço */}
-            {attendance.serviceTypes.length > 0 && (
-              <div className="space-y-1">
-                <span className="text-sm font-medium text-gray-800">Serviços:</span>
-                <div className="flex flex-wrap gap-1">
-                  {attendance.serviceTypes.map((type, index) => (
-                    <Badge key={index} variant="outline" className="text-xs px-2 py-0.5">
-                      {type}
-                    </Badge>
-                  ))}
+              {/* Informações profissionais em linha */}
+              <div className="flex flex-wrap gap-4 text-sm text-gray-700">
+                <div>
+                  <span className="font-medium text-gray-800">Profissional:</span> {professionalInfo.name}
+                </div>
+                <div>
+                  <span className="font-medium text-gray-800">Especialidade:</span> {professionalInfo.specialty || attendance.team}
+                </div>
+                <div>
+                  <span className="font-medium text-gray-800">Equipe:</span> {attendance.team}
+                </div>
+                <div>
+                  <span className="font-medium text-gray-800">Serviços:</span> {attendance.serviceTypes.join(', ')}
                 </div>
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Seção direita - Botões de ação */}
-          <div className="flex-shrink-0">
-            <AttendanceActions 
-              attendance={attendance as any} 
-              onStatusChange={handleStatusChange}
-            />
+          {/* Right side - Action buttons */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Button variant="outline" size="sm" className="text-xs">
+              <FileText className="w-4 h-4 mr-1" />
+              Escuta
+            </Button>
+            <Button variant="outline" size="sm" className="text-xs">
+              <Stethoscope className="w-4 h-4 mr-1" />
+              Atender
+            </Button>
+            <Button variant="outline" size="sm" className="text-xs">
+              <Syringe className="w-4 h-4 mr-1" />
+              Vacinar
+            </Button>
+            <Button variant="ghost" size="sm">
+              <MoreHorizontal className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </CardContent>
