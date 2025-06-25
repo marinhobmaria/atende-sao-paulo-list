@@ -1,96 +1,138 @@
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, User, Eye, ClipboardList, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { FileText, User, Eye, ClipboardList, Calendar, ChevronDown, CheckCircle } from "lucide-react";
 import { SOAPAntecedentes } from "./SOAPAntecedentes";
 import { SOAPSubjetivo } from "./SOAPSubjetivo";
 import { SOAPObjetivo } from "./SOAPObjetivo";
 import { SOAPAvaliacao } from "./SOAPAvaliacao";
 import { SOAPPlano } from "./SOAPPlano";
 
-export const SOAPContainer = () => {
+interface SOAPContainerProps {
+  onFinalizarAtendimento?: () => void;
+}
+
+export const SOAPContainer = ({ onFinalizarAtendimento }: SOAPContainerProps) => {
+  const [openSections, setOpenSections] = useState<string[]>(["antecedentes"]);
+
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => 
+      prev.includes(section) 
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
+    );
+  };
+
+  const sections = [
+    {
+      id: "antecedentes",
+      title: "Antecedentes",
+      icon: User,
+      color: "blue",
+      component: SOAPAntecedentes
+    },
+    {
+      id: "subjetivo", 
+      title: "Subjetivo",
+      icon: FileText,
+      color: "blue",
+      component: SOAPSubjetivo
+    },
+    {
+      id: "objetivo",
+      title: "Objetivo", 
+      icon: Eye,
+      color: "green",
+      component: SOAPObjetivo
+    },
+    {
+      id: "avaliacao",
+      title: "Avaliação",
+      icon: ClipboardList,
+      color: "orange", 
+      component: SOAPAvaliacao
+    },
+    {
+      id: "plano",
+      title: "Plano",
+      icon: Calendar,
+      color: "purple",
+      component: SOAPPlano
+    }
+  ];
+
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-6 rounded-lg border border-emerald-200">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center">
-            <FileText className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-semibold text-emerald-900">SOAP</h2>
-            <p className="text-emerald-700">Método de documentação clínica estruturada</p>
-          </div>
-        </div>
-        <p className="text-sm text-emerald-600 mt-2">
-          Registre informações seguindo a metodologia SOAP: Subjetivo, Objetivo, Avaliação e Plano
-        </p>
-      </div>
-
+    <div className="space-y-4">
       <Card className="shadow-lg">
-        <CardContent className="p-0">
-          <Tabs defaultValue="antecedentes" className="w-full">
-            <div className="border-b bg-gray-50 p-4">
-              <TabsList className="grid w-full grid-cols-5 bg-white shadow-sm">
-                <TabsTrigger 
-                  value="antecedentes" 
-                  className="flex items-center gap-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white"
-                >
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">Antecedentes</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="subjetivo"
-                  className="flex items-center gap-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white"
-                >
-                  <FileText className="h-4 w-4" />
-                  <span className="hidden sm:inline">Subjetivo</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="objetivo"
-                  className="flex items-center gap-2 data-[state=active]:bg-green-600 data-[state=active]:text-white"
-                >
-                  <Eye className="h-4 w-4" />
-                  <span className="hidden sm:inline">Objetivo</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="avaliacao"
-                  className="flex items-center gap-2 data-[state=active]:bg-orange-600 data-[state=active]:text-white"
-                >
-                  <ClipboardList className="h-4 w-4" />
-                  <span className="hidden sm:inline">Avaliação</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="plano"
-                  className="flex items-center gap-2 data-[state=active]:bg-purple-600 data-[state=active]:text-white"
-                >
-                  <Calendar className="h-4 w-4" />
-                  <span className="hidden sm:inline">Plano</span>
-                </TabsTrigger>
-              </TabsList>
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center">
+                <FileText className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl font-semibold text-emerald-900">SOAP</CardTitle>
+              </div>
             </div>
+            {onFinalizarAtendimento && (
+              <Button
+                onClick={onFinalizarAtendimento}
+                className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+              >
+                <CheckCircle className="h-4 w-4" />
+                Finalizar Atendimento
+              </Button>
+            )}
+          </div>
+        </CardHeader>
 
-            <div className="p-6">
-              <TabsContent value="antecedentes" className="mt-0">
-                <SOAPAntecedentes />
-              </TabsContent>
-
-              <TabsContent value="subjetivo" className="mt-0">
-                <SOAPSubjetivo />
-              </TabsContent>
-
-              <TabsContent value="objetivo" className="mt-0">
-                <SOAPObjetivo />
-              </TabsContent>
-
-              <TabsContent value="avaliacao" className="mt-0">
-                <SOAPAvaliacao />
-              </TabsContent>
-
-              <TabsContent value="plano" className="mt-0">
-                <SOAPPlano />
-              </TabsContent>
-            </div>
-          </Tabs>
+        <CardContent className="space-y-4">
+          {sections.map((section) => {
+            const IconComponent = section.icon;
+            const ContentComponent = section.component;
+            const isOpen = openSections.includes(section.id);
+            
+            return (
+              <Collapsible
+                key={section.id}
+                open={isOpen}
+                onOpenChange={() => toggleSection(section.id)}
+              >
+                <CollapsibleTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between p-4 h-auto hover:bg-gray-50"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        section.color === "blue" ? "bg-blue-600" :
+                        section.color === "green" ? "bg-green-600" :
+                        section.color === "orange" ? "bg-orange-600" :
+                        section.color === "purple" ? "bg-purple-600" : "bg-gray-600"
+                      }`}>
+                        <IconComponent className="h-4 w-4 text-white" />
+                      </div>
+                      <span className="font-semibold text-lg">{section.title}</span>
+                    </div>
+                    <ChevronDown 
+                      className={`h-5 w-5 transition-transform duration-200 ${
+                        isOpen ? "rotate-180" : ""
+                      }`} 
+                    />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2">
+                  <Card>
+                    <CardContent className="p-6">
+                      <ContentComponent />
+                    </CardContent>
+                  </Card>
+                </CollapsibleContent>
+              </Collapsible>
+            );
+          })}
         </CardContent>
       </Card>
     </div>

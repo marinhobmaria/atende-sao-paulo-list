@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -178,13 +177,6 @@ const Atendimento = () => {
               
               <div className="flex gap-2 ml-4">
                 <Button
-                  onClick={() => setShowFinalizacao(true)}
-                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
-                >
-                  <CheckCircle className="h-4 w-4" />
-                  Finalizar Atendimento
-                </Button>
-                <Button
                   variant="outline"
                   onClick={() => navigate("/")}
                   className="flex items-center gap-2"
@@ -260,7 +252,7 @@ const Atendimento = () => {
                 </TabsContent>
 
                 <TabsContent value="soap" className="mt-0">
-                  <SOAPContainer />
+                  <SOAPContainer onFinalizarAtendimento={() => setShowFinalizacao(true)} />
                 </TabsContent>
 
                 <TabsContent value="vacinacao" className="mt-0">
