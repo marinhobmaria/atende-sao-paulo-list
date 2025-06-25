@@ -1,3 +1,4 @@
+
 import { AttendanceCard } from "./AttendanceCard";
 
 interface AttendanceListProps {
@@ -7,7 +8,7 @@ interface AttendanceListProps {
   filters: any;
 }
 
-// Mock data para demonstração com fotos
+// Mock data para demonstração com fotos e diferentes status
 const mockAttendances = [
   {
     id: "1",
@@ -22,11 +23,12 @@ const mockAttendances = [
     status: "waiting",
     serviceTypes: ["DEMANDA ESPONTÂNEA"],
     professional: "MARIA MARINHO - MÉDICO CLÍNICO - EQUIPE APS 1",
-    team: "Equipe A",
+    team: "Equipe APS 1",
     vulnerability: null,
     hasInitialListening: false,
     hasPreService: false,
-    isCompleted: false
+    isCompleted: false,
+    scheduledAppointment: null
   },
   {
     id: "2", 
@@ -41,11 +43,12 @@ const mockAttendances = [
     status: "in-service",
     serviceTypes: ["CONSULTA", "EXAMES"],
     professional: "JOÃO SILVA - ENFERMEIRO - EQUIPE APS 2",
-    team: "Equipe B",
+    team: "Equipe APS 2",
     vulnerability: "ALTA",
     hasInitialListening: true,
     hasPreService: false,
-    isCompleted: false
+    isCompleted: false,
+    scheduledAppointment: { id: "apt_1", time: "09:15" }
   },
   {
     id: "3",
@@ -60,11 +63,12 @@ const mockAttendances = [
     status: "initial-listening",
     serviceTypes: ["VACINA"],
     professional: "ANA COSTA - TÉCNICO EM ENFERMAGEM - EQUIPE APS 1",
-    team: "Equipe A",
+    team: "Equipe APS 1",
     vulnerability: null,
     hasInitialListening: false,
     hasPreService: false,
-    isCompleted: false
+    isCompleted: false,
+    scheduledAppointment: null
   },
   {
     id: "4",
@@ -79,11 +83,132 @@ const mockAttendances = [
     status: "vaccination",
     serviceTypes: ["VACINA", "PROCEDIMENTOS"],
     professional: "PEDRO SANTOS - ENFERMEIRO - EQUIPE APS 3",
-    team: "Equipe C",
+    team: "Equipe APS 3",
     vulnerability: "BAIXA",
     hasInitialListening: true,
     hasPreService: true,
-    isCompleted: false
+    isCompleted: false,
+    scheduledAppointment: null
+  },
+  {
+    id: "5",
+    citizen: {
+      name: "Fernanda Rodrigues",
+      age: 55,
+      cpf: "321.654.987-00",
+      cns: "321654987321654",
+      photo: "https://images.unsplash.com/photo-1494790108755-2616b612b784?w=100&h=100&fit=crop&crop=face"
+    },
+    arrivalTime: "11:00",
+    status: "completed",
+    serviceTypes: ["PRÉ-CONSULTA", "CONSULTA"],
+    professional: "CARLA MENDES - MÉDICO GENERALISTA - EQUIPE APS 2",
+    team: "Equipe APS 2",
+    vulnerability: "MÉDIA",
+    hasInitialListening: false,
+    hasPreService: true,
+    isCompleted: true,
+    scheduledAppointment: { id: "apt_2", time: "11:00" }
+  },
+  {
+    id: "6",
+    citizen: {
+      name: "Roberto Santos",
+      age: 41,
+      cpf: "654.321.987-00",
+      cns: "654321987654321",
+      photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face"
+    },
+    arrivalTime: "11:30",
+    status: "waiting",
+    serviceTypes: [],
+    professional: "LUCAS FERNANDES - MÉDICO CLÍNICO - EQUIPE APS 1",
+    team: "Equipe APS 1",
+    vulnerability: null,
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    scheduledAppointment: { id: "apt_3", time: "11:30" }
+  },
+  {
+    id: "7",
+    citizen: {
+      name: "Juliana Alves",
+      age: 29,
+      cpf: "147.258.369-00",
+      cns: "147258369147258",
+      photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face"
+    },
+    arrivalTime: "12:00",
+    status: "did-not-wait",
+    serviceTypes: ["DEMANDA ESPONTÂNEA"],
+    professional: "PATRICIA LIMA - ENFERMEIRO - EQUIPE APS 3",
+    team: "Equipe APS 3",
+    vulnerability: "BAIXA",
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    scheduledAppointment: null
+  },
+  {
+    id: "8",
+    citizen: {
+      name: "Marcos Oliveira",
+      age: 67,
+      cpf: "369.258.147-00",
+      cns: "369258147369258",
+      photo: "https://images.unsplash.com/photo-1556474835-b0f3ac40d4d1?w=100&h=100&fit=crop&crop=face"
+    },
+    arrivalTime: "13:15",
+    status: "in-service",
+    serviceTypes: ["CURATIVO", "MEDICAÇÃO"],
+    professional: "SANDRA TORRES - TÉCNICO EM ENFERMAGEM - EQUIPE APS 2",
+    team: "Equipe APS 2",
+    vulnerability: "ALTA",
+    hasInitialListening: true,
+    hasPreService: false,
+    isCompleted: false,
+    scheduledAppointment: null
+  },
+  {
+    id: "9",
+    citizen: {
+      name: "Beatriz Costa",
+      age: 38,
+      cpf: "258.147.369-00",
+      cns: "258147369258147",
+      photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face"
+    },
+    arrivalTime: "13:45",
+    status: "vaccination",
+    serviceTypes: ["VACINA COVID", "VACINA GRIPE"],
+    professional: "RAFAEL SILVA - ENFERMEIRO - EQUIPE APS 1",
+    team: "Equipe APS 1",
+    vulnerability: null,
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    scheduledAppointment: null
+  },
+  {
+    id: "10",
+    citizen: {
+      name: "Diego Martins",
+      age: 52,
+      cpf: "741.852.963-00",
+      cns: "741852963741852",
+      photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face"
+    },
+    arrivalTime: "14:00",
+    status: "initial-listening",
+    serviceTypes: ["DEMANDA ESPONTÂNEA"],
+    professional: "GABRIELA SANTOS - MÉDICO CLÍNICO - EQUIPE APS 3",
+    team: "Equipe APS 3",
+    vulnerability: "MÉDIA",
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    scheduledAppointment: null
   }
 ];
 

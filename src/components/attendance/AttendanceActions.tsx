@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -34,42 +35,53 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
   const getButtonsForAttendance = () => {
     const buttons = [];
 
-    // Botão Escuta Inicial / Pré-Consulta
-    if (isScheduledAppointment) {
-      // Para agendamentos: Pré-Consulta
-      buttons.push({
-        key: 'pre-consulta',
-        label: 'Pré-Consulta',
-        shortLabel: 'Pré',
-        icon: FileText,
-        action: () => navigate(`/pre-atendimento?cidadao=${attendance.id}`),
-        disabled: attendance.hasPreService,
-        tooltip: attendance.hasPreService ? "Pré-consulta já realizada" : "Realizar pré-consulta"
-      });
-    } else {
-      // Para demanda espontânea: Escuta Inicial
-      buttons.push({
-        key: 'escuta-inicial',
-        label: 'Escuta Inicial',
-        shortLabel: 'Escuta',
-        icon: FileText,
-        action: () => navigate(`/escuta-inicial?cidadao=${attendance.id}`),
-        disabled: attendance.hasInitialListening,
-        tooltip: attendance.hasInitialListening ? "Escuta inicial já realizada" : "Realizar escuta inicial"
-      });
+    // Mostrar Escuta/Pré-consulta para agendamentos, sem serviços ou demanda espontânea
+    const shouldShowEscuta = isScheduledAppointment || 
+                            attendance.serviceTypes.length === 0 || 
+                            attendance.serviceTypes.includes("DEMANDA ESPONTÂNEA");
+
+    if (shouldShowEscuta) {
+      if (isScheduledAppointment) {
+        // Para agendamentos: Pré-Consulta
+        buttons.push({
+          key: 'pre-consulta',
+          label: 'Pré-Consulta',
+          shortLabel: 'Pré',
+          icon: FileText,
+          action: () => navigate(`/pre-atendimento?cidadao=${attendance.id}`),
+          disabled: attendance.hasPreService,
+          tooltip: "Realizar Escuta"
+        });
+      } else {
+        // Para demanda espontânea: Escuta Inicial  
+        buttons.push({
+          key: 'escuta-inicial',
+          label: 'Escuta Inicial',
+          shortLabel: 'Escuta',
+          icon: FileText,
+          action: () => navigate(`/escuta-inicial?cidadao=${attendance.id}`),
+          disabled: attendance.hasInitialListening,
+          tooltip: "Realizar Escuta"
+        });
+      }
     }
 
-    // Botão Atender - sempre presente
-    const canAttend = isScheduledAppointment ? attendance.hasPreService : attendance.hasInitialListening;
-    buttons.push({
-      key: 'atender',
-      label: 'Atender',
-      shortLabel: 'Atender',
-      icon: Stethoscope,
-      action: () => navigate(`/atendimento?cidadao=${attendance.id}`),
-      disabled: false, // Sempre habilitado
-      tooltip: attendance.isCompleted ? "Atendimento realizado" : "Realizar atendimento"
-    });
+    // Mostrar Atender para agendamentos, sem serviços ou demanda espontânea
+    const shouldShowAtender = isScheduledAppointment || 
+                             attendance.serviceTypes.length === 0 || 
+                             attendance.serviceTypes.includes("DEMANDA ESPONTÂNEA");
+
+    if (shouldShowAtender) {
+      buttons.push({
+        key: 'atender',
+        label: 'Atender',
+        shortLabel: 'Atender',
+        icon: Stethoscope,
+        action: () => navigate(`/atendimento?cidadao=${attendance.id}`),
+        disabled: false,
+        tooltip: "Realizar Atendimento"
+      });
+    }
 
     return buttons;
   };
@@ -162,7 +174,7 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
 
   return (
     <div className="flex items-center gap-1">
-      {/* Botões principais ultra compactos */}
+      {/* Botões principais ultra compactos com tooltips */}
       {buttons.map((button) => (
         <TooltipProvider key={button.key}>
           <Tooltip>
@@ -189,7 +201,7 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
         </TooltipProvider>
       ))}
 
-      {/* Botão Vacinar ultra compacto */}
+      {/* Botão Vacinar ultra compacto com tooltip */}
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -204,7 +216,7 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Realizar vacinação</p>
+            <p>Realizar Vacina</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
