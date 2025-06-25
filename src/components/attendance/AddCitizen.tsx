@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface AddCitizenProps {
@@ -12,22 +12,45 @@ interface AddCitizenProps {
   setShowAddCitizen: (show: boolean) => void;
 }
 
+// Mock scheduling data
+const mockSchedulings = [
+  {
+    id: "1",
+    time: "09:00",
+    citizen: "Maria Silva Santos",
+    professional: "Dr. João Silva",
+    specialty: "Médico Clínico",
+    team: "Equipe APS 1",
+    serviceType: "CONSULTA"
+  },
+  {
+    id: "2", 
+    time: "14:30",
+    citizen: "José Oliveira",
+    professional: "Dra. Ana Costa",
+    specialty: "Enfermeiro",
+    team: "Equipe APS 2",
+    serviceType: "PROCEDIMENTOS"
+  }
+];
+
 export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProps) => {
   const [citizen, setCitizen] = useState("");
+  const [selectedScheduling, setSelectedScheduling] = useState("");
   const [professional, setProfessional] = useState("");
   const [team, setTeam] = useState("");
   const [serviceTypes, setServiceTypes] = useState<string[]>([]);
   const { toast } = useToast();
 
   const serviceTypeOptions = [
-    "ADM. MEDICAMENTO",
-    "ESCUTA INICIAL", 
-    "ODONTOLOGIA",
+    "ADMINISTRAÇÃO DE MEDICAMENTO",
     "CURATIVO",
+    "DEMANDA ESPONTÂNEA", 
+    "ESCUTA INICIAL",
     "EXAMES",
-    "PROCEDIMENTOS",
-    "DEMANDA ESPONTÂNEA",
     "NEBULIZAÇÃO",
+    "ODONTOLOGIA",
+    "PROCEDIMENTOS",
     "VACINA"
   ];
 
@@ -37,13 +60,25 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
     { name: "Enf. Ana Costa", cpf: "456.789.123-00", cbo: "225142 - Médico generalista", ine: "INE789" }
   ];
 
-  const teams = ["Equipe A", "Equipe B", "Equipe C"];
+  const teams = ["Equipe APS 1", "Equipe APS 2", "Equipe APS 3"];
 
   const clearFields = () => {
     setCitizen("");
+    setSelectedScheduling("");
     setProfessional("");
     setTeam("");
     setServiceTypes([]);
+  };
+
+  const handleSchedulingSelect = (schedulingId: string) => {
+    const scheduling = mockSchedulings.find(s => s.id === schedulingId);
+    if (scheduling) {
+      setCitizen(scheduling.citizen);
+      setProfessional(scheduling.professional);
+      // Find team based on professional
+      setTeam(scheduling.team);
+      setServiceTypes([scheduling.serviceType]);
+    }
   };
 
   const handleServiceTypeChange = (serviceType: string, checked: boolean) => {
@@ -55,18 +90,18 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
   };
 
   const handleAddCitizen = () => {
-    if (!citizen) {
+    if (!citizen.trim()) {
       toast({
         title: "Erro",
-        description: "O campo Cidadão é obrigatório",
+        description: "O campo Munícipe é obrigatório",
         variant: "destructive"
       });
       return;
     }
 
     toast({
-      title: "✅ Cidadão foi adicionado com sucesso",
-      description: `${citizen} foi adicionado à lista de atendimento`
+      title: "✅ Munícipe foi adicionado com sucesso",
+      description: `${citizen} foi adicionado à fila de atendimento`
     });
 
     clearFields();
@@ -89,7 +124,7 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
           ) : (
             <>
               <Plus className="h-4 w-4" />
-              Adicionar Cidadão
+              Adicionar Munícipe
             </>
           )}
         </Button>
@@ -97,21 +132,53 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
 
       {showAddCitizen && (
         <div className="space-y-4">
-          {/* Cidadão */}
+          {/* Agendamento do dia */}
+          <div>
+            <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Agendamento do dia (opcional)
+            </label>
+            <Select value={selectedScheduling} onValueChange={(value) => {
+              setSelectedScheduling(value);
+              handleSchedulingSelect(value);
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione um agendamento" />
+              </SelectTrigger>
+              <SelectContent>
+                {mockSchedulings.map((scheduling) => (
+                  <SelectItem key={scheduling.id} value={scheduling.id}>
+                    <div>
+                      <div className="font-medium">{scheduling.time} - {scheduling.citizen}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {scheduling.professional} • {scheduling.specialty} • {scheduling.team}
+                      </div>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Munícipe */}
           <div>
             <label className="text-sm font-medium mb-2 block">
-              Cidadão <span className="text-red-500">*</span>
+              Munícipe <span className="text-red-500">*</span>
             </label>
             <Input
               placeholder="Nome, CPF, CNS ou data de nascimento"
               value={citizen}
               onChange={(e) => setCitizen(e.target.value)}
+              className={!citizen.trim() ? "border-red-300 focus:border-red-500" : ""}
             />
+            {!citizen.trim() && (
+              <p className="text-xs text-red-500 mt-1">Campo obrigatório</p>
+            )}
           </div>
 
           {/* Profissional */}
           <div>
-            <label className="text-sm font-medium mb-2 block">Profissional</label>
+            <label className="text-sm font-medium mb-2 block">Profissional (opcional)</label>
             <Select value={professional} onValueChange={setProfessional}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um profissional" />
@@ -133,7 +200,7 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
 
           {/* Equipe */}
           <div>
-            <label className="text-sm font-medium mb-2 block">Equipe</label>
+            <label className="text-sm font-medium mb-2 block">Equipe (opcional)</label>
             <Select value={team} onValueChange={setTeam}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione uma equipe" />
@@ -150,8 +217,8 @@ export const AddCitizen = ({ showAddCitizen, setShowAddCitizen }: AddCitizenProp
 
           {/* Tipo de Serviço */}
           <div>
-            <label className="text-sm font-medium mb-2 block">Tipo de serviço</label>
-            <div className="grid grid-cols-2 gap-2">
+            <label className="text-sm font-medium mb-2 block">Tipo de serviço (opcional)</label>
+            <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
               {serviceTypeOptions.map((serviceType) => (
                 <div key={serviceType} className="flex items-center space-x-2">
                   <Checkbox
