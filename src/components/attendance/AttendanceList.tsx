@@ -1,4 +1,3 @@
-
 import { AttendanceCard } from "./AttendanceCard";
 
 interface AttendanceListProps {
@@ -119,10 +118,6 @@ export const AttendanceList = ({ searchTerm, showMyAttendances, sortBy, filters 
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">
-        Lista de Atendimento ({filteredAttendances.length})
-      </h2>
-      
       <div className="grid gap-4">
         {filteredAttendances.map((attendance) => (
           <AttendanceCard key={attendance.id} attendance={attendance} />
