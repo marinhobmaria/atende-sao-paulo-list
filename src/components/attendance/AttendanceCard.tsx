@@ -52,6 +52,18 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
     }
   };
 
+  const getStatusBarColor = (status: string) => {
+    switch (status) {
+      case "waiting": return "bg-green-500";
+      case "in-service": return "bg-purple-500";
+      case "initial-listening": return "bg-pink-500";
+      case "vaccination": return "bg-purple-500";
+      case "completed": return "bg-blue-500";
+      case "did-not-wait": return "bg-gray-500";
+      default: return "bg-gray-500";
+    }
+  };
+
   const getVulnerabilityColor = (vulnerability: string | null) => {
     if (!vulnerability) return null;
     switch (vulnerability) {
@@ -113,8 +125,11 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
   const professionalInfo = formatProfessionalInfo(attendance.professional);
 
   return (
-    <Card className="hover:shadow-lg hover:scale-[1.02] hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 ease-in-out cursor-pointer">
-      <CardContent className="p-4">
+    <Card className="hover:shadow-lg hover:scale-[1.02] hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 ease-in-out cursor-pointer relative overflow-hidden">
+      {/* Status indicator bar on the left */}
+      <div className={`absolute left-0 top-0 bottom-0 w-1 ${getStatusBarColor(attendance.status)}`} />
+      
+      <CardContent className="p-4 ml-2">
         <div className="flex items-center justify-between">
           {/* Seção esquerda - Foto e informações principais */}
           <div className="flex items-center space-x-4 flex-1 min-w-0">
@@ -142,7 +157,7 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
               
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600">
                 <div>
-                  <span className="font-medium">Idade:</span> {calculateDetailedAge(attendance.citizen.age)}
+                  {calculateDetailedAge(attendance.citizen.age)}
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
