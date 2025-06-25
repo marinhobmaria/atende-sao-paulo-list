@@ -121,23 +121,23 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
       {/* Status indicator bar on the left */}
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${getStatusBarColor(attendance.status)}`} />
       
-      <CardContent className="p-3 ml-1">
-        <div className="flex items-start justify-between gap-3">
-          {/* Seção esquerda - Informações completas */}
-          <div className="flex items-start gap-3 flex-1 min-w-0">
-            {/* Avatar */}
-            <Avatar className="w-10 h-10 flex-shrink-0">
+      <CardContent className="p-2 ml-1">
+        <div className="flex items-start justify-between gap-2">
+          {/* Seção esquerda - Informações compactas */}
+          <div className="flex items-start gap-2 flex-1 min-w-0">
+            {/* Avatar menor */}
+            <Avatar className="w-8 h-8 flex-shrink-0">
               <AvatarImage src={attendance.citizen.photo} alt={attendance.citizen.name} />
               <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-xs">
                 {getInitials(attendance.citizen.name)}
               </AvatarFallback>
             </Avatar>
 
-            {/* Informações principais */}
-            <div className="flex-1 min-w-0 space-y-1">
-              {/* Linha 1: Nome completo + Status */}
+            {/* Informações organizadas */}
+            <div className="flex-1 min-w-0 space-y-0.5">
+              {/* Nome do munícipe - maior e destacado */}
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-semibold text-gray-900 text-sm">
+                <h3 className="font-bold text-gray-900 text-base leading-tight">
                   {attendance.citizen.name}
                 </h3>
                 <Badge className={`text-xs px-2 py-0.5 ${getStatusColor(attendance.status)}`}>
@@ -150,8 +150,8 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
                 )}
               </div>
               
-              {/* Linha 2: Idade detalhada + Horário */}
-              <div className="flex items-center gap-3 text-xs text-gray-600">
+              {/* Linha compacta: Idade + Horário */}
+              <div className="flex items-center gap-4 text-xs text-gray-600">
                 <span className="font-medium">{detailedAge}</span>
                 <div className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
@@ -159,27 +159,27 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
                 </div>
               </div>
 
-              {/* Linha 3: Profissional */}
-              <div className="text-xs text-gray-700">
-                <span className="font-medium">Prof:</span> {professionalInfo.name}
-              </div>
-
-              {/* Linha 4: Especialidade */}
-              {professionalInfo.specialty && (
-                <div className="text-xs text-gray-600">
-                  <span className="font-medium">Esp:</span> {professionalInfo.specialty}
+              {/* Grid de informações profissionais */}
+              <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs">
+                <div className="text-gray-700">
+                  <span className="font-medium text-gray-800">Profissional:</span> {professionalInfo.name}
                 </div>
-              )}
+                
+                <div className="text-gray-700">
+                  <span className="font-medium text-gray-800">Equipe:</span> {attendance.team}
+                </div>
 
-              {/* Linha 5: Equipe */}
-              <div className="text-xs text-gray-600">
-                <span className="font-medium">Equipe:</span> {attendance.team}
+                {professionalInfo.specialty && (
+                  <div className="text-gray-700 col-span-2">
+                    <span className="font-medium text-gray-800">Especialidade:</span> {professionalInfo.specialty}
+                  </div>
+                )}
               </div>
 
-              {/* Linha 6: Tipos de serviço */}
+              {/* Tipos de serviço compactos */}
               {attendance.serviceTypes.length > 0 && (
                 <div className="flex items-center gap-1 flex-wrap">
-                  <span className="text-xs font-medium text-gray-600">Serviços:</span>
+                  <span className="text-xs font-medium text-gray-800">Serviços:</span>
                   {attendance.serviceTypes.map((type, index) => (
                     <Badge key={index} variant="outline" className="text-xs px-1.5 py-0.5">
                       {type}
