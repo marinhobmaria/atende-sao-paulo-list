@@ -48,6 +48,7 @@ export const AddCitizen = ({
   isCollapsible = false 
 }: AddCitizenProps) => {
   const [selectedCitizen, setSelectedCitizen] = useState(null);
+  const [searchValue, setSearchValue] = useState("");
   const [serviceType, setServiceType] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("");
   const [schedulingDate, setSchedulingDate] = useState<Date | undefined>(undefined);
@@ -89,9 +90,10 @@ export const AddCitizen = ({
         </div>
         
         <CitizenSearch
+          value={searchValue}
+          onChange={setSearchValue}
           selectedCitizen={selectedCitizen}
           onCitizenSelect={handleCitizenSelect}
-          placeholder="Digite o nome, CPF ou CNS do munícipe..."
           className="w-full"
         />
       </div>
@@ -109,7 +111,7 @@ export const AddCitizen = ({
       )}
 
       {/* Service Configuration */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {/* Service Type */}
         <div className="space-y-2">
           <Label htmlFor="serviceType" className="text-sm font-medium text-gray-700">

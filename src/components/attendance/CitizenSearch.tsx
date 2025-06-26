@@ -86,6 +86,7 @@ interface CitizenSearchProps {
   value: string;
   onChange: (value: string) => void;
   onCitizenSelect?: (citizen: Citizen) => void;
+  selectedCitizen?: Citizen | null;
   citizensInQueue?: string[];
   disabled?: boolean;
 }
@@ -115,6 +116,7 @@ export const CitizenSearch = ({
   value, 
   onChange, 
   onCitizenSelect,
+  selectedCitizen,
   citizensInQueue = [],
   disabled = false
 }: CitizenSearchProps) => {
