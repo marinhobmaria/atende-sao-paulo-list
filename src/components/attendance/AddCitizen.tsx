@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { X } from "lucide-react";
-import { CitizenOnlySearch } from "./CitizenOnlySearch";
+import { CitizenSearch, Citizen } from "./CitizenSearch";
 import { ProfessionalSearch } from "./ProfessionalSearch";
 import { TeamSearch } from "./TeamSearch";
 import { ServiceTypeSearch } from "./ServiceTypeSearch";
@@ -31,22 +31,6 @@ const citizensInQueue = [
   "Maria Oliveira",
   "Ana Costa Lima"
 ];
-
-// Mock scheduled appointments for today
-const scheduledAppointments = {
-  "Maria Santos Silva": {
-    professional: "Dr. João Silva",
-    specialty: "Médico Clínico",
-    team: "Equipe APS 1",
-    time: "14:30"
-  },
-  "Carlos Pereira Lima": {
-    professional: "Dra. Ana Costa",
-    specialty: "Enfermeiro",
-    team: "Equipe APS 2",
-    time: "15:00"
-  }
-};
 
 export const AddCitizen = ({ 
   open, 
@@ -105,11 +89,10 @@ export const AddCitizen = ({
     }
   };
 
-  const handleCitizenSelect = (citizen: any) => {
+  const handleCitizenSelect = (citizen: Citizen) => {
     setSelectedCitizen(citizen.name);
-    const appointment = scheduledAppointments[citizen.name as keyof typeof scheduledAppointments];
-    if (appointment) {
-      setScheduledInfo(appointment);
+    if (citizen.hasScheduledAppointment && citizen.scheduledInfo) {
+      setScheduledInfo(citizen.scheduledInfo);
     } else {
       setScheduledInfo(null);
       setPatientPresent(false);
@@ -140,7 +123,7 @@ export const AddCitizen = ({
                 Munícipe *
               </Label>
               <div className="relative">
-                <CitizenOnlySearch
+                <CitizenSearch
                   value={selectedCitizen}
                   onChange={setSelectedCitizen}
                   onCitizenSelect={handleCitizenSelect}
@@ -151,7 +134,7 @@ export const AddCitizen = ({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 z-10"
                     onClick={() => clearField('citizen')}
                   >
                     <X className="h-3 w-3" />
@@ -316,7 +299,7 @@ export const AddCitizen = ({
                 Munícipe *
               </Label>
               <div className="relative">
-                <CitizenOnlySearch
+                <CitizenSearch
                   value={selectedCitizen}
                   onChange={setSelectedCitizen}
                   onCitizenSelect={handleCitizenSelect}
@@ -327,7 +310,7 @@ export const AddCitizen = ({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 z-10"
                     onClick={() => clearField('citizen')}
                   >
                     <X className="h-3 w-3" />

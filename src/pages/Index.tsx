@@ -18,6 +18,7 @@ const Index = () => {
   const [showMyAttendances, setShowMyAttendances] = useState(false);
   const [sortBy, setSortBy] = useState("arrival");
   const [showAddCitizen, setShowAddCitizen] = useState(false);
+  const [currentCall, setCurrentCall] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     status: ["waiting", "in-service", "initial-listening", "vaccination"],
     period: { start: new Date(), end: new Date() },
@@ -28,6 +29,12 @@ const Index = () => {
   });
 
   const statusCounts = getStatusCounts();
+
+  const handleCallPatient = (patientId: string, patientName: string) => {
+    const patientNumber = `A${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`;
+    setCurrentCall(patientNumber);
+    console.log(`Chamando paciente: ${patientName} - Senha: ${patientNumber}`);
+  };
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -50,6 +57,11 @@ const Index = () => {
 
         {/* Main Title */}
         <h1 className="text-2xl font-bold text-gray-900">Fila de atendimento</h1>
+
+        {/* Password Caller - Above filters */}
+        <div className="flex justify-center">
+          <PasswordCaller currentCall={currentCall} setCurrentCall={setCurrentCall} />
+        </div>
 
         {/* Header */}
         <AttendanceHeader
@@ -82,38 +94,28 @@ const Index = () => {
           </Button>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Left Column - Main Content */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Add Citizen Collapsible */}
-            {showAddCitizen && (
-              <AddCitizen
-                open={showAddCitizen}
-                onOpenChange={setShowAddCitizen}
-                queueCount={mockQueueCount}
-                waitingCount={mockWaitingCount}
-                statusCounts={statusCounts}
-                filters={filters}
-                setFilters={setFilters}
-                isCollapsible={true}
-              />
-            )}
+        {/* Add Citizen Collapsible */}
+        {showAddCitizen && (
+          <AddCitizen
+            open={showAddCitizen}
+            onOpenChange={setShowAddCitizen}
+            queueCount={mockQueueCount}
+            waitingCount={mockWaitingCount}
+            statusCounts={statusCounts}
+            filters={filters}
+            setFilters={setFilters}
+            isCollapsible={true}
+          />
+        )}
 
-            {/* Attendance List */}
-            <AttendanceList
-              searchTerm={searchTerm}
-              showMyAttendances={showMyAttendances}
-              sortBy={sortBy}
-              filters={filters}
-            />
-          </div>
-
-          {/* Right Column - Password Caller */}
-          <div className="lg:col-span-1">
-            <PasswordCaller />
-          </div>
-        </div>
+        {/* Attendance List */}
+        <AttendanceList
+          searchTerm={searchTerm}
+          showMyAttendances={showMyAttendances}
+          sortBy={sortBy}
+          filters={filters}
+          onCallPatient={handleCallPatient}
+        />
       </div>
     </div>
   );

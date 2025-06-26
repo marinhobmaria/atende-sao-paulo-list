@@ -1,10 +1,9 @@
-
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Clock, FileText, Stethoscope, Syringe, MoreHorizontal } from "lucide-react";
+import { Clock, FileText, Stethoscope, Syringe, MoreHorizontal, Volume2 } from "lucide-react";
 import { AttendanceActions } from "./AttendanceActions";
 
 interface AttendanceCardProps {
@@ -30,9 +29,10 @@ interface AttendanceCardProps {
     isCompleted: boolean;
     addedBy?: string;
   };
+  onCallPatient?: (patientId: string, patientName: string) => void;
 }
 
-export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
+export const AttendanceCard = ({ attendance, onCallPatient }: AttendanceCardProps) => {
   const navigate = useNavigate();
 
   const getStatusColor = (status: string) => {
@@ -150,6 +150,10 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
     console.log(`Status changed to: ${newStatus}`);
   };
 
+  const handleCallPatient = () => {
+    onCallPatient?.(attendance.id, attendance.citizen.name);
+  };
+
   // Create a mock attendance object that matches AttendanceQueueItem structure
   const mockAttendanceForActions = {
     id: attendance.id,
@@ -255,6 +259,17 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
 
           {/* Right side - Action buttons */}
           <div className="flex items-center gap-2 flex-shrink-0">
+            {attendance.status === "waiting" && (
+              <Button
+                onClick={handleCallPatient}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 text-blue-600 border-blue-200 hover:bg-blue-50"
+              >
+                <Volume2 className="h-4 w-4" />
+                Chamar paciente
+              </Button>
+            )}
             <AttendanceActions 
               attendance={mockAttendanceForActions} 
               onStatusChange={handleStatusChange}
