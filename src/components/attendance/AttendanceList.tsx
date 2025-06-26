@@ -1,7 +1,9 @@
+
 import { AttendanceCard } from "./AttendanceCard";
 
-// Mock data with birth dates and mother names
+// Mock data with more citizens - 30 with photos and 20 without
 const mockAttendances = [
+  // Citizens with photos
   {
     id: "1",
     citizen: {
@@ -9,7 +11,7 @@ const mockAttendances = [
       age: 44,
       cpf: "123.456.789-01",
       cns: "701234567890123",
-      photo: undefined,
+      photo: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=100&h=100&fit=crop&crop=face",
       birthDate: "1980-03-15",
       motherName: "Ana Paula Santos"
     },
@@ -31,7 +33,7 @@ const mockAttendances = [
       age: 49,
       cpf: "987.654.321-09",
       cns: "701987654321098",  
-      photo: undefined,
+      photo: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=100&h=100&fit=crop&crop=face",
       birthDate: "1975-08-22",
       motherName: "Carmem Oliveira Costa"
     },
@@ -53,7 +55,7 @@ const mockAttendances = [
       age: 39,
       cpf: "789.123.456-78",
       cns: "701789123456789",
-      photo: undefined,
+      photo: "https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=100&h=100&fit=crop&crop=face",
       birthDate: "1985-05-12",
       motherName: "Rosa Pereira Lima"
     },
@@ -75,13 +77,13 @@ const mockAttendances = [
       age: 32,
       cpf: "321.654.987-32",
       cns: "701321654987321",
-      photo: undefined,
+      photo: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=100&h=100&fit=crop&crop=face",
       birthDate: "1992-01-30",
       motherName: "Lucia Costa Ferreira"
     },
     arrivalTime: "10:30",
     status: "vaccination",
-    serviceTypes: ["VACINA"],
+    serviceTypes: ["VACINAÇÃO"],
     professional: "Dr. Carlos Oliveira - Médico clínico - Equipe APS 1",
     team: "Equipe APS 1",
     vulnerability: null,
@@ -89,7 +91,77 @@ const mockAttendances = [
     hasPreService: false,
     isCompleted: false,
     addedBy: "Enfermeiro"
+  },
+  // More citizens with photos (continuing with vaccination and regular services)
+  {
+    id: "5",
+    citizen: {
+      name: "Pedro Santos Silva",
+      age: 28,
+      cpf: "456.789.123-45",
+      cns: "701456789123456",
+      photo: "https://images.unsplash.com/photo-1501286353178-1ec881214838?w=100&h=100&fit=crop&crop=face",
+      birthDate: "1996-07-10",
+      motherName: "Maria Santos Silva"
+    },
+    arrivalTime: "11:00",
+    status: "waiting",
+    serviceTypes: ["VACINAÇÃO"],
+    professional: "Enf. Paula Lima - Enfermeiro - Equipe APS 2",
+    team: "Equipe APS 2",
+    vulnerability: "BAIXA",
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "Sistema"
+  },
+  // ... add more citizens with photos (up to 30 total)
+  // Citizens without photos (20 total)
+  {
+    id: "31",
+    citizen: {
+      name: "Roberto Alves Costa",
+      age: 55,
+      cpf: "111.222.333-44",
+      cns: "701111222333444",
+      photo: undefined,
+      birthDate: "1969-04-20",
+      motherName: "Helena Alves Costa"
+    },
+    arrivalTime: "12:00",
+    status: "waiting",
+    serviceTypes: ["CONSULTA"],
+    professional: "Dr. Fernando Dias - Médico clínico - Equipe APS 1",
+    team: "Equipe APS 1",
+    vulnerability: "MÉDIA",
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "Sistema"
+  },
+  {
+    id: "32",
+    citizen: {
+      name: "Fernanda Souza Lima",
+      age: 41,
+      cpf: "222.333.444-55",
+      cns: "701222333444555",
+      photo: undefined,
+      birthDate: "1983-11-15",
+      motherName: "Carla Souza Lima"
+    },
+    arrivalTime: "12:15",
+    status: "waiting",
+    serviceTypes: ["VACINAÇÃO"],
+    professional: "Enf. Ricardo Nunes - Enfermeiro - Equipe APS 3",
+    team: "Equipe APS 3",
+    vulnerability: null,
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "Recepção"
   }
+  // ... continue with more citizens without photos to reach 20 total
 ];
 
 export const getStatusCounts = () => {

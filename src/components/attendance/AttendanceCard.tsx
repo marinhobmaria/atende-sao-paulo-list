@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Clock, FileText, Stethoscope, Syringe, MoreHorizontal, Volume2 } from "lucide-react";
 import { AttendanceActions } from "./AttendanceActions";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface AttendanceCardProps {
   attendance: {
@@ -154,6 +155,9 @@ export const AttendanceCard = ({ attendance, onCallPatient }: AttendanceCardProp
     onCallPatient?.(attendance.id, attendance.citizen.name);
   };
 
+  // Determine if this should show vaccination button (based on service types)
+  const isVaccinationService = attendance.serviceTypes.includes("VACINA");
+
   // Create a mock attendance object that matches AttendanceQueueItem structure
   const mockAttendanceForActions = {
     id: attendance.id,
@@ -180,103 +184,112 @@ export const AttendanceCard = ({ attendance, onCallPatient }: AttendanceCardProp
   };
 
   return (
-    <Card className={`hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer border-l-4 ${getStatusBorderColor(attendance.status)}`}>
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          {/* Left side - Avatar and basic info */}
-          <div className="flex items-center gap-3">
-            <Avatar className="w-12 h-12 flex-shrink-0">
-              <AvatarImage src={attendance.citizen.photo} alt={attendance.citizen.name} />
-              <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-sm">
-                {getInitials(attendance.citizen.name)}
-              </AvatarFallback>
-            </Avatar>
+    <TooltipProvider>
+      <Card className={`hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer border-l-4 ${getStatusBorderColor(attendance.status)}`}>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            {/* Left side - Avatar and basic info */}
+            <div className="flex items-center gap-3">
+              <Avatar className="w-12 h-12 flex-shrink-0">
+                <AvatarImage src={attendance.citizen.photo} alt={attendance.citizen.name} />
+                <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-sm">
+                  {getInitials(attendance.citizen.name)}
+                </AvatarFallback>
+              </Avatar>
 
-            <div className="min-w-0">
-              {/* Nome e status */}
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-bold text-gray-900 text-base leading-tight">
-                  {attendance.citizen.name}
-                </h3>
-                <Badge className={`text-xs px-2 py-0.5 ${getStatusColor(attendance.status)}`}>
-                  {getStatusText(attendance.status)}
-                </Badge>
-                {attendance.vulnerability && (
-                  <Badge className={`text-white text-xs px-2 py-0.5 ${getVulnerabilityColor(attendance.vulnerability)}`}>
-                    {attendance.vulnerability}
+              <div className="min-w-0">
+                {/* Nome e status */}
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-bold text-gray-900 text-base leading-tight">
+                    {attendance.citizen.name}
+                  </h3>
+                  <Badge className={`text-xs px-2 py-0.5 ${getStatusColor(attendance.status)}`}>
+                    {getStatusText(attendance.status)}
                   </Badge>
-                )}
-              </div>
-              
-              {/* Data de nascimento, idade, horário e tempo de espera */}
-              <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
-                {attendance.citizen.birthDate && (
-                  <span>
-                    <span className="font-medium">Nascimento:</span> {new Date(attendance.citizen.birthDate).toLocaleDateString('pt-BR')} ({detailedAge})
-                  </span>
-                )}
-                <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  <span>Inclusão: {attendance.arrivalTime}</span>
+                  {attendance.vulnerability && (
+                    <Badge className={`text-white text-xs px-2 py-0.5 ${getVulnerabilityColor(attendance.vulnerability)}`}>
+                      {attendance.vulnerability}
+                    </Badge>
+                  )}
                 </div>
-                <div className="flex items-center gap-1 text-orange-600 font-medium">
-                  <Clock className="w-4 h-4" />
-                  <span>Aguardando: {waitTime}</span>
+                
+                {/* Data de nascimento, idade, horário e tempo de espera */}
+                <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
+                  {attendance.citizen.birthDate && (
+                    <span>
+                      <span className="font-medium">Nascimento:</span> {new Date(attendance.citizen.birthDate).toLocaleDateString('pt-BR')} ({detailedAge})
+                    </span>
+                  )}
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    <span>Inclusão: {attendance.arrivalTime}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-orange-600 font-medium">
+                    <Clock className="w-4 h-4" />
+                    <span>Aguardando: {waitTime}</span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Nome da mãe */}
-              {attendance.citizen.motherName && (
-                <div className="text-sm text-gray-700 mb-2">
-                  <span className="font-medium text-gray-800">Mãe:</span> {attendance.citizen.motherName}
-                </div>
-              )}
+                {/* Nome da mãe */}
+                {attendance.citizen.motherName && (
+                  <div className="text-sm text-gray-700 mb-2">
+                    <span className="font-medium text-gray-800">Mãe:</span> {attendance.citizen.motherName}
+                  </div>
+                )}
 
-              {/* Informações profissionais em linha */}
-              <div className="flex flex-wrap gap-4 text-sm text-gray-700">
-                <div>
-                  <span className="font-medium text-gray-800">Profissional:</span> {formatProfessionalInfo(attendance.professional).name}
-                </div>
-                <div>
-                  <span className="font-medium text-gray-800">Especialidade:</span> {formatProfessionalInfo(attendance.professional).specialty || attendance.team}
-                </div>
-                <div>
-                  <span className="font-medium text-gray-800">Equipe:</span> {attendance.team}
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="font-medium text-gray-800">Serviços:</span>
-                  <div className="flex gap-1">
-                    {attendance.serviceTypes.map((service, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {service}
-                      </Badge>
-                    ))}
+                {/* Informações profissionais em linha */}
+                <div className="flex flex-wrap gap-4 text-sm text-gray-700">
+                  <div>
+                    <span className="font-medium text-gray-800">Profissional:</span> {formatProfessionalInfo(attendance.professional).name}
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-800">Especialidade:</span> {formatProfessionalInfo(attendance.professional).specialty || attendance.team}
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-800">Equipe:</span> {attendance.team}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="font-medium text-gray-800">Serviços:</span>
+                    <div className="flex gap-1">
+                      {attendance.serviceTypes.map((service, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {service}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Right side - Action buttons */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {attendance.status === "waiting" && (
-              <Button
-                onClick={handleCallPatient}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2 text-blue-600 border-blue-200 hover:bg-blue-50"
-              >
-                <Volume2 className="h-4 w-4" />
-                Chamar paciente
-              </Button>
-            )}
-            <AttendanceActions 
-              attendance={mockAttendanceForActions} 
-              onStatusChange={handleStatusChange}
-            />
+            {/* Right side - Action buttons */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {attendance.status === "waiting" && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={handleCallPatient}
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2 text-blue-600 border-blue-200 hover:bg-blue-50"
+                    >
+                      <Volume2 className="h-4 w-4" />
+                      Chamar paciente
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Aguardando há {waitTime}</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+              <AttendanceActions 
+                attendance={mockAttendanceForActions} 
+                onStatusChange={handleStatusChange}
+              />
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </TooltipProvider>
   );
 };
