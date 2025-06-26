@@ -15,7 +15,7 @@ interface SOAPContainerProps {
 }
 
 export const SOAPContainer = ({ onFinalizarAtendimento }: SOAPContainerProps) => {
-  const [openSections, setOpenSections] = useState<string[]>(["antecedentes"]);
+  const [openSections, setOpenSections] = useState<string[]>([]);
 
   const toggleSection = (section: string) => {
     setOpenSections(prev => 
@@ -76,15 +76,6 @@ export const SOAPContainer = ({ onFinalizarAtendimento }: SOAPContainerProps) =>
                 <CardTitle className="text-2xl font-semibold text-emerald-900">SOAP</CardTitle>
               </div>
             </div>
-            {onFinalizarAtendimento && (
-              <Button
-                onClick={onFinalizarAtendimento}
-                className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
-              >
-                <CheckCircle className="h-4 w-4" />
-                Finalizar Atendimento
-              </Button>
-            )}
           </div>
         </CardHeader>
 
@@ -133,6 +124,20 @@ export const SOAPContainer = ({ onFinalizarAtendimento }: SOAPContainerProps) =>
               </Collapsible>
             );
           })}
+
+          {/* Botão Finalizar Atendimento no final do SOAP */}
+          <div className="flex justify-end pt-4 border-t">
+            {onFinalizarAtendimento && (
+              <Button
+                onClick={onFinalizarAtendimento}
+                className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                size="lg"
+              >
+                <CheckCircle className="h-5 w-5" />
+                Finalizar Atendimento
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, FileText, Syringe, Clock, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Home, FileText, Syringe, Clock, Calendar, AlertCircle, CheckCircle } from "lucide-react";
 import { SOAPContainer } from "@/components/atendimento/SOAPContainer";
 import { CitizenCompactInfo } from "@/components/escuta-inicial/CitizenCompactInfo";
 import { FinalizacaoAtendimentoModal } from "@/components/finalizacao/FinalizacaoAtendimentoModal";
@@ -14,6 +15,7 @@ const Atendimento = () => {
   const [searchParams] = useSearchParams();
   const cidadaoId = searchParams.get("cidadao");
   const [showFinalizacao, setShowFinalizacao] = useState(false);
+  const [showConfirmFinalizacao, setShowConfirmFinalizacao] = useState(false);
   const [isFinalizando, setIsFinalizando] = useState(false);
 
   // Mock data do cidadão baseado na imagem de referência
@@ -48,6 +50,7 @@ const Atendimento = () => {
       });
 
       setShowFinalizacao(false);
+      setShowConfirmFinalizacao(false);
       navigate("/");
     } catch (error) {
       toast({
@@ -58,6 +61,11 @@ const Atendimento = () => {
     } finally {
       setIsFinalizando(false);
     }
+  };
+
+  const handleConfirmarFinalizacao = () => {
+    setShowConfirmFinalizacao(false);
+    setShowFinalizacao(true);
   };
 
   return (
@@ -127,7 +135,7 @@ const Atendimento = () => {
               </TabsContent>
 
               <TabsContent value="soap" className="mt-6">
-                <SOAPContainer onFinalizarAtendimento={() => setShowFinalizacao(true)} />
+                <SOAPContainer onFinalizarAtendimento={() => setShowConfirmFinalizacao(true)} />
               </TabsContent>
 
               <TabsContent value="vacinacao" className="mt-6">
@@ -172,6 +180,30 @@ const Atendimento = () => {
             </Tabs>
           </CardContent>
         </Card>
+
+        {/* Modal de Confirmação de Finalização */}
+        {showConfirmFinalizacao && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+              <div className="flex items-center gap-3 mb-4">
+                <AlertCircle className="h-6 w-6 text-orange-500" />
+                <h3 className="text-lg font-semibold">Confirmar Finalização</h3>
+              </div>
+              <p className="text-gray-600 mb-6">
+                Tem certeza que deseja finalizar este atendimento? Esta ação não poderá ser desfeita.
+              </p>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setShowConfirmFinalizacao(false)}>
+                  Cancelar
+                </Button>
+                <Button onClick={handleConfirmarFinalizacao} className="bg-green-600 hover:bg-green-700">
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Sim, finalizar
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Modal de Finalização */}
         <FinalizacaoAtendimentoModal

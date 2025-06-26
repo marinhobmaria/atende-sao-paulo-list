@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,11 +6,11 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { AtestadoSection } from "./atestado/AtestadoSection";
 import { DeclaracaoComparecimento } from "./atestado/DeclaracaoComparecimento";
+import { PrescricaoMedicamento } from "./prescricao/PrescricaoMedicamento";
 import { 
   FileText, 
   ClipboardCheck, 
@@ -25,7 +24,8 @@ import {
   Trash2,
   Plus,
   Eye,
-  Info
+  Info,
+  Pill
 } from "lucide-react";
 
 interface CiapEntry {
@@ -171,10 +171,14 @@ export const SOAPPlano = () => {
           </p>
           
           <Tabs defaultValue="plano-cuidado" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="plano-cuidado" className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 Plano de Cuidado
+              </TabsTrigger>
+              <TabsTrigger value="prescricao" className="flex items-center gap-2">
+                <Pill className="h-4 w-4" />
+                Prescrição de Medicamento
               </TabsTrigger>
               <TabsTrigger value="atestados" className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
@@ -441,6 +445,12 @@ export const SOAPPlano = () => {
                   </div>
                 )}
               </div>
+            </TabsContent>
+            
+            <TabsContent value="prescricao" className="mt-6">
+              <PrescricaoMedicamento 
+                ultimoPeso={{ valor: 70, data: "15/12/2024" }}
+              />
             </TabsContent>
             
             <TabsContent value="atestados" className="mt-6">
