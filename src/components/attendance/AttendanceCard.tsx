@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -42,6 +41,18 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
       case "completed": return "bg-blue-500 text-white border-blue-500";
       case "did-not-wait": return "bg-gray-500 text-white border-gray-500";
       default: return "bg-gray-500 text-white border-gray-500";
+    }
+  };
+
+  const getStatusBorderColor = (status: string) => {
+    switch (status) {
+      case "waiting": return "border-l-green-500";
+      case "in-service": return "border-l-purple-500";
+      case "initial-listening": return "border-l-pink-500";
+      case "vaccination": return "border-l-purple-500";
+      case "completed": return "border-l-blue-500";
+      case "did-not-wait": return "border-l-gray-500";
+      default: return "border-l-gray-500";
     }
   };
 
@@ -127,7 +138,7 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
   };
 
   return (
-    <Card className="hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer">
+    <Card className={`hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer border-l-4 ${getStatusBorderColor(attendance.status)}`}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           {/* Left side - Avatar and basic info */}

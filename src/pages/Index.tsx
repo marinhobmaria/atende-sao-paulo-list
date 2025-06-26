@@ -65,6 +65,11 @@ const Index = () => {
           setFilters={setFilters}
         />
 
+        {/* Main Title */}
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-900">Fila de atendimento</h1>
+        </div>
+
         {/* Attendance List */}
         <AttendanceList
           searchTerm={searchTerm}
