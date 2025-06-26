@@ -40,13 +40,6 @@ export const AddCitizen = ({ queueCount, waitingCount, statusCounts, filters, se
     setSearchValue("");
   };
 
-  const handleAppointmentSelected = (appointment: any, citizen: any) => {
-    console.log("Appointment selected:", appointment, citizen);
-    // Aqui você pode adicionar a lógica para adicionar o cidadão à fila com agendamento
-    setShowCitizenSearch(false);
-    setSearchValue("");
-  };
-
   const handleNewCitizen = () => {
     console.log("New citizen requested");
     // Aqui você pode adicionar a lógica para criar um novo cidadão
@@ -85,14 +78,13 @@ export const AddCitizen = ({ queueCount, waitingCount, statusCounts, filters, se
       <Dialog open={showCitizenSearch} onOpenChange={setShowCitizenSearch}>
         <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">Buscar Munícipe</DialogTitle>
+            <DialogTitle className="text-xl font-semibold">Adicionar Munícipe à Fila</DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">
             <CitizenSearch
               value={searchValue}
               onChange={setSearchValue}
               onCitizenSelect={handleCitizenSelected}
-              onAppointmentSelect={handleAppointmentSelected}
               onNewCitizen={handleNewCitizen}
             />
           </div>

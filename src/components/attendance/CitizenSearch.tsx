@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, User, Plus } from "lucide-react";
+import { Search, User, Plus, Calendar } from "lucide-react";
 import { mockRandomCitizens, CitizenRandom } from "@/data/mockCitizensRandom";
 
 interface CitizenSearchProps {
@@ -13,6 +13,15 @@ interface CitizenSearchProps {
   onCitizenSelect?: (citizen: CitizenRandom) => void;
   onNewCitizen?: () => void;
 }
+
+// Mock appointment data to simulate "Agendamento do dia"
+const mockAppointments = [
+  { citizenId: "1", hasAppointment: true, appointmentTime: "09:30" },
+  { citizenId: "2", hasAppointment: true, appointmentTime: "14:15" },
+  { citizenId: "5", hasAppointment: true, appointmentTime: "10:45" },
+  { citizenId: "8", hasAppointment: true, appointmentTime: "16:20" },
+  { citizenId: "12", hasAppointment: true, appointmentTime: "11:00" },
+];
 
 export const CitizenSearch = ({ 
   value, 
@@ -63,6 +72,10 @@ export const CitizenSearch = ({
     onCitizenSelect?.(citizen);
   };
 
+  const getAppointmentInfo = (citizenId: string) => {
+    return mockAppointments.find(apt => apt.citizenId === citizenId);
+  };
+
   return (
     <div className="relative" ref={searchRef}>
       <div className="relative">
@@ -82,67 +95,60 @@ export const CitizenSearch = ({
             <div className="p-2 space-y-2">
               {!searchTerm.trim() && (
                 <p className="text-xs font-medium text-gray-600 mb-2 px-2 border-b pb-2">
-                  Selecione um munícipe (40 registros)
+                  Resultados da busca
                 </p>
               )}
               {searchTerm.trim() && (
                 <p className="text-xs font-medium text-gray-600 mb-2 px-2 border-b pb-2">
-                  Resultados encontrados ({filteredCitizens.length})
+                  Resultados da busca
                 </p>
               )}
               
-              {filteredCitizens.map((citizen) => (
-                <Card 
-                  key={citizen.id}
-                  className="cursor-pointer hover:bg-gray-50 transition-colors"
-                  onClick={() => handleCitizenSelect(citizen)}
-                >
-                  <CardContent className="p-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="flex-shrink-0">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <User className="w-5 h-5 text-blue-600" />
-                        </div>
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 truncate mb-2">
-                          {citizen.name}
-                        </h4>
-                        
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div className="flex items-center gap-1">
-                            <Badge variant="outline" className="text-xs px-2 py-0.5">
-                              CPF: {citizen.cpf}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Badge variant="outline" className="text-xs px-2 py-0.5">
-                              CNS: {citizen.cns}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Badge variant="outline" className="text-xs px-2 py-0.5">
-                              Prontuário: {citizen.prontuario}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Badge variant="outline" className="text-xs px-2 py-0.5">
-                              Nasc: {citizen.birthDate}
-                            </Badge>
+              {filteredCitizens.map((citizen) => {
+                const appointmentInfo = getAppointmentInfo(citizen.id);
+                return (
+                  <Card 
+                    key={citizen.id}
+                    className="cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => handleCitizenSelect(citizen)}
+                  >
+                    <CardContent className="p-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0">
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <User className="w-5 h-5 text-blue-600" />
                           </div>
                         </div>
                         
-                        <div className="mt-1">
-                          <Badge variant="outline" className="text-xs px-2 py-0.5">
-                            {citizen.age}
-                          </Badge>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h4 className="font-medium text-gray-900 truncate">
+                              {citizen.name}
+                            </h4>
+                            {appointmentInfo && (
+                              <Badge variant="outline" className="text-xs px-2 py-0.5 bg-green-50 text-green-700 border-green-200">
+                                <Calendar className="w-3 h-3 mr-1" />
+                                Agendamento do dia
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-1 text-xs text-gray-600">
+                            <div>CPF: {citizen.cpf}</div>
+                            <div>CNS: {citizen.cns}</div>
+                            <div>Prontuário: {citizen.prontuario}</div>
+                            <div>Nasc: {citizen.birthDate}</div>
+                          </div>
+                          
+                          <div className="mt-1">
+                            <span className="text-xs text-gray-500">{citizen.age}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           ) : (
             <div className="p-4 text-center">
