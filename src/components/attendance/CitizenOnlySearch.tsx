@@ -6,13 +6,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, User, Calendar } from "lucide-react";
 
-// Mock citizen data with birth dates for age calculation
+// Mock citizen data with birth dates for age calculation and mother names
 const mockCitizens = [
   {
     name: "Maria Silva Santos",
     cpf: "123.456.789-01",
     cns: "701234567890123",
     birthDate: "1980-03-15",
+    motherName: "Ana Paula Santos",
     hasScheduledAppointment: false
   },
   {
@@ -20,6 +21,7 @@ const mockCitizens = [
     cpf: "987.654.321-09",
     cns: "701987654321098",
     birthDate: "1975-08-22",
+    motherName: "Carmem Oliveira Costa",
     hasScheduledAppointment: false
   },
   {
@@ -27,6 +29,7 @@ const mockCitizens = [
     cpf: "456.789.123-45",
     cns: "701456789123456",
     birthDate: "1990-11-08",
+    motherName: "José Silva Santos",
     hasScheduledAppointment: true
   },
   {
@@ -34,6 +37,7 @@ const mockCitizens = [
     cpf: "789.123.456-78",
     cns: "701789123456789",
     birthDate: "1985-05-12",
+    motherName: "Rosa Pereira Lima",
     hasScheduledAppointment: true
   },
   {
@@ -41,6 +45,7 @@ const mockCitizens = [
     cpf: "321.654.987-32",
     cns: "701321654987321",
     birthDate: "1992-01-30",
+    motherName: "Lucia Costa Ferreira",
     hasScheduledAppointment: false
   }
 ];
@@ -108,7 +113,7 @@ export const CitizenOnlySearch = ({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="w-full justify-between text-left font-normal"
+          className="w-full justify-between text-left font-normal h-12"
         >
           <span className={value ? "text-foreground" : "text-muted-foreground"}>
             {value || "Selecione um munícipe"}
@@ -117,7 +122,7 @@ export const CitizenOnlySearch = ({
         </Button>
       </PopoverTrigger>
       
-      <PopoverContent className="w-80 p-0" align="start">
+      <PopoverContent className="w-96 p-0" align="start">
         <div className="p-3 border-b">
           <Input
             placeholder="Buscar por nome, CPF, CNS ou data de nascimento..."
@@ -127,7 +132,7 @@ export const CitizenOnlySearch = ({
           />
         </div>
         
-        <div className="max-h-60 overflow-y-auto">
+        <div className="max-h-80 overflow-y-auto">
           {filteredCitizens.map((citizen) => {
             const isInQueue = isCitizenInQueue(citizen.name);
             const age = calculateAge(citizen.birthDate);
@@ -148,7 +153,7 @@ export const CitizenOnlySearch = ({
                       {citizen.hasScheduledAppointment && (
                         <Badge variant="outline" className="text-xs">
                           <Calendar className="h-3 w-3 mr-1" />
-                          Agendamento programado
+                          Agendamento hoje
                         </Badge>
                       )}
                     </div>
@@ -158,6 +163,7 @@ export const CitizenOnlySearch = ({
                       <div>
                         Nascimento: {new Date(citizen.birthDate).toLocaleDateString('pt-BR')} ({age})
                       </div>
+                      <div>Mãe: {citizen.motherName}</div>
                     </div>
                     {isInQueue && (
                       <div className="text-xs text-red-600 font-medium mt-1">

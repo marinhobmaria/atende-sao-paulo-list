@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,8 @@ interface AttendanceCardProps {
       cpf: string;
       cns: string;
       photo?: string;
+      birthDate?: string;
+      motherName?: string;
     };
     arrivalTime: string;
     status: string;
@@ -98,15 +101,50 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
-  const calculateDetailedAge = (age: number) => {
-    const years = age;
-    const months = Math.floor(Math.random() * 12);
-    const days = Math.floor(Math.random() * 30);
+  const calculateDetailedAge = (birthDate?: string) => {
+    if (!birthDate) return `${attendance.citizen.age} anos`;
+    
+    const birth = new Date(birthDate);
+    const today = new Date();
+    
+    let years = today.getFullYear() - birth.getFullYear();
+    let months = today.getMonth() - birth.getMonth();
+    let days = today.getDate() - birth.getDate();
+    
+    if (days < 0) {
+      months--;
+      days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+    }
+    
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+    
     return `${years}a ${months}m ${days}d`;
   };
 
+  const calculateWaitTime = (arrivalTime: string) => {
+    const [hours, minutes] = arrivalTime.split(':').map(Number);
+    const arrival = new Date();
+    arrival.setHours(hours, minutes, 0, 0);
+    
+    const now = new Date();
+    const diffMs = now.getTime() - arrival.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    
+    if (diffMins < 60) {
+      return `${diffMins}min`;
+    } else {
+      const hours = Math.floor(diffMins / 60);
+      const mins = diffMins % 60;
+      return `${hours}h ${mins}min`;
+    }
+  };
+
   const professionalInfo = formatProfessionalInfo(attendance.professional);
-  const detailedAge = calculateDetailedAge(attendance.citizen.age);
+  const detailedAge = calculateDetailedAge(attendance.citizen.birthDate);
+  const waitTime = calculateWaitTime(attendance.arrivalTime);
 
   const handleStatusChange = (newStatus: string) => {
     console.log(`Status changed to: ${newStatus}`);
@@ -122,7 +160,7 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
       cpf: attendance.citizen.cpf,
       cns: attendance.citizen.cns,
       prontuario: "123456", // Mock data
-      birthDate: "10/02/2004", // Mock data
+      birthDate: attendance.citizen.birthDate || "10/02/2004", // Mock data
       photo: attendance.citizen.photo
     },
     arrivalTime: attendance.arrivalTime,
@@ -166,14 +204,29 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
                 )}
               </div>
               
-              {/* Idade e horário */}
+              {/* Data de nascimento, idade, horário e tempo de espera */}
               <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
-                <span className="font-medium">{calculateDetailedAge(attendance.citizen.age)}</span>
+                {attendance.citizen.birthDate && (
+                  <span>
+                    <span className="font-medium">Nascimento:</span> {new Date(attendance.citizen.birthDate).toLocaleDateString('pt-BR')} ({detailedAge})
+                  </span>
+                )}
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
                   <span>Inclusão: {attendance.arrivalTime}</span>
                 </div>
+                <div className="flex items-center gap-1 text-orange-600 font-medium">
+                  <Clock className="w-4 h-4" />
+                  <span>Aguardando: {waitTime}</span>
+                </div>
               </div>
+
+              {/* Nome da mãe */}
+              {attendance.citizen.motherName && (
+                <div className="text-sm text-gray-700 mb-2">
+                  <span className="font-medium text-gray-800">Mãe:</span> {attendance.citizen.motherName}
+                </div>
+              )}
 
               {/* Informações profissionais em linha */}
               <div className="flex flex-wrap gap-4 text-sm text-gray-700">
@@ -186,8 +239,15 @@ export const AttendanceCard = ({ attendance }: AttendanceCardProps) => {
                 <div>
                   <span className="font-medium text-gray-800">Equipe:</span> {attendance.team}
                 </div>
-                <div>
-                  <span className="font-medium text-gray-800">Serviços:</span> {attendance.serviceTypes.join(', ')}
+                <div className="flex items-center gap-1">
+                  <span className="font-medium text-gray-800">Serviços:</span>
+                  <div className="flex gap-1">
+                    {attendance.serviceTypes.map((service, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs">
+                        {service}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

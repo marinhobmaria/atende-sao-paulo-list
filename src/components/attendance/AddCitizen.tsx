@@ -32,20 +32,18 @@ const citizensInQueue = [
   "Ana Costa Lima"
 ];
 
-// Mock scheduled appointments
+// Mock scheduled appointments for today
 const scheduledAppointments = {
   "Maria Santos Silva": {
     professional: "Dr. João Silva",
     specialty: "Médico Clínico",
     team: "Equipe APS 1",
-    date: "26/06/2025",
     time: "14:30"
   },
   "Carlos Pereira Lima": {
     professional: "Dra. Ana Costa",
     specialty: "Enfermeiro",
     team: "Equipe APS 2",
-    date: "26/06/2025",
     time: "15:00"
   }
 };
@@ -64,7 +62,7 @@ export const AddCitizen = ({
   const [selectedProfessional, setSelectedProfessional] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("");
   const [selectedServiceTypes, setSelectedServiceTypes] = useState<string[]>([]);
-  const [useScheduledAppointment, setUseScheduledAppointment] = useState(false);
+  const [patientPresent, setPatientPresent] = useState(false);
   const [scheduledInfo, setScheduledInfo] = useState<any>(null);
 
   const handleAddCitizen = () => {
@@ -74,7 +72,7 @@ export const AddCitizen = ({
         professional: selectedProfessional,
         team: selectedTeam,
         serviceTypes: selectedServiceTypes,
-        useScheduledAppointment
+        patientPresent
       });
       
       // Reset form
@@ -82,7 +80,7 @@ export const AddCitizen = ({
       setSelectedProfessional("");
       setSelectedTeam("");
       setSelectedServiceTypes([]);
-      setUseScheduledAppointment(false);
+      setPatientPresent(false);
       setScheduledInfo(null);
       onOpenChange(false);
     }
@@ -92,7 +90,7 @@ export const AddCitizen = ({
     switch (field) {
       case 'citizen':
         setSelectedCitizen("");
-        setUseScheduledAppointment(false);
+        setPatientPresent(false);
         setScheduledInfo(null);
         break;
       case 'professional':
@@ -114,12 +112,12 @@ export const AddCitizen = ({
       setScheduledInfo(appointment);
     } else {
       setScheduledInfo(null);
-      setUseScheduledAppointment(false);
+      setPatientPresent(false);
     }
   };
 
-  const handleUseScheduledAppointment = (checked: boolean) => {
-    setUseScheduledAppointment(checked);
+  const handlePatientPresent = (checked: boolean) => {
+    setPatientPresent(checked);
     if (checked && scheduledInfo) {
       setSelectedProfessional(scheduledInfo.professional);
       setSelectedTeam(scheduledInfo.team);
@@ -136,8 +134,8 @@ export const AddCitizen = ({
       <div className="bg-white rounded-lg shadow-sm border p-4">
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Munícipe Field */}
-            <div className="space-y-2">
+            {/* Munícipe Field - Larger */}
+            <div className="space-y-2 md:col-span-2">
               <Label htmlFor="citizen" className="text-sm font-medium">
                 Munícipe *
               </Label>
@@ -155,64 +153,6 @@ export const AddCitizen = ({
                     size="sm"
                     className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
                     onClick={() => clearField('citizen')}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            {/* Profissional Field */}
-            <div className="space-y-2">
-              <Label htmlFor="professional" className="text-sm font-medium">
-                Profissional
-              </Label>
-              <div className="relative">
-                <ProfessionalSearch
-                  value={selectedProfessional}
-                  onChange={setSelectedProfessional}
-                  onProfessionalSelect={(professional) => {
-                    setSelectedProfessional(professional.name);
-                    setSelectedTeam(""); // Clear team when professional is selected
-                  }}
-                  disabled={useScheduledAppointment}
-                />
-                {selectedProfessional && !useScheduledAppointment && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 z-10"
-                    onClick={() => clearField('professional')}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            {/* Equipe Field */}
-            <div className="space-y-2">
-              <Label htmlFor="team" className="text-sm font-medium">
-                Equipe
-              </Label>
-              <div className="relative">
-                <TeamSearch
-                  value={selectedTeam}
-                  onChange={setSelectedTeam}
-                  onTeamSelect={(team) => {
-                    setSelectedTeam(team.name);
-                    setSelectedProfessional(""); // Clear professional when team is selected
-                  }}
-                  disabled={useScheduledAppointment}
-                />
-                {selectedTeam && !useScheduledAppointment && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 z-10"
-                    onClick={() => clearField('team')}
                   >
                     <X className="h-3 w-3" />
                   </Button>
@@ -250,27 +190,87 @@ export const AddCitizen = ({
             <div className="p-3 bg-blue-50 rounded-lg border">
               <div className="flex items-center space-x-2 mb-2">
                 <Checkbox
-                  id="useScheduled"
-                  checked={useScheduledAppointment}
-                  onCheckedChange={handleUseScheduledAppointment}
+                  id="patientPresent"
+                  checked={patientPresent}
+                  onCheckedChange={handlePatientPresent}
                 />
-                <Label htmlFor="useScheduled" className="text-sm font-medium">
-                  Usar próximo agendamento
+                <Label htmlFor="patientPresent" className="text-sm font-medium">
+                  Paciente presente
                 </Label>
               </div>
               <div className="text-sm text-gray-600">
                 <p><span className="font-medium">Profissional:</span> {scheduledInfo.professional}</p>
                 <p><span className="font-medium">Especialidade:</span> {scheduledInfo.specialty}</p>
                 <p><span className="font-medium">Equipe:</span> {scheduledInfo.team}</p>
-                <p><span className="font-medium">Data/Hora:</span> {scheduledInfo.date} às {scheduledInfo.time}</p>
+                <p><span className="font-medium">Horário:</span> {scheduledInfo.time}</p>
               </div>
-              {useScheduledAppointment && (
+              {patientPresent && (
                 <div className="mt-2 text-sm text-blue-600 font-medium">
                   ✓ Profissional e equipe preenchidos automaticamente
                 </div>
               )}
             </div>
           )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Profissional Field */}
+            <div className="space-y-2">
+              <Label htmlFor="professional" className="text-sm font-medium">
+                Profissional
+              </Label>
+              <div className="relative">
+                <ProfessionalSearch
+                  value={selectedProfessional}
+                  onChange={setSelectedProfessional}
+                  onProfessionalSelect={(professional) => {
+                    setSelectedProfessional(professional.name);
+                    setSelectedTeam(""); // Clear team when professional is selected
+                  }}
+                  disabled={patientPresent}
+                />
+                {selectedProfessional && !patientPresent && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 z-10"
+                    onClick={() => clearField('professional')}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Equipe Field */}
+            <div className="space-y-2">
+              <Label htmlFor="team" className="text-sm font-medium">
+                Equipe
+              </Label>
+              <div className="relative">
+                <TeamSearch
+                  value={selectedTeam}
+                  onChange={setSelectedTeam}
+                  onTeamSelect={(team) => {
+                    setSelectedTeam(team.name);
+                    setSelectedProfessional(""); // Clear professional when team is selected
+                  }}
+                  disabled={patientPresent}
+                />
+                {selectedTeam && !patientPresent && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 z-10"
+                    onClick={() => clearField('team')}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
 
           <div className="flex justify-end gap-2">
             <Button
@@ -280,7 +280,7 @@ export const AddCitizen = ({
                 setSelectedProfessional("");
                 setSelectedTeam("");
                 setSelectedServiceTypes([]);
-                setUseScheduledAppointment(false);
+                setPatientPresent(false);
                 setScheduledInfo(null);
               }}
               size="sm"
@@ -366,21 +366,21 @@ export const AddCitizen = ({
             <div className="p-4 bg-blue-50 rounded-lg border">
               <div className="flex items-center space-x-2 mb-3">
                 <Checkbox
-                  id="useScheduled"
-                  checked={useScheduledAppointment}
-                  onCheckedChange={handleUseScheduledAppointment}
+                  id="patientPresent"
+                  checked={patientPresent}
+                  onCheckedChange={handlePatientPresent}
                 />
-                <Label htmlFor="useScheduled" className="text-sm font-medium">
-                  Usar próximo agendamento
+                <Label htmlFor="patientPresent" className="text-sm font-medium">
+                  Paciente presente
                 </Label>
               </div>
               <div className="text-sm text-gray-600">
                 <p><span className="font-medium">Profissional:</span> {scheduledInfo.professional}</p>
                 <p><span className="font-medium">Especialidade:</span> {scheduledInfo.specialty}</p>
                 <p><span className="font-medium">Equipe:</span> {scheduledInfo.team}</p>
-                <p><span className="font-medium">Data/Hora:</span> {scheduledInfo.date} às {scheduledInfo.time}</p>
+                <p><span className="font-medium">Horário:</span> {scheduledInfo.time}</p>
               </div>
-              {useScheduledAppointment && (
+              {patientPresent && (
                 <div className="mt-2 text-sm text-blue-600 font-medium">
                   ✓ Profissional e equipe preenchidos automaticamente
                 </div>
@@ -402,9 +402,9 @@ export const AddCitizen = ({
                     setSelectedProfessional(professional.name);
                     setSelectedTeam(""); // Clear team when professional is selected
                   }}
-                  disabled={useScheduledAppointment}
+                  disabled={patientPresent}
                 />
-                {selectedProfessional && !useScheduledAppointment && (
+                {selectedProfessional && !patientPresent && (
                   <Button
                     type="button"
                     variant="ghost"
@@ -431,9 +431,9 @@ export const AddCitizen = ({
                     setSelectedTeam(team.name);
                     setSelectedProfessional(""); // Clear professional when team is selected
                   }}
-                  disabled={useScheduledAppointment}
+                  disabled={patientPresent}
                 />
-                {selectedTeam && !useScheduledAppointment && (
+                {selectedTeam && !patientPresent && (
                   <Button
                     type="button"
                     variant="ghost"
@@ -456,7 +456,7 @@ export const AddCitizen = ({
                 setSelectedProfessional("");
                 setSelectedTeam("");
                 setSelectedServiceTypes([]);
-                setUseScheduledAppointment(false);
+                setPatientPresent(false);
                 setScheduledInfo(null);
               }}
             >

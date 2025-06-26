@@ -4,6 +4,7 @@ import { AttendanceList, getStatusCounts } from "@/components/attendance/Attenda
 import { AttendanceHeader } from "@/components/attendance/AttendanceHeader";
 import { AddCitizen } from "@/components/attendance/AddCitizen";
 import { StatusCounters } from "@/components/attendance/StatusCounters";
+import { PasswordCaller } from "@/components/attendance/PasswordCaller";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Home, Plus } from "lucide-react";
@@ -81,27 +82,38 @@ const Index = () => {
           </Button>
         </div>
 
-        {/* Add Citizen Collapsible */}
-        {showAddCitizen && (
-          <AddCitizen
-            open={showAddCitizen}
-            onOpenChange={setShowAddCitizen}
-            queueCount={mockQueueCount}
-            waitingCount={mockWaitingCount}
-            statusCounts={statusCounts}
-            filters={filters}
-            setFilters={setFilters}
-            isCollapsible={true}
-          />
-        )}
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Left Column - Main Content */}
+          <div className="lg:col-span-3 space-y-6">
+            {/* Add Citizen Collapsible */}
+            {showAddCitizen && (
+              <AddCitizen
+                open={showAddCitizen}
+                onOpenChange={setShowAddCitizen}
+                queueCount={mockQueueCount}
+                waitingCount={mockWaitingCount}
+                statusCounts={statusCounts}
+                filters={filters}
+                setFilters={setFilters}
+                isCollapsible={true}
+              />
+            )}
 
-        {/* Attendance List */}
-        <AttendanceList
-          searchTerm={searchTerm}
-          showMyAttendances={showMyAttendances}
-          sortBy={sortBy}
-          filters={filters}
-        />
+            {/* Attendance List */}
+            <AttendanceList
+              searchTerm={searchTerm}
+              showMyAttendances={showMyAttendances}
+              sortBy={sortBy}
+              filters={filters}
+            />
+          </div>
+
+          {/* Right Column - Password Caller */}
+          <div className="lg:col-span-1">
+            <PasswordCaller />
+          </div>
+        </div>
       </div>
     </div>
   );
