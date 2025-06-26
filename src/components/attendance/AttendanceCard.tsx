@@ -1,8 +1,10 @@
+
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Clock, FileText, Stethoscope, Syringe, MoreHorizontal, Volume2 } from "lucide-react";
 import { AttendanceActions } from "./AttendanceActions";
 
@@ -179,6 +181,9 @@ export const AttendanceCard = ({ attendance, onCallPatient }: AttendanceCardProp
     addedBy: attendance.addedBy || "Sistema"
   };
 
+  // Determine if should show vaccination button (when service type is VACINA)
+  const showVaccinationButton = attendance.serviceTypes.includes("VACINA") || attendance.serviceTypes.includes("VACINAÇÃO");
+  
   return (
     <Card className={`hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer border-l-4 ${getStatusBorderColor(attendance.status)}`}>
       <CardContent className="p-4">
@@ -219,10 +224,6 @@ export const AttendanceCard = ({ attendance, onCallPatient }: AttendanceCardProp
                   <Clock className="w-4 h-4" />
                   <span>Inclusão: {attendance.arrivalTime}</span>
                 </div>
-                <div className="flex items-center gap-1 text-orange-600 font-medium">
-                  <Clock className="w-4 h-4" />
-                  <span>Aguardando: {waitTime}</span>
-                </div>
               </div>
 
               {/* Nome da mãe */}
@@ -260,19 +261,29 @@ export const AttendanceCard = ({ attendance, onCallPatient }: AttendanceCardProp
           {/* Right side - Action buttons */}
           <div className="flex items-center gap-2 flex-shrink-0">
             {attendance.status === "waiting" && (
-              <Button
-                onClick={handleCallPatient}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2 text-blue-600 border-blue-200 hover:bg-blue-50"
-              >
-                <Volume2 className="h-4 w-4" />
-                Chamar paciente
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={handleCallPatient}
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2 text-blue-600 border-blue-200 hover:bg-blue-50"
+                    >
+                      <Volume2 className="h-4 w-4" />
+                      Chamar paciente
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Aguardando: {waitTime}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
             <AttendanceActions 
               attendance={mockAttendanceForActions} 
               onStatusChange={handleStatusChange}
+              showVaccinationButton={showVaccinationButton}
             />
           </div>
         </div>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AttendanceList, getStatusCounts } from "@/components/attendance/AttendanceList";
 import { AttendanceHeader } from "@/components/attendance/AttendanceHeader";
@@ -32,7 +31,6 @@ const Index = () => {
 
   const handleCallPatient = (patientId: string, patientName: string) => {
     const patientNumber = `A${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`;
-    setCurrentCall(patientNumber);
     console.log(`Chamando paciente: ${patientName} - Senha: ${patientNumber}`);
   };
 
@@ -60,7 +58,7 @@ const Index = () => {
 
         {/* Password Caller - Above filters */}
         <div className="flex justify-center">
-          <PasswordCaller currentCall={currentCall} setCurrentCall={setCurrentCall} />
+          <PasswordCaller />
         </div>
 
         {/* Header */}

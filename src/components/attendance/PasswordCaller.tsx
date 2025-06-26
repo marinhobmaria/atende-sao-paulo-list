@@ -2,8 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Volume2, UserCheck, Users } from "lucide-react";
+import { Volume2, UserCheck } from "lucide-react";
 
 // Mock data for queue
 const mockQueue = [
@@ -32,21 +31,6 @@ export const PasswordCaller = () => {
     }
   };
 
-  const callSpecific = (patientId: string) => {
-    const patient = queue.find(p => p.id === patientId);
-    if (patient) {
-      setCurrentCall(patient.number);
-      console.log(`Chamando senha: ${patient.number} - ${patient.name}`);
-      
-      // Update queue status
-      setQueue(prev => prev.map(p => 
-        p.id === patientId 
-          ? { ...p, status: "called" }
-          : p
-      ));
-    }
-  };
-
   const waitingCount = queue.filter(p => p.status === "waiting").length;
 
   return (
@@ -54,7 +38,7 @@ export const PasswordCaller = () => {
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
           <Volume2 className="h-5 w-5" />
-          Chamador de Senhas
+          Chamar próximo da fila
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -77,43 +61,6 @@ export const PasswordCaller = () => {
             <UserCheck className="h-4 w-4 mr-2" />
             Próximo ({waitingCount})
           </Button>
-        </div>
-
-        {/* Queue List */}
-        <div className="space-y-2">
-          <div className="text-sm font-medium text-gray-700 flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Fila de Espera
-          </div>
-          <div className="max-h-40 overflow-y-auto space-y-1">
-            {queue.filter(p => p.status === "waiting").map((patient) => (
-              <div
-                key={patient.id}
-                className="flex items-center justify-between p-2 bg-gray-50 rounded border text-sm"
-              >
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-xs font-mono">
-                    {patient.number}
-                  </Badge>
-                  <span className="truncate">{patient.name}</span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => callSpecific(patient.id)}
-                  className="h-6 px-2 text-xs"
-                >
-                  Chamar
-                </Button>
-              </div>
-            ))}
-          </div>
-          
-          {waitingCount === 0 && (
-            <div className="text-center text-sm text-gray-500 py-4">
-              Nenhum paciente na fila
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>
