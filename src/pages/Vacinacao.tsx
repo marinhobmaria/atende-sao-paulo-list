@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,16 +5,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Home, Syringe, Calendar, Clock } from "lucide-react";
 import { CitizenCompactInfo } from "@/components/escuta-inicial/CitizenCompactInfo";
-import { FinalizacaoAtendimentoModal } from "@/components/finalizacao/FinalizacaoAtendimentoModal";
 import { FolhaRostoTab } from "@/components/folha-rosto/FolhaRostoTab";
+import { VacinacaoForm } from "@/components/vacinacao/VacinacaoForm";
 import { toast } from "@/hooks/use-toast";
 
 const Vacinacao = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const cidadaoId = searchParams.get("cidadao");
-  const [showFinalizacao, setShowFinalizacao] = useState(false);
-  const [isFinalizando, setIsFinalizando] = useState(false);
 
   // Mock data do cidadão baseado na imagem de referência
   const cidadao = {
@@ -34,30 +31,12 @@ const Vacinacao = () => {
     photo: "https://images.unsplash.com/photo-1494790108755-2616b812e672?w=150&h=150&fit=crop&crop=face"
   };
 
-  const handleFinalizarVacinacao = async (data: any) => {
-    setIsFinalizando(true);
-    try {
-      console.log("Dados da vacinação:", data);
-      
-      // Simular processamento
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      toast({
-        title: "Vacinação finalizada com sucesso",
-        description: "Todas as vacinas foram registradas no sistema.",
-      });
-
-      setShowFinalizacao(false);
-      navigate("/");
-    } catch (error) {
-      toast({
-        title: "Erro ao finalizar",
-        description: "Não foi possível finalizar a vacinação. Tente novamente.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsFinalizando(false);
-    }
+  const handleFinalizarVacinacao = () => {
+    toast({
+      title: "Vacinação finalizada com sucesso",
+      description: "Todas as vacinas foram registradas no sistema.",
+    });
+    navigate("/");
   };
 
   return (
@@ -105,44 +84,7 @@ const Vacinacao = () => {
               </TabsContent>
 
               <TabsContent value="vacinacao" className="mt-6">
-                <div className="space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
-                      <Syringe className="h-5 w-5 text-purple-600" />
-                      Aplicação de Vacinas
-                    </h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <h4 className="font-medium">Vacinas Disponíveis</h4>
-                        <div className="space-y-2">
-                          <div className="p-3 border rounded-lg">
-                            <p className="font-medium">COVID-19 (Pfizer)</p>
-                            <p className="text-sm text-muted-foreground">Dose de reforço disponível</p>
-                          </div>
-                          <div className="p-3 border rounded-lg">
-                            <p className="font-medium">Influenza (H1N1)</p>
-                            <p className="text-sm text-muted-foreground">Campanha 2024</p>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-4">
-                        <h4 className="font-medium">Cartão de Vacinação</h4>
-                        <div className="space-y-2">
-                          <div className="p-3 border rounded-lg bg-green-50">
-                            <p className="font-medium text-green-800">COVID-19 - 1ª Dose</p>
-                            <p className="text-sm text-green-600">Aplicada em 15/03/2024</p>
-                          </div>
-                          <div className="p-3 border rounded-lg bg-green-50">
-                            <p className="font-medium text-green-800">COVID-19 - 2ª Dose</p>
-                            <p className="text-sm text-green-600">Aplicada em 15/04/2024</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <VacinacaoForm onFinalizarVacinacao={handleFinalizarVacinacao} />
               </TabsContent>
 
               <TabsContent value="historico" className="mt-6">
@@ -202,14 +144,6 @@ const Vacinacao = () => {
             </Tabs>
           </CardContent>
         </Card>
-
-        {/* Modal de Finalização */}
-        <FinalizacaoAtendimentoModal
-          isOpen={showFinalizacao}
-          onClose={() => setShowFinalizacao(false)}
-          onSave={handleFinalizarVacinacao}
-          isLoading={isFinalizando}
-        />
       </div>
     </div>
   );
