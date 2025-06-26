@@ -5,7 +5,7 @@ import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { MotivoConsultaSection } from "./MotivoConsultaSection";
 import { AntropometriaSection } from "./AntropometriaSection";
-import { SinaisVitaisSection } from "./SinaisVitaisSection";
+import { SinaisVitaisGlicemiaSection } from "./SinaisVitaisGlicemiaSection";
 import { ProcedimentosSection } from "./ProcedimentosSection";
 import { ClassificacaoRiscoSection } from "./ClassificacaoRiscoSection";
 import { DesfechoSection } from "./DesfechoSection";
@@ -46,48 +46,52 @@ export const EscutaInicialForm = ({ onSubmit, onCancel, isLoading }: EscutaInici
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
-        {/* Motivo da Consulta */}
-        <MotivoConsultaSection form={form} />
+    <div className="max-w-4xl mx-auto">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+          {/* Motivo da Consulta */}
+          <MotivoConsultaSection form={form} />
 
-        <Separator />
+          <Separator className="my-8" />
 
-        {/* Antropometria */}
-        <AntropometriaSection 
-          form={form} 
-          onValuesChange={updateProcedimentosAutomaticos}
-        />
+          {/* Antropometria */}
+          <AntropometriaSection 
+            form={form} 
+            onValuesChange={updateProcedimentosAutomaticos}
+          />
 
-        <Separator />
+          <Separator className="my-8" />
 
-        {/* Sinais Vitais */}
-        <SinaisVitaisSection 
-          form={form} 
-          onValuesChange={updateProcedimentosAutomaticos}
-        />
+          {/* Sinais Vitais e Glicemia */}
+          <SinaisVitaisGlicemiaSection 
+            form={form} 
+            onValuesChange={updateProcedimentosAutomaticos}
+          />
 
-        <Separator />
+          <Separator className="my-8" />
 
-        {/* Procedimentos */}
-        <ProcedimentosSection 
-          form={form}
-          procedimentosAutomaticos={procedimentosAutomaticos}
-        />
+          {/* Procedimentos */}
+          <ProcedimentosSection 
+            form={form}
+            procedimentosAutomaticos={procedimentosAutomaticos}
+          />
 
-        <Separator />
+          <Separator className="my-8" />
 
-        {/* Classificação de Risco */}
-        <ClassificacaoRiscoSection form={form} />
+          {/* Classificação de Risco */}
+          <ClassificacaoRiscoSection form={form} />
 
-        <Separator />
+          <Separator className="my-8" />
 
-        {/* Desfecho */}
-        <DesfechoSection form={form} />
+          {/* Desfecho */}
+          <DesfechoSection form={form} />
 
-        {/* Botões de ação */}
-        <FormActions onCancel={onCancel} isLoading={isLoading} />
-      </form>
-    </Form>
+          {/* Botões de ação */}
+          <div className="pt-6">
+            <FormActions onCancel={onCancel} isLoading={isLoading} />
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 };

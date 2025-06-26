@@ -1,0 +1,387 @@
+
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { FieldAlert } from "./FieldAlert";
+import { useState } from "react";
+
+interface SinaisVitaisGlicemiaSectionProps {
+  form: any;
+  onValuesChange: (values: any) => void;
+}
+
+export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVitaisGlicemiaSectionProps) => {
+  const [fieldWarnings, setFieldWarnings] = useState<Record<string, string>>({});
+
+  const handleFieldChange = (fieldName: string, value: string) => {
+    const currentValues = form.getValues();
+    const newValues = { ...currentValues, [fieldName]: value };
+    onValuesChange(newValues);
+
+    // Check field limits and show warnings
+    const warnings = { ...fieldWarnings };
+    const numValue = parseFloat(value);
+
+    switch (fieldName) {
+      case "pressaoSistolica":
+        if (numValue < 70) warnings[fieldName] = "Valor muito baixo para pressão sistólica";
+        else if (numValue > 250) warnings[fieldName] = "Valor muito alto para pressão sistólica";
+        else delete warnings[fieldName];
+        break;
+      case "pressaoDiastolica":
+        if (numValue < 40) warnings[fieldName] = "Valor muito baixo para pressão diastólica";
+        else if (numValue > 150) warnings[fieldName] = "Valor muito alto para pressão diastólica";
+        else delete warnings[fieldName];
+        break;
+      case "frequenciaCardiaca":
+        if (numValue < 30) warnings[fieldName] = "Frequência cardíaca muito baixa";
+        else if (numValue > 220) warnings[fieldName] = "Frequência cardíaca muito alta";
+        else delete warnings[fieldName];
+        break;
+      case "frequenciaRespiratoria":
+        if (numValue < 8) warnings[fieldName] = "Frequência respiratória muito baixa";
+        else if (numValue > 80) warnings[fieldName] = "Frequência respiratória muito alta";
+        else delete warnings[fieldName];
+        break;
+      case "temperatura":
+        if (numValue < 32) warnings[fieldName] = "Temperatura muito baixa";
+        else if (numValue > 42) warnings[fieldName] = "Temperatura muito alta";
+        else delete warnings[fieldName];
+        break;
+      case "saturacaoOxigenio":
+        if (numValue < 70) warnings[fieldName] = "Saturação muito baixa";
+        else if (numValue > 100) warnings[fieldName] = "Saturação não pode exceder 100%";
+        else delete warnings[fieldName];
+        break;
+      case "glicemiaCapilar":
+        if (numValue < 20) warnings[fieldName] = "Glicemia muito baixa";
+        else if (numValue > 600) warnings[fieldName] = "Glicemia muito alta";
+        else delete warnings[fieldName];
+        break;
+    }
+
+    setFieldWarnings(warnings);
+  };
+
+  const preventInvalidInput = (fieldName: string, min: number, max: number) => {
+    return (e: React.KeyboardEvent<HTMLInputElement>) => {
+      const value = e.currentTarget.value + e.key;
+      const numValue = parseFloat(value);
+      
+      if (e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab' && e.key !== 'Enter') {
+        if (numValue < min || numValue > max) {
+          e.preventDefault();
+        }
+      }
+    };
+  };
+
+  return (
+    <Card className="shadow-sm border-gray-200">
+      <CardHeader className="pb-4 bg-gradient-to-r from-green-50 to-emerald-50">
+        <CardTitle className="text-lg font-semibold text-green-800 flex items-center gap-2">
+          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          Sinais Vitais e Glicemia Capilar
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6 p-6">
+        {/* Pressão Arterial */}
+        <div>
+          <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+            Pressão Arterial
+          </h4>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <FormField
+              control={form.control}
+              name="pressaoSistolica"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">PA Sistólica</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      className="w-full max-w-[120px]"
+                      placeholder="120"
+                      {...field}
+                      onKeyDown={preventInvalidInput("pressaoSistolica", 70, 250)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '' || (parseFloat(value) >= 70 && parseFloat(value) <= 250)) {
+                          field.onChange(e);
+                          handleFieldChange("pressaoSistolica", e.target.value);
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <div className="text-xs text-gray-500">70-250 mmHg</div>
+                  <FieldAlert 
+                    type="warning" 
+                    message={fieldWarnings.pressaoSistolica || ""} 
+                    show={!!fieldWarnings.pressaoSistolica} 
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="pressaoDiastolica"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">PA Diastólica</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      className="w-full max-w-[120px]"
+                      placeholder="80"
+                      {...field}
+                      onKeyDown={preventInvalidInput("pressaoDiastolica", 40, 150)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '' || (parseFloat(value) >= 40 && parseFloat(value) <= 150)) {
+                          field.onChange(e);
+                          handleFieldChange("pressaoDiastolica", e.target.value);
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <div className="text-xs text-gray-500">40-150 mmHg</div>
+                  <FieldAlert 
+                    type="warning" 
+                    message={fieldWarnings.pressaoDiastolica || ""} 
+                    show={!!fieldWarnings.pressaoDiastolica} 
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        <Separator className="my-6" />
+
+        {/* Frequências */}
+        <div>
+          <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+            Frequências
+          </h4>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <FormField
+              control={form.control}
+              name="frequenciaCardiaca"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">FC</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      className="w-full max-w-[120px]"
+                      placeholder="72"
+                      {...field}
+                      onKeyDown={preventInvalidInput("frequenciaCardiaca", 30, 220)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '' || (parseFloat(value) >= 30 && parseFloat(value) <= 220)) {
+                          field.onChange(e);
+                          handleFieldChange("frequenciaCardiaca", e.target.value);
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <div className="text-xs text-gray-500">30-220 bpm</div>
+                  <FieldAlert 
+                    type="warning" 
+                    message={fieldWarnings.frequenciaCardiaca || ""} 
+                    show={!!fieldWarnings.frequenciaCardiaca} 
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="frequenciaRespiratoria"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">FR</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      className="w-full max-w-[120px]"
+                      placeholder="16"
+                      {...field}
+                      onKeyDown={preventInvalidInput("frequenciaRespiratoria", 8, 80)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '' || (parseFloat(value) >= 8 && parseFloat(value) <= 80)) {
+                          field.onChange(e);
+                          handleFieldChange("frequenciaRespiratoria", e.target.value);
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <div className="text-xs text-gray-500">8-80 rpm</div>
+                  <FieldAlert 
+                    type="warning" 
+                    message={fieldWarnings.frequenciaRespiratoria || ""} 
+                    show={!!fieldWarnings.frequenciaRespiratoria} 
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        <Separator className="my-6" />
+
+        {/* Temperatura e Saturação */}
+        <div>
+          <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+            Temperatura e Saturação
+          </h4>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <FormField
+              control={form.control}
+              name="temperatura"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">Temperatura</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      className="w-full max-w-[120px]"
+                      placeholder="36.5"
+                      {...field}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '' || (parseFloat(value) >= 32 && parseFloat(value) <= 42)) {
+                          field.onChange(e);
+                          handleFieldChange("temperatura", e.target.value);
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <div className="text-xs text-gray-500">32-42°C</div>
+                  <FieldAlert 
+                    type="warning" 
+                    message={fieldWarnings.temperatura || ""} 
+                    show={!!fieldWarnings.temperatura} 
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="saturacaoOxigenio"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">SpO₂</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      className="w-full max-w-[120px]"
+                      placeholder="98"
+                      {...field}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '' || (parseFloat(value) >= 70 && parseFloat(value) <= 100)) {
+                          field.onChange(e);
+                          handleFieldChange("saturacaoOxigenio", e.target.value);
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <div className="text-xs text-gray-500">70-100%</div>
+                  <FieldAlert 
+                    type="warning" 
+                    message={fieldWarnings.saturacaoOxigenio || ""} 
+                    show={!!fieldWarnings.saturacaoOxigenio} 
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        <Separator className="my-6" />
+
+        {/* Glicemia Capilar */}
+        <div>
+          <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+            Glicemia Capilar
+          </h4>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <FormField
+              control={form.control}
+              name="glicemiaCapilar"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">Glicemia Capilar</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      className="w-full max-w-[140px]"
+                      placeholder="90"
+                      {...field}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '' || (parseFloat(value) >= 20 && parseFloat(value) <= 600)) {
+                          field.onChange(e);
+                          handleFieldChange("glicemiaCapilar", e.target.value);
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <div className="text-xs text-gray-500">20-600 mg/dL</div>
+                  <FieldAlert 
+                    type="warning" 
+                    message={fieldWarnings.glicemiaCapilar || ""} 
+                    show={!!fieldWarnings.glicemiaCapilar} 
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="momentoColeta"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">Momento da Coleta</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="max-w-[200px]">
+                        <SelectValue placeholder="Selecione o momento" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="nao_especificado">Não especificado</SelectItem>
+                      <SelectItem value="jejum">Jejum</SelectItem>
+                      <SelectItem value="pre_prandial">Pré-prandial</SelectItem>
+                      <SelectItem value="pos_prandial">Pós-prandial</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
