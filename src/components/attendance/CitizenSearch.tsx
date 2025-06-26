@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -89,6 +88,7 @@ interface CitizenSearchProps {
   selectedCitizen?: Citizen | null;
   citizensInQueue?: string[];
   disabled?: boolean;
+  className?: string;
 }
 
 const calculateAge = (birthDate: string) => {
@@ -118,7 +118,8 @@ export const CitizenSearch = ({
   onCitizenSelect,
   selectedCitizen,
   citizensInQueue = [],
-  disabled = false
+  disabled = false,
+  className
 }: CitizenSearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
