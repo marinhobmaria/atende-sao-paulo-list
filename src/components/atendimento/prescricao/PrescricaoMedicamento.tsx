@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -338,7 +337,7 @@ export const PrescricaoMedicamento = ({ ultimoPeso }: PrescricaoMedicamentoProps
                     <Checkbox 
                       id="manual"
                       checked={preenchimentoManual}
-                      onCheckedChange={setPreenchimentoManual}
+                      onCheckedChange={(checked) => setPreenchimentoManual(checked === true)}
                     />
                     <Label htmlFor="manual">Preencher manualmente. Medicamento não encontrado na lista</Label>
                   </div>
