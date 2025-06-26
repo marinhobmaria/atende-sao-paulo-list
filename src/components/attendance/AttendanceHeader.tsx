@@ -59,7 +59,7 @@ export const AttendanceHeader = ({
 
   return (
     <div className="bg-white rounded-lg shadow-sm border">
-      <div className="p-4 space-y-4">
+      <div className="p-4">
         {/* Search and Main Controls */}
         <div className="flex gap-3 items-center">
           {/* Search */}
@@ -76,14 +76,14 @@ export const AttendanceHeader = ({
           </div>
 
           {/* Controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="myAttendances"
                 checked={showMyAttendances}
                 onCheckedChange={setShowMyAttendances}
               />
-              <label htmlFor="myAttendances" className="text-sm font-medium whitespace-nowrap">
+              <label htmlFor="myAttendances" className="text-sm whitespace-nowrap">
                 Meus atendimentos
               </label>
             </div>
@@ -92,7 +92,7 @@ export const AttendanceHeader = ({
               variant="outline"
               onClick={handleRefresh}
               size="sm"
-              className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-300"
+              className="flex items-center gap-2"
             >
               <RefreshCw className="h-4 w-4" />
               Atualizar
@@ -115,11 +115,9 @@ export const AttendanceHeader = ({
           </div>
         </div>
 
-        {/* Active Filters Summary */}
+        {/* Active Filters Summary - Made more compact */}
         {(getActiveFiltersCount() > 0 || showMyAttendances) && (
-          <div className="flex flex-wrap gap-2 text-sm pt-2 border-t">
-            <span className="text-gray-600 font-medium">Filtros ativos:</span>
-            
+          <div className="flex flex-wrap gap-1 text-sm pt-3 border-t mt-3">
             {showMyAttendances && (
               <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
                 Meus atendimentos
@@ -128,7 +126,7 @@ export const AttendanceHeader = ({
             
             {filters.serviceType && filters.serviceType.length > 0 && (
               <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                {filters.serviceType.length} tipo{filters.serviceType.length > 1 ? 's' : ''} de serviço
+                {filters.serviceType.length} serviço{filters.serviceType.length > 1 ? 's' : ''}
               </span>
             )}
             
@@ -140,15 +138,15 @@ export const AttendanceHeader = ({
             
             {filters.professional && filters.professional.length > 0 && (
               <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">
-                {filters.professional.length} profissional{filters.professional.length > 1 ? 'is' : ''}
+                {filters.professional.length} prof.
               </span>
             )}
 
             <button
               onClick={resetFilters}
-              className="text-blue-600 hover:text-blue-800 text-xs underline ml-2"
+              className="text-blue-600 hover:text-blue-800 text-xs underline ml-1"
             >
-              Limpar todos
+              Limpar
             </button>
           </div>
         )}

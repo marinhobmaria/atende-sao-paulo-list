@@ -44,6 +44,11 @@ const Index = () => {
           </BreadcrumbList>
         </Breadcrumb>
 
+        {/* Main Title - moved above filters */}
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-900">Fila de atendimento</h1>
+        </div>
+
         {/* Header */}
         <AttendanceHeader
           searchTerm={searchTerm}
@@ -56,7 +61,7 @@ const Index = () => {
           setFilters={setFilters}
         />
 
-        {/* Add Citizen Section - now includes status counters */}
+        {/* Add Citizen Section */}
         <AddCitizen
           queueCount={mockQueueCount}
           waitingCount={mockWaitingCount}
@@ -64,11 +69,6 @@ const Index = () => {
           filters={filters}
           setFilters={setFilters}
         />
-
-        {/* Main Title */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Fila de atendimento</h1>
-        </div>
 
         {/* Attendance List */}
         <AttendanceList
