@@ -1,5 +1,7 @@
-
 import { AttendanceCard } from "./AttendanceCard";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { RotateCcw } from "lucide-react";
 
 // Mock data with 50 citizens - mix of vaccination and regular services
 const mockAttendances = [
@@ -273,8 +275,22 @@ export const AttendanceList = ({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">
-          Atendimentos ({sortedAttendances.length})
+          Atendimentos
         </h2>
+        
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                <RotateCcw className="h-4 w-4" />
+                Atualizar
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Atualizado há 2 segundos</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       
       <div className="space-y-3">

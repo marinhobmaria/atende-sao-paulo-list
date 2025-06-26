@@ -34,34 +34,32 @@ export const PasswordCaller = () => {
   const waitingCount = queue.filter(p => p.status === "waiting").length;
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Volume2 className="h-5 w-5" />
+    <Card className="w-full max-w-sm">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Volume2 className="h-4 w-4" />
           Chamar próximo da fila
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3">
         {/* Current Call Display */}
         {currentCall && (
-          <div className="bg-blue-50 p-3 rounded-lg border text-center">
-            <div className="text-sm text-gray-600 mb-1">Chamando agora:</div>
-            <div className="text-2xl font-bold text-blue-600">{currentCall}</div>
+          <div className="bg-blue-50 p-2 rounded border text-center">
+            <div className="text-xs text-gray-600 mb-1">Chamando:</div>
+            <div className="text-lg font-bold text-blue-600">{currentCall}</div>
           </div>
         )}
 
         {/* Quick Actions */}
-        <div className="flex gap-2">
-          <Button 
-            onClick={callNext}
-            disabled={waitingCount === 0}
-            className="flex-1 bg-green-600 hover:bg-green-700"
-            size="sm"
-          >
-            <UserCheck className="h-4 w-4 mr-2" />
-            Próximo ({waitingCount})
-          </Button>
-        </div>
+        <Button 
+          onClick={callNext}
+          disabled={waitingCount === 0}
+          className="w-full bg-green-600 hover:bg-green-700"
+          size="sm"
+        >
+          <UserCheck className="h-4 w-4 mr-2" />
+          Próximo ({waitingCount})
+        </Button>
       </CardContent>
     </Card>
   );
