@@ -85,7 +85,8 @@ const Atendimento = () => {
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink href="/">Lista de Atendimento</BreadcrumbLink>
-            </BreadcrumbSeparator />
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbPage>Atendimento</BreadcrumbPage>
             </BreadcrumbItem>
@@ -153,7 +154,7 @@ const Atendimento = () => {
                   </p>
                   <div className="space-y-2">
                     <h4 className="font-medium">Próximos Agendamentos</h4>
-                    <p className="text-sm text-muted-foregreen">Nenhum agendamento futuro encontrado.</p>
+                    <p className="text-sm text-muted-foreground">Nenhum agendamento futuro encontrado.</p>
                   </div>
                 </div>
               </TabsContent>
