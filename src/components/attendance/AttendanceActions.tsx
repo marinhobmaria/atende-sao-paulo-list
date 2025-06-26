@@ -13,10 +13,9 @@ import { useToast } from "@/hooks/use-toast";
 interface AttendanceActionsProps {
   attendance: AttendanceQueueItem;
   onStatusChange?: (newStatus: AttendanceQueueItem['status']) => void;
-  showVaccinationButton?: boolean;
 }
 
-export const AttendanceActions = ({ attendance, onStatusChange, showVaccinationButton = false }: AttendanceActionsProps) => {
+export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActionsProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showDeclaracaoModal, setShowDeclaracaoModal] = useState(false);
@@ -35,57 +34,42 @@ export const AttendanceActions = ({ attendance, onStatusChange, showVaccinationB
   const getButtonsForAttendance = () => {
     const buttons = [];
 
-    // Botão Escuta Inicial / Pré-Consulta (só se não foi realizada)
+    // Botão Escuta Inicial / Pré-Consulta
     if (isScheduledAppointment) {
       // Para agendamentos: Pré-Consulta
-      if (!attendance.hasPreService) {
-        buttons.push({
-          key: 'pre-consulta',
-          label: 'Pré-Consulta',
-          shortLabel: 'Pré',
-          icon: FileText,
-          action: () => navigate(`/pre-atendimento?cidadao=${attendance.id}`),
-          disabled: false,
-          tooltip: "Realizar pré-consulta"
-        });
-      }
+      buttons.push({
+        key: 'pre-consulta',
+        label: 'Pré-Consulta',
+        shortLabel: 'Pré',
+        icon: FileText,
+        action: () => navigate(`/pre-atendimento?cidadao=${attendance.id}`),
+        disabled: attendance.hasPreService,
+        tooltip: attendance.hasPreService ? "Pré-consulta já realizada" : "Realizar pré-consulta"
+      });
     } else {
-      // Para demanda espontânea: Escuta Inicial (só se não foi realizada)
-      if (!attendance.hasInitialListening) {
-        buttons.push({
-          key: 'escuta-inicial',
-          label: 'Escuta Inicial',
-          shortLabel: 'Escuta',
-          icon: FileText,
-          action: () => navigate(`/escuta-inicial?cidadao=${attendance.id}`),
-          disabled: false,
-          tooltip: "Realizar escuta inicial"
-        });
-      }
+      // Para demanda espontânea: Escuta Inicial
+      buttons.push({
+        key: 'escuta-inicial',
+        label: 'Escuta Inicial',
+        shortLabel: 'Escuta',
+        icon: FileText,
+        action: () => navigate(`/escuta-inicial?cidadao=${attendance.id}`),
+        disabled: attendance.hasInitialListening,
+        tooltip: attendance.hasInitialListening ? "Escuta inicial já realizada" : "Realizar escuta inicial"
+      });
     }
 
-    // Botão Atender ou Vacinar (nunca os dois juntos)
-    if (showVaccinationButton) {
-      buttons.push({
-        key: 'vacinar',
-        label: 'Vacinar',
-        shortLabel: 'Vacinar',
-        icon: Syringe,
-        action: () => navigate(`/vacinacao?cidadao=${attendance.id}`),
-        disabled: false,
-        tooltip: "Realizar vacinação"
-      });
-    } else {
-      buttons.push({
-        key: 'atender',
-        label: 'Atender',
-        shortLabel: 'Atender',
-        icon: Stethoscope,
-        action: () => navigate(`/atendimento?cidadao=${attendance.id}`),
-        disabled: false,
-        tooltip: attendance.isCompleted ? "Atendimento realizado" : "Realizar atendimento"
-      });
-    }
+    // Botão Atender - sempre presente
+    const canAttend = isScheduledAppointment ? attendance.hasPreService : attendance.hasInitialListening;
+    buttons.push({
+      key: 'atender',
+      label: 'Atender',
+      shortLabel: 'Atender',
+      icon: Stethoscope,
+      action: () => navigate(`/atendimento?cidadao=${attendance.id}`),
+      disabled: false, // Sempre habilitado
+      tooltip: attendance.isCompleted ? "Atendimento realizado" : "Realizar atendimento"
+    });
 
     return buttons;
   };
@@ -191,8 +175,6 @@ export const AttendanceActions = ({ attendance, onStatusChange, showVaccinationB
                 className={`h-7 px-2 text-xs ${
                   button.key === 'escuta-inicial' || button.key === 'pre-consulta' 
                     ? 'hover:bg-blue-50 hover:border-blue-300' 
-                    : button.key === 'vacinar'
-                    ? 'hover:bg-purple-50 hover:border-purple-300'
                     : 'hover:bg-green-50 hover:border-green-300'
                 } ${button.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
@@ -206,6 +188,26 @@ export const AttendanceActions = ({ attendance, onStatusChange, showVaccinationB
           </Tooltip>
         </TooltipProvider>
       ))}
+
+      {/* Botão Vacinar ultra compacto */}
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleVacinar}
+              className="h-7 px-2 text-xs hover:bg-purple-50 hover:border-purple-300"
+            >
+              <Syringe className="w-3 h-3 mr-1" />
+              <span className="hidden lg:inline">Vacinar</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Realizar vacinação</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
       {/* Menu Mais Opções compacto */}
       <DropdownMenu>

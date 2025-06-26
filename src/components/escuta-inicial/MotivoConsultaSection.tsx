@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, X } from "lucide-react";
+import { Search } from "lucide-react";
 import { useState } from "react";
 
 interface MotivoConsultaSectionProps {
@@ -30,7 +30,6 @@ const mockCiap2 = [
 export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showResults, setShowResults] = useState(false);
-  const [selectedCiaps, setSelectedCiaps] = useState<string[]>([]);
 
   const filteredCiap2 = mockCiap2.filter(item => 
     item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -38,32 +37,16 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
   );
 
   const handleCiap2Select = (code: string, description: string) => {
-    const ciapString = `${code} - ${description}`;
-    if (!selectedCiaps.includes(ciapString)) {
-      const newCiaps = [...selectedCiaps, ciapString];
-      setSelectedCiaps(newCiaps);
-      form.setValue("ciap2", newCiaps);
-    }
+    form.setValue("ciap2", `${code} - ${description}`);
     setShowResults(false);
     setSearchTerm("");
-  };
-
-  const handleRemoveCiap = (ciapToRemove: string) => {
-    const newCiaps = selectedCiaps.filter(ciap => ciap !== ciapToRemove);
-    setSelectedCiaps(newCiaps);
-    form.setValue("ciap2", newCiaps);
-  };
-
-  const isCiapAlreadySelected = (code: string, description: string) => {
-    const ciapString = `${code} - ${description}`;
-    return selectedCiaps.includes(ciapString);
   };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          Motivo da Consulta (CIAP2)
+          Motivo da Consulta
           <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
         </CardTitle>
       </CardHeader>
@@ -74,7 +57,7 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
           rules={{ required: "Campo obrigatório" }}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Motivo da consulta (CIAP2) *</FormLabel>
+              <FormLabel>Código CIAP2 *</FormLabel>
               <div className="space-y-2">
                 <div className="flex gap-2">
                   <FormControl>
@@ -100,32 +83,16 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
                 {showResults && searchTerm && (
                   <div className="border rounded-md max-h-48 overflow-y-auto bg-white shadow-lg z-50">
                     {filteredCiap2.length > 0 ? (
-                      filteredCiap2.map((item) => {
-                        const isSelected = isCiapAlreadySelected(item.code, item.description);
-                        return (
-                          <div
-                            key={item.code}
-                            className={`p-3 border-b last:border-b-0 ${
-                              isSelected 
-                                ? "bg-gray-100 cursor-not-allowed" 
-                                : "hover:bg-gray-50 cursor-pointer"
-                            }`}
-                            onClick={() => !isSelected && handleCiap2Select(item.code, item.description)}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <div className="font-medium text-sm">{item.code}</div>
-                                <div className="text-sm text-gray-600">{item.description}</div>
-                              </div>
-                              {isSelected && (
-                                <Badge variant="secondary" className="text-xs">
-                                  Adicionado
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })
+                      filteredCiap2.map((item) => (
+                        <div
+                          key={item.code}
+                          className="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
+                          onClick={() => handleCiap2Select(item.code, item.description)}
+                        >
+                          <div className="font-medium text-sm">{item.code}</div>
+                          <div className="text-sm text-gray-600">{item.description}</div>
+                        </div>
+                      ))
                     ) : (
                       <div className="p-3 text-sm text-gray-500">
                         Nenhum código encontrado
@@ -134,24 +101,10 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
                   </div>
                 )}
 
-                {selectedCiaps.length > 0 && (
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-gray-700">CIAP2 selecionados:</div>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedCiaps.map((ciap, index) => (
-                        <div key={index} className="flex items-center gap-1 bg-teal-50 text-teal-800 px-2 py-1 rounded border">
-                          <span className="text-sm">{ciap}</span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="h-4 w-4 p-0 hover:bg-teal-100"
-                            onClick={() => handleRemoveCiap(ciap)}
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      ))}
+                {field.value && (
+                  <div className="p-2 bg-teal-50 rounded border">
+                    <div className="text-sm font-medium text-teal-800">
+                      Selecionado: {field.value}
                     </div>
                   </div>
                 )}
@@ -166,9 +119,10 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
           name="descricaoLivre"
           render={({ field }) => (
             <FormItem>
+              <FormLabel>Descrição complementar (opcional)</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Informe as informações subjetivas do profissional e as expressadas pelo cidadão"
+                  placeholder="Descreva detalhes complementares sobre o motivo da consulta..."
                   className="min-h-[100px]"
                   maxLength={4000}
                   {...field}

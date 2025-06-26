@@ -3,10 +3,10 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Search, X } from "lucide-react";
+import { Check, ChevronsUpDown, MessageSquare, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Mock data para CIAP-2
@@ -28,10 +28,10 @@ const mockCIAP2 = [
 
 export const SOAPSubjetivo = () => {
   const [subjetivo, setSubjetivo] = useState("");
+  const [motivoConsulta, setMotivoConsulta] = useState("");
+  const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showResults, setShowResults] = useState(false);
-  const [selectedCiaps, setSelectedCiaps] = useState<string[]>([]);
-  const [errors, setErrors] = useState<{ subjetivo?: string }>({});
+  const [errors, setErrors] = useState<{ subjetivo?: string; motivoConsulta?: string }>({});
 
   const handleSubjetivoChange = (value: string) => {
     setSubjetivo(value);
@@ -62,23 +62,7 @@ export const SOAPSubjetivo = () => {
     );
   });
 
-  const handleCiapSelect = (code: string, display: string) => {
-    const ciapString = `${code} - ${display}`;
-    if (!selectedCiaps.includes(ciapString)) {
-      setSelectedCiaps(prev => [...prev, ciapString]);
-    }
-    setShowResults(false);
-    setSearchTerm("");
-  };
-
-  const handleRemoveCiap = (ciapToRemove: string) => {
-    setSelectedCiaps(prev => prev.filter(ciap => ciap !== ciapToRemove));
-  };
-
-  const isCiapAlreadySelected = (code: string, display: string) => {
-    const ciapString = `${code} - ${display}`;
-    return selectedCiaps.includes(ciapString);
-  };
+  const selectedCIAP2 = mockCIAP2.find(item => item.code === motivoConsulta);
 
   return (
     <div className="space-y-6">
@@ -109,7 +93,7 @@ export const SOAPSubjetivo = () => {
               <div className="space-y-3">
                 <Textarea
                   id="subjetivo"
-                  placeholder="Informe as informações subjetivas do profissional e as expressadas pelo cidadão"
+                  placeholder="Ex: Paciente relata dor abdominal há 2 dias, localizada em epigástrio, de intensidade moderada, que piora após alimentação. Nega febre, náuseas ou vômitos. Refere que dor é semelhante a episódios anteriores..."
                   value={subjetivo}
                   onChange={(e) => handleSubjetivoChange(e.target.value)}
                   onBlur={handleSubjetivoBlur}
@@ -145,7 +129,7 @@ export const SOAPSubjetivo = () => {
             <CardHeader className="pb-4">
               <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                Motivo da consulta (CIAP2)
+                Motivo da Consulta (CIAP-2)
               </CardTitle>
               <p className="text-sm text-gray-600">
                 Classifique o motivo principal da consulta usando a codificação CIAP-2
@@ -153,89 +137,79 @@ export const SOAPSubjetivo = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Digite pelo menos 2 caracteres (ex: A03 ou Febre)"
-                    value={searchTerm}
-                    onChange={(e) => {
-                      setSearchTerm(e.target.value);
-                      setShowResults(e.target.value.length > 1);
-                    }}
-                    className="flex-1"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setShowResults(!showResults)}
-                  >
-                    <Search className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {showResults && searchTerm.length > 1 && (
-                  <div className="border rounded-md max-h-48 overflow-y-auto bg-white shadow-lg z-50">
-                    {filteredCIAP2.length > 0 ? (
-                      filteredCIAP2.map((item) => {
-                        const isSelected = isCiapAlreadySelected(item.code, item.display);
-                        return (
-                          <div
-                            key={item.code}
-                            className={`p-3 border-b last:border-b-0 ${
-                              isSelected 
-                                ? "bg-gray-100 cursor-not-allowed" 
-                                : "hover:bg-blue-50 cursor-pointer"
-                            }`}
-                            onClick={() => !isSelected && handleCiapSelect(item.code, item.display)}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={open}
+                      className={cn(
+                        "w-full justify-between h-12 px-4 bg-white hover:bg-gray-50 transition-colors",
+                        !selectedCIAP2 && "text-gray-500"
+                      )}
+                    >
+                      {selectedCIAP2 ? (
+                        <div className="flex items-center gap-3">
+                          <div className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">
+                            {selectedCIAP2.code}
+                          </div>
+                          <span className="text-gray-900">{selectedCIAP2.display}</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <Search className="h-4 w-4 text-gray-400" />
+                          <span>Buscar por código ou descrição...</span>
+                        </div>
+                      )}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0" align="start">
+                    <Command>
+                      <CommandInput 
+                        placeholder="Digite pelo menos 2 caracteres (ex: A03 ou Febre)" 
+                        value={searchTerm}
+                        onValueChange={setSearchTerm}
+                        className="h-12"
+                      />
+                      <CommandList>
+                        <CommandEmpty>
+                          {searchTerm.length < 2 
+                            ? "Digite pelo menos 2 caracteres para buscar"
+                            : "Nenhum resultado encontrado."
+                          }
+                        </CommandEmpty>
+                        <CommandGroup>
+                          {filteredCIAP2.map((item) => (
+                            <CommandItem
+                              key={item.code}
+                              value={item.code}
+                              onSelect={(currentValue) => {
+                                setMotivoConsulta(currentValue === motivoConsulta ? "" : currentValue);
+                                setOpen(false);
+                                setSearchTerm("");
+                              }}
+                              className="flex items-center gap-3 p-4 hover:bg-blue-50"
+                            >
+                              <Check
+                                className={cn(
+                                  "h-4 w-4 text-blue-600",
+                                  motivoConsulta === item.code ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              <div className="flex items-center gap-3 flex-1">
                                 <div className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm font-medium">
                                   {item.code}
                                 </div>
                                 <div className="text-gray-900">{item.display}</div>
                               </div>
-                              {isSelected && (
-                                <Badge variant="secondary" className="text-xs">
-                                  Adicionado
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <div className="p-3 text-sm text-gray-500">
-                        {searchTerm.length < 2 
-                          ? "Digite pelo menos 2 caracteres para buscar"
-                          : "Nenhum resultado encontrado."
-                        }
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {selectedCiaps.length > 0 && (
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-gray-700">CIAP2 selecionados:</div>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedCiaps.map((ciap, index) => (
-                        <div key={index} className="flex items-center gap-1 bg-blue-50 text-blue-800 px-2 py-1 rounded border">
-                          <span className="text-sm">{ciap}</span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="h-4 w-4 p-0 hover:bg-blue-100"
-                            onClick={() => handleRemoveCiap(ciap)}
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 
                 <p className="text-xs text-gray-500">
                   Campo opcional - busque por código (ex: A03) ou descrição (ex: Febre)
