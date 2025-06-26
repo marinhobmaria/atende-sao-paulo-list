@@ -169,7 +169,7 @@ export const DeclaracaoComparecimentoModal = ({ isOpen, onClose }: DeclaracaoCom
               <Checkbox
                 id="acompanhante"
                 checked={incluirAcompanhante}
-                onCheckedChange={setIncluirAcompanhante}
+                onCheckedChange={(checked) => setIncluirAcompanhante(checked === true)}
               />
               <Label htmlFor="acompanhante">Incluir nome do acompanhante</Label>
             </div>

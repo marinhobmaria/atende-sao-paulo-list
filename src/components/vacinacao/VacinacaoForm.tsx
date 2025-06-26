@@ -152,7 +152,7 @@ export const VacinacaoForm = ({ onFinalizarVacinacao }: VacinacaoFormProps) => {
             <Checkbox
               id="imprimir"
               checked={imprimirAoFinalizar}
-              onCheckedChange={setImprimirAoFinalizar}
+              onCheckedChange={(checked) => setImprimirAoFinalizar(checked === true)}
             />
             <Label htmlFor="imprimir">Imprimir atendimento ao finalizar</Label>
           </div>
