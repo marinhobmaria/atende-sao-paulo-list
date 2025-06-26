@@ -134,6 +134,11 @@ export const SOAPObjetivo = () => {
   // Mostrar campo DUM para mulheres >= 10 anos
   const shouldShowDUM = patientSex === "feminino" && patientAge >= 10;
 
+  // Determinar qual questionário de marcadores mostrar baseado na idade
+  const showMarcadoresMenor6Meses = patientAgeInMonths < 6;
+  const showMarcadores6a23Meses = patientAgeInMonths >= 6 && patientAgeInMonths <= 23;
+  const showMarcadores2AnosOuMais = patientAgeInMonths >= 24;
+
   // Funções de formatação de texto
   const handleTextFormat = (format: string) => {
     console.log(`Aplicando formatação: ${format}`);
