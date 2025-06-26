@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { Home } from "lucide-react";
 import { EscutaInicialForm } from "@/components/escuta-inicial/EscutaInicialForm";
 import { CitizenCompactInfo } from "@/components/escuta-inicial/CitizenCompactInfo";
 import { FinalizacaoAtendimentoModal } from "@/components/finalizacao/FinalizacaoAtendimentoModal";
+import { FolhaRostoTab } from "@/components/folha-rosto/FolhaRostoTab";
 import { toast } from "@/hooks/use-toast";
 
 const EscutaInicial = () => {
@@ -140,9 +142,7 @@ const EscutaInicial = () => {
               </TabsList>
 
               <TabsContent value="folha-rosto" className="mt-6">
-                <div className="text-center py-8 text-gray-500">
-                  <p>Conteúdo da Folha Rosto será implementado aqui</p>
-                </div>
+                <FolhaRostoTab cidadao={cidadao} />
               </TabsContent>
 
               <TabsContent value="escuta-inicial" className="mt-6">

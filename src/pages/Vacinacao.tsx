@@ -4,9 +4,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, Syringe, FileText, Calendar, Clock } from "lucide-react";
+import { Home, Syringe, Calendar, Clock } from "lucide-react";
 import { CitizenCompactInfo } from "@/components/escuta-inicial/CitizenCompactInfo";
 import { FinalizacaoAtendimentoModal } from "@/components/finalizacao/FinalizacaoAtendimentoModal";
+import { FolhaRostoTab } from "@/components/folha-rosto/FolhaRostoTab";
 import { toast } from "@/hooks/use-toast";
 
 const Vacinacao = () => {
@@ -100,28 +101,7 @@ const Vacinacao = () => {
               </TabsList>
 
               <TabsContent value="folha-rosto" className="mt-6">
-                <div className="space-y-4">
-                  <p className="text-muted-foreground">
-                    Informações gerais do cidadão e dados de identificação.
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Dados de Identificação</h4>
-                      <div className="text-sm text-muted-foreground space-y-1">
-                        <p>CPF: {cidadao.cpf}</p>
-                        <p>Data de Nascimento: {cidadao.birthDate}</p>
-                        <p>Sexo: {cidadao.sex}</p>
-                        <p>Nome da Mãe: {cidadao.motherName}</p>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Condições de Saúde</h4>
-                      <div className="text-sm text-muted-foreground">
-                        <p>Hipertensão, Diabetes, Gestação</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <FolhaRostoTab cidadao={cidadao} />
               </TabsContent>
 
               <TabsContent value="vacinacao" className="mt-6">

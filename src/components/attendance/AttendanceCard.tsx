@@ -1,9 +1,10 @@
+
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Clock, FileText, Stethoscope, Syringe, MoreHorizontal, Volume2 } from "lucide-react";
+import { Clock, Volume2 } from "lucide-react";
 import { AttendanceActions } from "./AttendanceActions";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -135,11 +136,11 @@ export const AttendanceCard = ({ attendance, onCallPatient }: AttendanceCardProp
     const diffMins = Math.floor(diffMs / (1000 * 60));
     
     if (diffMins < 60) {
-      return `${diffMins}min`;
+      return `Aguardando há ${diffMins} minutos`;
     } else {
       const hours = Math.floor(diffMins / 60);
       const mins = diffMins % 60;
-      return `${hours}h ${mins}min`;
+      return `Aguardando há ${hours}h e ${mins} minutos`;
     }
   };
 
@@ -156,7 +157,7 @@ export const AttendanceCard = ({ attendance, onCallPatient }: AttendanceCardProp
   };
 
   // Determine if this should show vaccination button (based on service types)
-  const isVaccinationService = attendance.serviceTypes.includes("VACINA");
+  const isVaccinationService = attendance.serviceTypes.includes("VACINAÇÃO");
 
   // Create a mock attendance object that matches AttendanceQueueItem structure
   const mockAttendanceForActions = {

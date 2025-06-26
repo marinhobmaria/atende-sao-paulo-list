@@ -1,13 +1,15 @@
+
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { Home, FileText, Syringe, Clock, Calendar, AlertCircle, CheckCircle } from "lucide-react";
+import { Home, AlertCircle, CheckCircle } from "lucide-react";
 import { SOAPContainer } from "@/components/atendimento/SOAPContainer";
 import { CitizenCompactInfo } from "@/components/escuta-inicial/CitizenCompactInfo";
 import { FinalizacaoAtendimentoModal } from "@/components/finalizacao/FinalizacaoAtendimentoModal";
+import { FolhaRostoTab } from "@/components/folha-rosto/FolhaRostoTab";
 import { toast } from "@/hooks/use-toast";
 
 const Atendimento = () => {
@@ -83,8 +85,7 @@ const Atendimento = () => {
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink href="/">Lista de Atendimento</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
+            </BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbPage>Atendimento</BreadcrumbPage>
             </BreadcrumbItem>
@@ -110,28 +111,7 @@ const Atendimento = () => {
               </TabsList>
 
               <TabsContent value="folha-rosto" className="mt-6">
-                <div className="space-y-4">
-                  <p className="text-muted-foreground">
-                    Aqui serão exibidas as informações principais do atendimento, 
-                    dados vitais, anamnese e exame físico.
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Dados Vitais</h4>
-                      <div className="text-sm text-muted-foreground space-y-1">
-                        <p>Peso: --</p>
-                        <p>Altura: --</p>
-                        <p>PA: --</p>
-                        <p>FC: --</p>
-                        <p>Temperatura: --</p>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Queixa Principal</h4>
-                      <p className="text-sm text-muted-foreground">--</p>
-                    </div>
-                  </div>
-                </div>
+                <FolhaRostoTab cidadao={cidadao} />
               </TabsContent>
 
               <TabsContent value="soap" className="mt-6">
@@ -173,7 +153,7 @@ const Atendimento = () => {
                   </p>
                   <div className="space-y-2">
                     <h4 className="font-medium">Próximos Agendamentos</h4>
-                    <p className="text-sm text-muted-foreground">Nenhum agendamento futuro encontrado.</p>
+                    <p className="text-sm text-muted-foregreen">Nenhum agendamento futuro encontrado.</p>
                   </div>
                 </div>
               </TabsContent>
