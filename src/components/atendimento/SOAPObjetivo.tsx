@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -93,6 +92,11 @@ export const SOAPObjetivo = () => {
   const [refeicoesDia, setRefeicoesDia] = useState<string[]>([]);
   const [consumoOntem, setConsumoOntem] = useState<{[key: string]: string}>({});
   
+  // Marcadores específicos por idade
+  const [marcadoresMenor6Meses, setMarcadoresMenor6Meses] = useState<{[key: string]: string}>({});
+  const [marcadores6a23Meses, setMarcadores6a23Meses] = useState<{[key: string]: string}>({});
+  const [marcadores2AnosOuMais, setMarcadores2AnosOuMais] = useState<{[key: string]: string}>({});
+  
   // Vacinação
   const [vacinacaoEmDia, setVacinacaoEmDia] = useState("");
   
@@ -118,6 +122,9 @@ export const SOAPObjetivo = () => {
   const patientAge = 25; // anos
   const patientSex = "feminino"; // ou "masculino"
   const isPregnant = false;
+
+  // Calcular idade em meses para determinar questionário
+  const patientAgeInMonths = patientAge * 12; // Simplificado - normalmente seria calculado da data de nascimento
 
   // Determinar botões especiais baseado na idade e condições
   const showPuericultura = patientAge <= 18;
@@ -154,12 +161,125 @@ export const SOAPObjetivo = () => {
     }
   };
 
-  // Função para limpar campos dos marcadores
-  const clearMarcadores = () => {
-    setRefeicaoTv("");
-    setRefeicoesDia([]);
-    setConsumoOntem({});
+  // Função para limpar campos dos marcadores baseado na idade
+  const clearMarcadoresSpecific = () => {
+    if (showMarcadoresMenor6Meses) {
+      setMarcadoresMenor6Meses({});
+    } else if (showMarcadores6a23Meses) {
+      setMarcadores6a23Meses({});
+    } else if (showMarcadores2AnosOuMais) {
+      setRefeicaoTv("");
+      setRefeicoesDia([]);
+      setMarcadores2AnosOuMais({});
+    }
   };
+
+  // Questionários específicos por idade
+  const perguntas6Meses = [
+    "Leite de peito",
+    "Mingau", 
+    "Água / Chá",
+    "Leite de vaca",
+    "Fórmula infantil",
+    "Suco de fruta",
+    "Fruta",
+    "Comida de sal (comida de panela, papa ou sopa)",
+    "Outros alimentos/Bebidas"
+  ];
+
+  const perguntas6a23Meses = [
+    {
+      key: "leite_peito",
+      label: "Leite de peito?",
+      type: "simple"
+    },
+    {
+      key: "fruta_inteira",
+      label: "Fruta inteira, em pedaços ou amassada",
+      type: "conditional",
+      followUp: "Se sim, quantas vezes?",
+      followUpOptions: ["Uma vez", "Duas vezes", "Três vezes ou mais", "Não sabe"]
+    },
+    {
+      key: "comida_sal",
+      label: "Comida de sal (comida de panela, papa ou sopa)",
+      type: "conditional",
+      followUp: "Se sim, quantas vezes?",
+      followUpOptions: ["Uma vez", "Duas vezes", "Três vezes ou mais", "Não sabe"],
+      secondFollowUp: "Se sim, essa comida foi oferecida:",
+      secondFollowUpOptions: ["Em pedaços", "Amassada", "Passada na peneira", "Liquidificada", "Só o caldo", "Não sabe"]
+    },
+    {
+      key: "outro_leite",
+      label: "Outro leite que não o leite de peito",
+      type: "simple"
+    },
+    {
+      key: "mingau_leite",
+      label: "Mingau com leite",
+      type: "simple"
+    },
+    {
+      key: "iogurte",
+      label: "Iogurte",
+      type: "simple"
+    },
+    {
+      key: "legumes",
+      label: "Legumes (não considerar os utilizados como temperos, nem batata, mandioca / aipim / macaxeira, cará e inhame)",
+      type: "simple"
+    },
+    {
+      key: "vegetal_alaranjado",
+      label: "Vegetal ou fruta de cor alaranjada ou folhas verde-escuras (Frutas alaranjadas: abóbora ou jerimum, cenoura, mamão, manga - Folhas verde-escuras: couve, caruru, beldroega, bertalha, espinafre, mostarda)",
+      type: "simple"
+    },
+    {
+      key: "verdura_folha",
+      label: "Verdura de folha (alface, acelga, repolho)",
+      type: "simple"
+    },
+    {
+      key: "carne_ovo",
+      label: "Carne ou ovo (carne de boi, frango, peixe, porco, miúdos, outras)",
+      type: "simple"
+    },
+    {
+      key: "figado",
+      label: "Fígado",
+      type: "simple"
+    },
+    {
+      key: "feijao",
+      label: "Feijão",
+      type: "simple"
+    },
+    {
+      key: "arroz_batata",
+      label: "Arroz, batata, inhame, aipim / macaxeira/ mandioca, farinha ou macarrão (sem ser instantâneo)",
+      type: "simple"
+    },
+    {
+      key: "hamburguer_embutidos",
+      label: "Hambúrguer e / ou embutidos (presunto, mortadela, salame, linguiça, salsicha)",
+      type: "simple"
+    },
+    {
+      key: "bebidas_adocadas",
+      label: "Bebidas adoçadas (refrigerante, suco de caixinha, suco em pó, água de coco de caixinha, xarope de guaraná / groselha ou suco de fruta com adição de açúcar)",
+      type: "simple"
+    },
+    {
+      key: "macarrao_instantaneo",
+      label: "Macarrão instantâneo, salgadinho de pacote ou biscoitos salgados",
+      type: "simple"
+    },
+    {
+      key: "biscoito_recheado",
+      label: "Biscoito recheado, doces ou guloseimas (balas, pirulitos, chiclete, caramelo, gelatina)",
+      type: "simple"
+    }
+  ];
 
   // Função para adicionar/remover refeições
   const toggleRefeicao = (refeicao: string) => {
@@ -530,7 +650,7 @@ export const SOAPObjetivo = () => {
             </CollapsibleContent>
           </Collapsible>
 
-          {/* Marcadores de consumo alimentar */}
+          {/* Marcadores de consumo alimentar - Idade específica */}
           <Collapsible open={marcadoresOpen} onOpenChange={setMarcadoresOpen}>
             <CollapsibleTrigger asChild>
               <Button variant="outline" className="w-full justify-between mb-4">
@@ -542,140 +662,326 @@ export const SOAPObjetivo = () => {
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-4 mb-6">
               <div className="p-4 border rounded-md bg-gray-50 space-y-4">
-                <div className="space-y-2">
-                  <p className="font-bold text-sm">
-                    Crianças com 2 anos ou mais, adolescentes, adultos, gestantes e pessoas idosas.
-                  </p>
-                  <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded">
-                    <Info className="h-4 w-4 text-blue-600" />
-                    <p className="text-sm text-blue-700">
-                      Para registrar os marcadores de consumo alimentar todas as perguntas devem ser respondidas
+                {/* Informações baseadas na idade */}
+                {showMarcadoresMenor6Meses && (
+                  <div className="space-y-2">
+                    <p className="font-bold text-sm">
+                      Crianças menores de 6 meses.
                     </p>
+                    <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                      <Info className="h-4 w-4 text-blue-600" />
+                      <p className="text-sm text-blue-700">
+                        Para registrar os marcadores de consumo alimentar todas as perguntas devem ser respondidas
+                      </p>
+                    </div>
                   </div>
-                </div>
+                )}
+
+                {showMarcadores6a23Meses && (
+                  <div className="space-y-2">
+                    <p className="font-bold text-sm">
+                      Crianças de 6 meses a 23 meses.
+                    </p>
+                    <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                      <Info className="h-4 w-4 text-blue-600" />
+                      <p className="text-sm text-blue-700">
+                        Para registrar os marcadores de consumo alimentar todas as perguntas devem ser respondidas
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {showMarcadores2AnosOuMais && (
+                  <div className="space-y-2">
+                    <p className="font-bold text-sm">
+                      Crianças com 2 anos ou mais, adolescentes, adultos, gestantes e pessoas idosas.
+                    </p>
+                    <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                      <Info className="h-4 w-4 text-blue-600" />
+                      <p className="text-sm text-blue-700">
+                        Para registrar os marcadores de consumo alimentar todas as perguntas devem ser respondidas
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex justify-end">
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={clearMarcadores}
-                    disabled={!refeicaoTv && refeicoesDia.length === 0 && Object.keys(consumoOntem).length === 0}
+                    onClick={clearMarcadoresSpecific}
+                    disabled={
+                      (showMarcadoresMenor6Meses && Object.keys(marcadoresMenor6Meses).length === 0) &&
+                      (showMarcadores6a23Meses && Object.keys(marcadores6a23Meses).length === 0) &&
+                      (showMarcadores2AnosOuMais && !refeicaoTv && refeicoesDia.length === 0 && Object.keys(marcadores2AnosOuMais).length === 0)
+                    }
                   >
                     Limpar campos
                   </Button>
                 </div>
 
-                {/* Pergunta sobre TV/computador */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium">
-                    Você tem costume de realizar as refeições assistindo à TV, mexendo no computador e/ou celular?
-                  </Label>
-                  <RadioGroup value={refeicaoTv} onValueChange={setRefeicaoTv}>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="sim" id="tv-sim" />
-                      <Label htmlFor="tv-sim">Sim</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="nao" id="tv-nao" />
-                      <Label htmlFor="tv-nao">Não</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="nao-sabe" id="tv-nao-sabe" />
-                      <Label htmlFor="tv-nao-sabe">Não sabe</Label>
-                    </div>
-                  </RadioGroup>
-                  {refeicaoTv && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setRefeicaoTv("")}
-                      className="h-6 w-6 p-0"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-
-                {/* Refeições do dia */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium">
-                    Quais refeições você faz ao longo do dia?
-                  </Label>
-                  <div className="space-y-2">
-                    {[
-                      "Café da manhã",
-                      "Lanche da manhã", 
-                      "Almoço",
-                      "Lanche da tarde",
-                      "Jantar",
-                      "Ceia"
-                    ].map((refeicao) => (
-                      <div key={refeicao} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={refeicao}
-                          checked={refeicoesDia.includes(refeicao)}
-                          onCheckedChange={() => toggleRefeicao(refeicao)}
-                        />
-                        <Label htmlFor={refeicao}>{refeicao}</Label>
+                {/* Questionário para menores de 6 meses */}
+                {showMarcadoresMenor6Meses && (
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-sm">Ontem a criança consumiu:</h4>
+                    {perguntas6Meses.map((pergunta, index) => (
+                      <div key={index} className="space-y-3">
+                        <Label className="text-sm font-medium">{pergunta}</Label>
+                        <div className="flex items-center gap-4">
+                          <RadioGroup 
+                            value={marcadoresMenor6Meses[`pergunta_${index}`] || ""} 
+                            onValueChange={(value) => setMarcadoresMenor6Meses(prev => ({...prev, [`pergunta_${index}`]: value}))}
+                          >
+                            <div className="flex gap-6">
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="sim" id={`menor6_${index}_sim`} />
+                                <Label htmlFor={`menor6_${index}_sim`}>Sim</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="nao" id={`menor6_${index}_nao`} />
+                                <Label htmlFor={`menor6_${index}_nao`}>Não</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="nao-sabe" id={`menor6_${index}_nao-sabe`} />
+                                <Label htmlFor={`menor6_${index}_nao-sabe`}>Não sabe</Label>
+                              </div>
+                            </div>
+                          </RadioGroup>
+                          {marcadoresMenor6Meses[`pergunta_${index}`] && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setMarcadoresMenor6Meses(prev => {
+                                const newState = {...prev};
+                                delete newState[`pergunta_${index}`];
+                                return newState;
+                              })}
+                              className="h-6 w-6 p-0"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
-                </div>
+                )}
 
-                {/* Consumo de ontem */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium">
-                    Ontem você consumiu:
-                  </Label>
-                  <div className="space-y-3">
-                    {[
-                      "Feijão",
-                      "Frutas frescas (não considerar suco de frutas)",
-                      "Verduras e/ou legumes (não considerar batata, mandioca, aipim, macaxeira, cará e inhame)",
-                      "Hambúrguer e/ou embutidos (presunto, mortadela, salame, linguiça, salsicha)",
-                      "Bebidas adoçadas (refrigerante, suco de caixinha, suco em pó, água de coco de caixinha, xaropes de guaraná/groselha ou suco de fruta com adição de açúcar)",
-                      "Macarrão instantâneo, salgadinhos de pacote ou biscoitos salgados",
-                      "Biscoito recheado, doces ou guloseimas (balas, pirulitos, chiclete, caramelo, gelatina)"
-                    ].map((item) => (
-                      <div key={item} className="space-y-2">
-                        <Label className="text-sm">{item}</Label>
-                        <RadioGroup 
-                          value={consumoOntem[item] || ""} 
-                          onValueChange={(value) => setConsumoOntem(prev => ({...prev, [item]: value}))}
-                        >
-                          <div className="flex gap-4">
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="sim" id={`${item}-sim`} />
-                              <Label htmlFor={`${item}-sim`}>Sim</Label>
+                {/* Questionário para 6 a 23 meses */}
+                {showMarcadores6a23Meses && (
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-sm">Ontem a criança consumiu:</h4>
+                    {perguntas6a23Meses.map((pergunta, index) => (
+                      <div key={pergunta.key} className="space-y-3">
+                        <Label className="text-sm font-medium">{pergunta.label}</Label>
+                        <div className="flex items-center gap-4">
+                          <RadioGroup 
+                            value={marcadores6a23Meses[pergunta.key] || ""} 
+                            onValueChange={(value) => setMarcadores6a23Meses(prev => ({...prev, [pergunta.key]: value}))}
+                          >
+                            <div className="flex gap-6">
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="sim" id={`6a23_${pergunta.key}_sim`} />
+                                <Label htmlFor={`6a23_${pergunta.key}_sim`}>Sim</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="nao" id={`6a23_${pergunta.key}_nao`} />
+                                <Label htmlFor={`6a23_${pergunta.key}_nao`}>Não</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="nao-sabe" id={`6a23_${pergunta.key}_nao-sabe`} />
+                                <Label htmlFor={`6a23_${pergunta.key}_nao-sabe`}>Não sabe</Label>
+                              </div>
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="nao" id={`${item}-nao`} />
-                              <Label htmlFor={`${item}-nao`}>Não</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="nao-sabe" id={`${item}-nao-sabe`} />
-                              <Label htmlFor={`${item}-nao-sabe`}>Não sabe</Label>
-                            </div>
-                            {consumoOntem[item] && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setConsumoOntem(prev => {
-                                  const newState = {...prev};
-                                  delete newState[item];
-                                  return newState;
-                                })}
-                                className="h-6 w-6 p-0"
+                          </RadioGroup>
+                          {marcadores6a23Meses[pergunta.key] && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setMarcadores6a23Meses(prev => {
+                                const newState = {...prev};
+                                delete newState[pergunta.key];
+                                if (pergunta.type === "conditional") {
+                                  delete newState[`${pergunta.key}_followup`];
+                                  delete newState[`${pergunta.key}_second_followup`];
+                                }
+                                return newState;
+                              })}
+                              className="h-6 w-6 p-0"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+
+                        {/* Follow-up questions for conditional items */}
+                        {pergunta.type === "conditional" && marcadores6a23Meses[pergunta.key] === "sim" && (
+                          <div className="ml-4 space-y-3">
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium">{pergunta.followUp}</Label>
+                              <RadioGroup 
+                                value={marcadores6a23Meses[`${pergunta.key}_followup`] || ""} 
+                                onValueChange={(value) => setMarcadores6a23Meses(prev => ({...prev, [`${pergunta.key}_followup`]: value}))}
                               >
-                                <X className="h-4 w-4" />
-                              </Button>
+                                <div className="flex gap-4 flex-wrap">
+                                  {pergunta.followUpOptions?.map((option) => (
+                                    <div key={option} className="flex items-center space-x-2">
+                                      <RadioGroupItem value={option.toLowerCase().replace(/\s+/g, '-')} id={`${pergunta.key}_followup_${option.toLowerCase().replace(/\s+/g, '-')}`} />
+                                      <Label htmlFor={`${pergunta.key}_followup_${option.toLowerCase().replace(/\s+/g, '-')}`}>{option}</Label>
+                                    </div>
+                                  ))}
+                                </div>
+                              </RadioGroup>
+                            </div>
+
+                            {/* Second follow-up for comida_sal */}
+                            {pergunta.key === "comida_sal" && pergunta.secondFollowUp && (
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium">{pergunta.secondFollowUp}</Label>
+                                <RadioGroup 
+                                  value={marcadores6a23Meses[`${pergunta.key}_second_followup`] || ""} 
+                                  onValueChange={(value) => setMarcadores6a23Meses(prev => ({...prev, [`${pergunta.key}_second_followup`]: value}))}
+                                >
+                                  <div className="flex gap-4 flex-wrap">
+                                    {pergunta.secondFollowUpOptions?.map((option) => (
+                                      <div key={option} className="flex items-center space-x-2">
+                                        <RadioGroupItem value={option.toLowerCase().replace(/\s+/g, '-')} id={`${pergunta.key}_second_${option.toLowerCase().replace(/\s+/g, '-')}`} />
+                                        <Label htmlFor={`${pergunta.key}_second_${option.toLowerCase().replace(/\s+/g, '-')}`}>{option}</Label>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </RadioGroup>
+                              </div>
                             )}
                           </div>
-                        </RadioGroup>
+                        )}
                       </div>
                     ))}
                   </div>
-                </div>
+                )}
+
+                {/* Questionário para 2 anos ou mais */}
+                {showMarcadores2AnosOuMais && (
+                  <div className="space-y-4">
+                    {/* Pergunta sobre TV/computador */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">
+                        Você tem costume de realizar as refeições assistindo à TV, mexendo no computador e/ou celular?
+                      </Label>
+                      <div className="flex items-center gap-4">
+                        <RadioGroup value={refeicaoTv} onValueChange={setRefeicaoTv}>
+                          <div className="flex gap-6">
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="sim" id="tv-sim" />
+                              <Label htmlFor="tv-sim">Sim</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="nao" id="tv-nao" />
+                              <Label htmlFor="tv-nao">Não</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="nao-sabe" id="tv-nao-sabe" />
+                              <Label htmlFor="tv-nao-sabe">Não sabe</Label>
+                            </div>
+                          </div>
+                        </RadioGroup>
+                        {refeicaoTv && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setRefeicaoTv("")}
+                            className="h-6 w-6 p-0"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Refeições do dia */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">
+                        Quais refeições você faz ao longo do dia?
+                      </Label>
+                      <div className="space-y-2">
+                        {[
+                          "Café da manhã",
+                          "Lanche da manhã", 
+                          "Almoço",
+                          "Lanche da tarde",
+                          "Jantar",
+                          "Ceia"
+                        ].map((refeicao) => (
+                          <div key={refeicao} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={refeicao}
+                              checked={refeicoesDia.includes(refeicao)}
+                              onCheckedChange={() => toggleRefeicao(refeicao)}
+                            />
+                            <Label htmlFor={refeicao}>{refeicao}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Consumo de ontem */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">
+                        Ontem a pessoa consumiu:
+                      </Label>
+                      <div className="space-y-3">
+                        {[
+                          "Feijão",
+                          "Frutas frescas (não considerar suco de frutas)",
+                          "Verduras e/ou legumes (não considerar batata, mandioca / aipim / macaxeira, cará e inhame)",
+                          "Hambúrguer e/ou embutidos (presunto, mortadela, salame, linguiça, salsicha)",
+                          "Bebidas adoçadas (refrigerante, suco de caixinha, suco em pó, água de coco de caixinha, xarope de guaraná / groselha ou suco de fruta com adição de açúcar)",
+                          "Macarrão instantâneo, salgadinho de pacote ou biscoitos salgados",
+                          "Biscoito recheado, doces ou guloseimas (balas, pirulitos, chiclete, caramelo, gelatina)"
+                        ].map((item) => (
+                          <div key={item} className="space-y-2">
+                            <Label className="text-sm">{item}</Label>
+                            <div className="flex items-center gap-4">
+                              <RadioGroup 
+                                value={marcadores2AnosOuMais[item] || ""} 
+                                onValueChange={(value) => setMarcadores2AnosOuMais(prev => ({...prev, [item]: value}))}
+                              >
+                                <div className="flex gap-6">
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="sim" id={`2anos_${item}_sim`} />
+                                    <Label htmlFor={`2anos_${item}_sim`}>Sim</Label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="nao" id={`2anos_${item}_nao`} />
+                                    <Label htmlFor={`2anos_${item}_nao`}>Não</Label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="nao-sabe" id={`2anos_${item}_nao-sabe`} />
+                                    <Label htmlFor={`2anos_${item}_nao-sabe`}>Não sabe</Label>
+                                  </div>
+                                </div>
+                              </RadioGroup>
+                              {marcadores2AnosOuMais[item] && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setMarcadores2AnosOuMais(prev => {
+                                    const newState = {...prev};
+                                    delete newState[item];
+                                    return newState;
+                                  })}
+                                  className="h-6 w-6 p-0"
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </CollapsibleContent>
           </Collapsible>
