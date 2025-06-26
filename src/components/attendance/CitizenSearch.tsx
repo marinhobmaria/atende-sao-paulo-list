@@ -40,8 +40,8 @@ export const CitizenSearch = ({
           cns: citizen.cns || "000000000000000",
           prontuario: citizen.prontuario,
           birthDate: citizen.birthDate,
-          age: citizen.age
-        };
+          age: typeof citizen.age === 'string' ? citizen.age : `${citizen.age} anos`
+        } as CitizenRandom;
       });
   }, []);
 
