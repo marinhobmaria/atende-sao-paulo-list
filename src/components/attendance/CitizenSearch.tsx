@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search, User, Plus, Calendar } from "lucide-react";
 import { mockRandomCitizens, CitizenRandom } from "@/data/mockCitizensRandom";
+import { mockCitizens } from "@/data/mockCitizens";
 
 interface CitizenSearchProps {
   value: string;
@@ -13,15 +14,6 @@ interface CitizenSearchProps {
   onCitizenSelect?: (citizen: CitizenRandom) => void;
   onNewCitizen?: () => void;
 }
-
-// Mock appointment data to simulate "Agendamento do dia"
-const mockAppointments = [
-  { citizenId: "1", hasAppointment: true, appointmentTime: "09:30" },
-  { citizenId: "2", hasAppointment: true, appointmentTime: "14:15" },
-  { citizenId: "5", hasAppointment: true, appointmentTime: "10:45" },
-  { citizenId: "8", hasAppointment: true, appointmentTime: "16:20" },
-  { citizenId: "12", hasAppointment: true, appointmentTime: "11:00" },
-];
 
 export const CitizenSearch = ({ 
   value, 
@@ -33,9 +25,33 @@ export const CitizenSearch = ({
   const [searchTerm, setSearchTerm] = useState("");
   const searchRef = useRef<HTMLDivElement>(null);
 
+  // Get citizens with today's appointments (15 citizens)
+  const citizensWithAppointments = useMemo(() => {
+    return mockCitizens
+      .filter(citizen => citizen.todayAppointments && citizen.todayAppointments.length > 0)
+      .slice(0, 15)
+      .map(citizen => {
+        // Map to CitizenRandom format
+        const randomCitizen = mockRandomCitizens.find(rc => rc.id === citizen.id);
+        return randomCitizen || {
+          id: citizen.id,
+          name: citizen.name,
+          cpf: citizen.cpf,
+          cns: citizen.cns || "000000000000000",
+          prontuario: citizen.prontuario,
+          birthDate: citizen.birthDate,
+          age: citizen.age
+        };
+      });
+  }, []);
+
   const filteredCitizens = useMemo(() => {
     if (!searchTerm.trim()) {
-      return mockRandomCitizens; // Mostra todos os 40 munícipes quando não há busca
+      // Show citizens with appointments first, then regular citizens
+      const remainingCitizens = mockRandomCitizens.filter(
+        citizen => !citizensWithAppointments.find(c => c.id === citizen.id)
+      );
+      return [...citizensWithAppointments, ...remainingCitizens];
     }
     
     const term = searchTerm.toLowerCase().trim();
@@ -46,7 +62,7 @@ export const CitizenSearch = ({
       citizen.prontuario.toLowerCase().includes(term) ||
       citizen.birthDate.includes(term)
     );
-  }, [searchTerm]);
+  }, [searchTerm, citizensWithAppointments]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -72,8 +88,8 @@ export const CitizenSearch = ({
     onCitizenSelect?.(citizen);
   };
 
-  const getAppointmentInfo = (citizenId: string) => {
-    return mockAppointments.find(apt => apt.citizenId === citizenId);
+  const hasAppointment = (citizenId: string) => {
+    return citizensWithAppointments.find(c => c.id === citizenId);
   };
 
   return (
@@ -93,62 +109,107 @@ export const CitizenSearch = ({
         <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-96 overflow-auto">
           {filteredCitizens.length > 0 ? (
             <div className="p-2 space-y-2">
-              {!searchTerm.trim() && (
-                <p className="text-xs font-medium text-gray-600 mb-2 px-2 border-b pb-2">
-                  Resultados da busca
-                </p>
+              {!searchTerm.trim() && citizensWithAppointments.length > 0 && (
+                <>
+                  <p className="text-xs font-medium text-blue-600 mb-2 px-2 border-b pb-2">
+                    Próximos agendamentos do dia ({citizensWithAppointments.length})
+                  </p>
+                  {citizensWithAppointments.map((citizen) => (
+                    <Card 
+                      key={citizen.id}
+                      className="cursor-pointer hover:bg-blue-50 transition-colors border-blue-200"
+                      onClick={() => handleCitizenSelect(citizen)}
+                    >
+                      <CardContent className="p-3">
+                        <div className="flex items-center space-x-3">
+                          <div className="flex-shrink-0">
+                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                              <User className="w-5 h-5 text-blue-600" />
+                            </div>
+                          </div>
+                          
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h4 className="font-medium text-gray-900 truncate">
+                                {citizen.name}
+                              </h4>
+                              <Badge variant="outline" className="text-xs px-2 py-0.5 bg-green-50 text-green-700 border-green-200">
+                                <Calendar className="w-3 h-3 mr-1" />
+                                Agendamento do dia
+                              </Badge>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-1 text-xs text-gray-600">
+                              <div>CPF: {citizen.cpf}</div>
+                              <div>CNS: {citizen.cns}</div>
+                              <div>Prontuário: {citizen.prontuario}</div>
+                              <div>Nasc: {citizen.birthDate}</div>
+                            </div>
+                            
+                            <div className="mt-1">
+                              <span className="text-xs text-gray-500">{citizen.age}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  <p className="text-xs font-medium text-gray-600 mb-2 px-2 border-b pb-2 mt-4">
+                    Outros munícipes
+                  </p>
+                </>
               )}
+              
               {searchTerm.trim() && (
                 <p className="text-xs font-medium text-gray-600 mb-2 px-2 border-b pb-2">
                   Resultados da busca
                 </p>
               )}
               
-              {filteredCitizens.map((citizen) => {
-                const appointmentInfo = getAppointmentInfo(citizen.id);
-                return (
-                  <Card 
-                    key={citizen.id}
-                    className="cursor-pointer hover:bg-gray-50 transition-colors"
-                    onClick={() => handleCitizenSelect(citizen)}
-                  >
-                    <CardContent className="p-3">
-                      <div className="flex items-center space-x-3">
-                        <div className="flex-shrink-0">
-                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                            <User className="w-5 h-5 text-blue-600" />
-                          </div>
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h4 className="font-medium text-gray-900 truncate">
-                              {citizen.name}
-                            </h4>
-                            {appointmentInfo && (
-                              <Badge variant="outline" className="text-xs px-2 py-0.5 bg-green-50 text-green-700 border-green-200">
-                                <Calendar className="w-3 h-3 mr-1" />
-                                Agendamento do dia
-                              </Badge>
-                            )}
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-1 text-xs text-gray-600">
-                            <div>CPF: {citizen.cpf}</div>
-                            <div>CNS: {citizen.cns}</div>
-                            <div>Prontuário: {citizen.prontuario}</div>
-                            <div>Nasc: {citizen.birthDate}</div>
-                          </div>
-                          
-                          <div className="mt-1">
-                            <span className="text-xs text-gray-500">{citizen.age}</span>
-                          </div>
+              {filteredCitizens
+                .filter(citizen => searchTerm.trim() || !hasAppointment(citizen.id))
+                .map((citizen) => (
+                <Card 
+                  key={citizen.id}
+                  className="cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() => handleCitizenSelect(citizen)}
+                >
+                  <CardContent className="p-3">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                          <User className="w-5 h-5 text-blue-600" />
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h4 className="font-medium text-gray-900 truncate">
+                            {citizen.name}
+                          </h4>
+                          {hasAppointment(citizen.id) && (
+                            <Badge variant="outline" className="text-xs px-2 py-0.5 bg-green-50 text-green-700 border-green-200">
+                              <Calendar className="w-3 h-3 mr-1" />
+                              Agendamento do dia
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-1 text-xs text-gray-600">
+                          <div>CPF: {citizen.cpf}</div>
+                          <div>CNS: {citizen.cns}</div>
+                          <div>Prontuário: {citizen.prontuario}</div>
+                          <div>Nasc: {citizen.birthDate}</div>
+                        </div>
+                        
+                        <div className="mt-1">
+                          <span className="text-xs text-gray-500">{citizen.age}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           ) : (
             <div className="p-4 text-center">

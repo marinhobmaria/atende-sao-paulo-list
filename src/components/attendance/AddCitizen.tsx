@@ -6,6 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Plus } from "lucide-react";
 import { StatusCounters } from "./StatusCounters";
 import { CitizenSearch } from "./CitizenSearch";
+import { AddCitizenForm } from "./AddCitizenForm";
+import { CitizenRandom } from "@/data/mockCitizensRandom";
 
 interface AddCitizenProps {
   queueCount: number;
@@ -23,6 +25,7 @@ interface AddCitizenProps {
 export const AddCitizen = ({ queueCount, waitingCount, statusCounts, filters, setFilters }: AddCitizenProps) => {
   const [showCitizenSearch, setShowCitizenSearch] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [selectedCitizen, setSelectedCitizen] = useState<CitizenRandom | null>(null);
 
   const handleAddCitizen = () => {
     setShowCitizenSearch(true);
@@ -31,20 +34,30 @@ export const AddCitizen = ({ queueCount, waitingCount, statusCounts, filters, se
   const handleCloseCitizenSearch = () => {
     setShowCitizenSearch(false);
     setSearchValue("");
+    setSelectedCitizen(null);
   };
 
-  const handleCitizenSelected = (citizen: any) => {
+  const handleCitizenSelected = (citizen: CitizenRandom) => {
     console.log("Citizen selected:", citizen);
-    // Aqui você pode adicionar a lógica para adicionar o cidadão à fila
-    setShowCitizenSearch(false);
+    setSelectedCitizen(citizen);
     setSearchValue("");
   };
 
   const handleNewCitizen = () => {
     console.log("New citizen requested");
-    // Aqui você pode adicionar a lógica para criar um novo cidadão
     setShowCitizenSearch(false);
     setSearchValue("");
+  };
+
+  const handleFormSubmit = (data: any) => {
+    console.log("Form submitted:", data);
+    setShowCitizenSearch(false);
+    setSelectedCitizen(null);
+    setSearchValue("");
+  };
+
+  const handleBackToCitizenSearch = () => {
+    setSelectedCitizen(null);
   };
 
   return (
@@ -74,19 +87,28 @@ export const AddCitizen = ({ queueCount, waitingCount, statusCounts, filters, se
         </CardHeader>
       </Card>
 
-      {/* Modal de busca de cidadão */}
       <Dialog open={showCitizenSearch} onOpenChange={setShowCitizenSearch}>
         <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">Adicionar Munícipe à Fila</DialogTitle>
+            <DialogTitle className="text-xl font-semibold">
+              {selectedCitizen ? "Adicionar Munícipe à Fila" : "Adicionar Munícipe à Fila"}
+            </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">
-            <CitizenSearch
-              value={searchValue}
-              onChange={setSearchValue}
-              onCitizenSelect={handleCitizenSelected}
-              onNewCitizen={handleNewCitizen}
-            />
+            {!selectedCitizen ? (
+              <CitizenSearch
+                value={searchValue}
+                onChange={setSearchValue}
+                onCitizenSelect={handleCitizenSelected}
+                onNewCitizen={handleNewCitizen}
+              />
+            ) : (
+              <AddCitizenForm
+                selectedCitizen={selectedCitizen}
+                onClose={handleCloseCitizenSearch}
+                onSubmit={handleFormSubmit}
+              />
+            )}
           </div>
         </DialogContent>
       </Dialog>
