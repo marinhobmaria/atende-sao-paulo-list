@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AttendanceList, getStatusCounts } from "@/components/attendance/AttendanceList";
 import { AttendanceHeader } from "@/components/attendance/AttendanceHeader";
@@ -60,18 +59,6 @@ const Index = () => {
           {/* Main Title */}
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-900">Fila de atendimento</h1>
-            
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Atualizar
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Atualizado há 2 segundos</p>
-              </TooltipContent>
-            </Tooltip>
           </div>
 
           {/* Password Caller - Above filters */}

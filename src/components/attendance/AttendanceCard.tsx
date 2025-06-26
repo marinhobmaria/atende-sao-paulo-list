@@ -213,7 +213,7 @@ export const AttendanceCard = ({ attendance, onCallPatient }: AttendanceCardProp
                   )}
                 </div>
                 
-                {/* Data de nascimento, idade, horário e tempo de espera */}
+                {/* Data de nascimento, idade, horário */}
                 <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
                   {attendance.citizen.birthDate && (
                     <span>
@@ -223,10 +223,6 @@ export const AttendanceCard = ({ attendance, onCallPatient }: AttendanceCardProp
                   <div className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
                     <span>Inclusão: {attendance.arrivalTime}</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-orange-600 font-medium">
-                    <Clock className="w-4 h-4" />
-                    <span>Aguardando: {waitTime}</span>
                   </div>
                 </div>
 
@@ -278,7 +274,7 @@ export const AttendanceCard = ({ attendance, onCallPatient }: AttendanceCardProp
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Aguardando há {waitTime}</p>
+                    <p>{waitTime}</p>
                   </TooltipContent>
                 </Tooltip>
               )}

@@ -1,5 +1,8 @@
 
 import { AttendanceCard } from "./AttendanceCard";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RefreshCw, ArrowUpDown } from "lucide-react";
 
 // Mock data with more citizens - 30 with photos and 20 without
 const mockAttendances = [
@@ -39,7 +42,7 @@ const mockAttendances = [
     },
     arrivalTime: "09:15",
     status: "in-service",
-    serviceTypes: ["CONSULTA"],
+    serviceTypes: ["VACINAÇÃO"],
     professional: "Dra. Maria Santos - Enfermeiro - Equipe APS 2",
     team: "Equipe APS 2", 
     vulnerability: "MÉDIA",
@@ -92,7 +95,6 @@ const mockAttendances = [
     isCompleted: false,
     addedBy: "Enfermeiro"
   },
-  // More citizens with photos (continuing with vaccination and regular services)
   {
     id: "5",
     citizen: {
@@ -106,7 +108,7 @@ const mockAttendances = [
     },
     arrivalTime: "11:00",
     status: "waiting",
-    serviceTypes: ["VACINAÇÃO"],
+    serviceTypes: ["CONSULTA"],
     professional: "Enf. Paula Lima - Enfermeiro - Equipe APS 2",
     team: "Equipe APS 2",
     vulnerability: "BAIXA",
@@ -115,7 +117,184 @@ const mockAttendances = [
     isCompleted: false,
     addedBy: "Sistema"
   },
-  // ... add more citizens with photos (up to 30 total)
+  {
+    id: "6",
+    citizen: {
+      name: "Fernanda Moreira Santos",
+      age: 35,
+      cpf: "111.222.333-44",
+      cns: "701111222333444",
+      photo: "https://images.unsplash.com/photo-1494790108755-2616b332446c?w=100&h=100&fit=crop&crop=face",
+      birthDate: "1989-02-14",
+      motherName: "Sandra Moreira Santos"
+    },
+    arrivalTime: "11:30",
+    status: "waiting",
+    serviceTypes: ["VACINAÇÃO"],
+    professional: "Dr. Fernando Dias - Médico clínico - Equipe APS 1",
+    team: "Equipe APS 1",
+    vulnerability: "ALTA",
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "Sistema"
+  },
+  {
+    id: "7",
+    citizen: {
+      name: "Ricardo Almeida Costa",
+      age: 45,
+      cpf: "222.333.444-55",
+      cns: "701222333444555",
+      photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+      birthDate: "1979-06-18",
+      motherName: "Elena Almeida Costa"
+    },
+    arrivalTime: "12:00",
+    status: "waiting",
+    serviceTypes: ["CONSULTA"],
+    professional: "Dra. Carla Nunes - Enfermeiro - Equipe APS 2",
+    team: "Equipe APS 2",
+    vulnerability: "MÉDIA",
+    hasInitialListening: true,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "Recepção"
+  },
+  {
+    id: "8",
+    citizen: {
+      name: "Juliana Souza Lima",
+      age: 29,
+      cpf: "333.444.555-66",
+      cns: "701333444555666",
+      photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
+      birthDate: "1995-09-25",
+      motherName: "Patricia Souza Lima"
+    },
+    arrivalTime: "12:15",
+    status: "waiting",
+    serviceTypes: ["VACINAÇÃO"],
+    professional: "Dr. Roberto Silva - Médico clínico - Equipe APS 3",
+    team: "Equipe APS 3",
+    vulnerability: "BAIXA",
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "Sistema"
+  },
+  {
+    id: "9",
+    citizen: {
+      name: "Marcos Vieira Santos",
+      age: 52,
+      cpf: "444.555.666-77",
+      cns: "701444555666777",
+      photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+      birthDate: "1972-11-08",
+      motherName: "Isabel Vieira Santos"
+    },
+    arrivalTime: "12:30",
+    status: "waiting",
+    serviceTypes: ["CONSULTA"],
+    professional: "Enf. Lucia Martins - Enfermeiro - Equipe APS 1",
+    team: "Equipe APS 1",
+    vulnerability: "ALTA",
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "Sistema"
+  },
+  {
+    id: "10",
+    citizen: {
+      name: "Patrícia Gomes Silva",
+      age: 38,
+      cpf: "555.666.777-88",
+      cns: "701555666777888",
+      photo: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=100&h=100&fit=crop&crop=face",
+      birthDate: "1986-03-12",
+      motherName: "Regina Gomes Silva"
+    },
+    arrivalTime: "13:00",
+    status: "waiting",
+    serviceTypes: ["VACINAÇÃO"],
+    professional: "Dr. Antonio Costa - Médico clínico - Equipe APS 2",
+    team: "Equipe APS 2",
+    vulnerability: "MÉDIA",
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "Sistema"
+  },
+  // Continue with more citizens with photos (up to 30)
+  {
+    id: "11",
+    citizen: {
+      name: "Eduardo Silva Pereira",
+      age: 41,
+      cpf: "666.777.888-99",
+      cns: "701666777888999",
+      photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&crop=face",
+      birthDate: "1983-07-29",
+      motherName: "Carmen Silva Pereira"
+    },
+    arrivalTime: "13:15",
+    status: "waiting",
+    serviceTypes: ["CONSULTA"],
+    professional: "Dra. Beatriz Santos - Médico clínico - Equipe APS 3",
+    team: "Equipe APS 3",
+    vulnerability: "BAIXA",
+    hasInitialListening: true,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "Sistema"
+  },
+  {
+    id: "12",
+    citizen: {
+      name: "Camila Rodrigues Costa",
+      age: 33,
+      cpf: "777.888.999-00",
+      cns: "701777888999000",
+      photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face",
+      birthDate: "1991-12-03",
+      motherName: "Marcia Rodrigues Costa"
+    },
+    arrivalTime: "13:30",
+    status: "waiting",
+    serviceTypes: ["VACINAÇÃO"],
+    professional: "Enf. Carlos Oliveira - Enfermeiro - Equipe APS 1",
+    team: "Equipe APS 1",
+    vulnerability: "ALTA",
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "Sistema"
+  },
+  // Add more mock data with photos to reach 30 total
+  {
+    id: "13",
+    citizen: {
+      name: "Rafael Medeiros Lima",
+      age: 36,
+      cpf: "888.999.000-11",
+      cns: "701888999000111",
+      photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+      birthDate: "1988-04-16",
+      motherName: "Sonia Medeiros Lima"
+    },
+    arrivalTime: "13:45",
+    status: "waiting",
+    serviceTypes: ["CONSULTA"],
+    professional: "Dr. Paulo Mendes - Médico clínico - Equipe APS 2",
+    team: "Equipe APS 2",
+    vulnerability: "MÉDIA",
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "Sistema"
+  },
   // Citizens without photos (20 total)
   {
     id: "31",
@@ -155,13 +334,79 @@ const mockAttendances = [
     serviceTypes: ["VACINAÇÃO"],
     professional: "Enf. Ricardo Nunes - Enfermeiro - Equipe APS 3",
     team: "Equipe APS 3",
-    vulnerability: null,
+    vulnerability: "ALTA",
     hasInitialListening: false,
     hasPreService: false,
     isCompleted: false,
     addedBy: "Recepção"
+  },
+  {
+    id: "33",
+    citizen: {
+      name: "Antonio Silva Santos",
+      age: 48,
+      cpf: "333.444.555-66",
+      cns: "701333444555666",
+      photo: undefined,
+      birthDate: "1976-08-10",
+      motherName: "Rosa Silva Santos"
+    },
+    arrivalTime: "12:30",
+    status: "waiting",
+    serviceTypes: ["CONSULTA"],
+    professional: "Dra. Helena Costa - Médico clínico - Equipe APS 2",
+    team: "Equipe APS 2",
+    vulnerability: "BAIXA",
+    hasInitialListening: true,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "Sistema"
+  },
+  {
+    id: "34",
+    citizen: {
+      name: "Lucia Pereira Oliveira",
+      age: 42,
+      cpf: "444.555.666-77",
+      cns: "701444555666777",
+      photo: undefined,
+      birthDate: "1982-05-22",
+      motherName: "Maria Pereira Oliveira"
+    },
+    arrivalTime: "12:45",
+    status: "waiting",
+    serviceTypes: ["VACINAÇÃO"],
+    professional: "Dr. Sergio Almeida - Médico clínico - Equipe APS 1",
+    team: "Equipe APS 1",
+    vulnerability: "MÉDIA",
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "Sistema"
+  },
+  {
+    id: "35",
+    citizen: {
+      name: "Carlos Eduardo Martins",
+      age: 50,
+      cpf: "555.666.777-88",
+      cns: "701555666777888",
+      photo: undefined,
+      birthDate: "1974-09-14",
+      motherName: "Ana Eduardo Martins"
+    },
+    arrivalTime: "13:00",
+    status: "waiting",
+    serviceTypes: ["CONSULTA"],
+    professional: "Enf. Monica Silva - Enfermeiro - Equipe APS 3",
+    team: "Equipe APS 3",
+    vulnerability: "ALTA",
+    hasInitialListening: false,
+    hasPreService: false,
+    isCompleted: false,
+    addedBy: "Sistema"
   }
-  // ... continue with more citizens without photos to reach 20 total
+  // Continue adding more citizens without photos to reach 20 total
 ];
 
 export const getStatusCounts = () => {
@@ -215,23 +460,61 @@ export const AttendanceList = ({
 
   const sortedAttendances = [...filteredAttendances].sort((a, b) => {
     switch (sortBy) {
-      case "arrival":
+      case "risk":
+        // Sort by vulnerability: ALTA > MÉDIA > BAIXA > null
+        const riskOrder = { "ALTA": 3, "MÉDIA": 2, "BAIXA": 1, null: 0 };
+        const aRisk = riskOrder[a.vulnerability as keyof typeof riskOrder] || 0;
+        const bRisk = riskOrder[b.vulnerability as keyof typeof riskOrder] || 0;
+        return bRisk - aRisk;
+      case "arrival-asc":
         return a.arrivalTime.localeCompare(b.arrivalTime);
-      case "name":
-        return a.citizen.name.localeCompare(b.citizen.name);
-      case "status":
-        return a.status.localeCompare(b.status);
+      case "arrival-desc":
+        return b.arrivalTime.localeCompare(a.arrivalTime);
       default:
-        return 0;
+        // Default: sort by risk
+        const defaultRiskOrder = { "ALTA": 3, "MÉDIA": 2, "BAIXA": 1, null: 0 };
+        const aDefaultRisk = defaultRiskOrder[a.vulnerability as keyof typeof defaultRiskOrder] || 0;
+        const bDefaultRisk = defaultRiskOrder[b.vulnerability as keyof typeof defaultRiskOrder] || 0;
+        return bDefaultRisk - aDefaultRisk;
     }
   });
+
+  const handleRefresh = () => {
+    console.log("Refreshing attendance queue...");
+  };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">
-          Atendimentos ({sortedAttendances.length})
+          Lista de Atendimentos
         </h2>
+        
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <ArrowUpDown className="h-4 w-4 text-gray-500" />
+            <Select defaultValue="risk">
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Ordenar por..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="risk">Classificação de risco</SelectItem>
+                <SelectItem value="arrival-asc">Ordem de chegada crescente</SelectItem>
+                <SelectItem value="arrival-desc">Ordem de chegada decrescente</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <Button
+            variant="outline"
+            onClick={handleRefresh}
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Atualizar
+          </Button>
+        </div>
       </div>
       
       <div className="space-y-3">

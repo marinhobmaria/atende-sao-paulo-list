@@ -1,4 +1,3 @@
-
 import { Search, Filter, RefreshCw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -28,10 +27,6 @@ export const AttendanceHeader = ({
   setFilters
 }: AttendanceHeaderProps) => {
   const [showFilterModal, setShowFilterModal] = useState(false);
-
-  const handleRefresh = () => {
-    console.log("Refreshing attendance queue...");
-  };
 
   const resetFilters = () => {
     setFilters({
@@ -87,16 +82,6 @@ export const AttendanceHeader = ({
                 Meus atendimentos
               </label>
             </div>
-
-            <Button
-              variant="outline"
-              onClick={handleRefresh}
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Atualizar
-            </Button>
 
             <Button
               variant="outline"
