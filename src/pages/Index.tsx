@@ -3,6 +3,7 @@ import { useState } from "react";
 import { AttendanceList, getStatusCounts } from "@/components/attendance/AttendanceList";
 import { AttendanceHeader } from "@/components/attendance/AttendanceHeader";
 import { AddCitizen } from "@/components/attendance/AddCitizen";
+import { StatusCounters } from "@/components/attendance/StatusCounters";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Home, Plus } from "lucide-react";
@@ -47,16 +48,7 @@ const Index = () => {
         </Breadcrumb>
 
         {/* Main Title */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Fila de atendimento</h1>
-          <Button
-            onClick={() => setShowAddCitizen(true)}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
-          >
-            <Plus className="w-4 h-4" />
-            Adicionar munícipe
-          </Button>
-        </div>
+        <h1 className="text-2xl font-bold text-gray-900">Fila de atendimento</h1>
 
         {/* Header */}
         <AttendanceHeader
@@ -70,23 +62,45 @@ const Index = () => {
           setFilters={setFilters}
         />
 
+        {/* Status Counters and Add Citizen Button */}
+        <div className="flex items-center justify-between gap-4">
+          <StatusCounters
+            statusCounts={statusCounts}
+            filters={filters}
+            setFilters={setFilters}
+            queueCount={mockQueueCount}
+          />
+          
+          <Button
+            onClick={() => setShowAddCitizen(!showAddCitizen)}
+            variant="secondary"
+            className="flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Adicionar munícipe
+          </Button>
+        </div>
+
+        {/* Add Citizen Collapsible */}
+        {showAddCitizen && (
+          <AddCitizen
+            open={showAddCitizen}
+            onOpenChange={setShowAddCitizen}
+            queueCount={mockQueueCount}
+            waitingCount={mockWaitingCount}
+            statusCounts={statusCounts}
+            filters={filters}
+            setFilters={setFilters}
+            isCollapsible={true}
+          />
+        )}
+
         {/* Attendance List */}
         <AttendanceList
           searchTerm={searchTerm}
           showMyAttendances={showMyAttendances}
           sortBy={sortBy}
           filters={filters}
-        />
-
-        {/* Add Citizen Modal */}
-        <AddCitizen
-          open={showAddCitizen}
-          onOpenChange={setShowAddCitizen}
-          queueCount={mockQueueCount}
-          waitingCount={mockWaitingCount}
-          statusCounts={statusCounts}
-          filters={filters}
-          setFilters={setFilters}
         />
       </div>
     </div>

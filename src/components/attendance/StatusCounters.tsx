@@ -1,6 +1,3 @@
-
-import { Badge } from "@/components/ui/badge";
-
 interface StatusCountersProps {
   statusCounts: {
     waiting: number;
@@ -26,29 +23,29 @@ export const StatusCounters = ({ statusCounts, filters, setFilters, queueCount }
       key: 'waiting',
       label: 'Aguardando',
       count: statusCounts.waiting,
-      color: 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300',
+      color: 'bg-green-50 hover:bg-green-100 text-green-700 border border-green-200',
       activeColor: 'bg-green-100 text-green-700 border border-green-300'
     },
     {
       key: 'in-service',
       label: 'Em atendimento',
       count: statusCounts['in-service'],
-      color: 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300',
+      color: 'bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200',
       activeColor: 'bg-purple-100 text-purple-700 border border-purple-300'
     },
     {
       key: 'initial-listening',
       label: 'Em escuta inicial',
       count: statusCounts['initial-listening'],
-      color: 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300',
+      color: 'bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200',
       activeColor: 'bg-pink-100 text-pink-700 border border-pink-300'
     },
     {
       key: 'vaccination',
       label: 'Em vacinação',
       count: statusCounts.vaccination,
-      color: 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300',
-      activeColor: 'bg-purple-100 text-purple-700 border border-purple-300'
+      color: 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200',
+      activeColor: 'bg-indigo-100 text-indigo-700 border border-indigo-300'
     }
   ];
 
@@ -90,12 +87,12 @@ export const StatusCounters = ({ statusCounts, filters, setFilters, queueCount }
           key={config.key}
           onClick={() => handleStatusFilter(config.key)}
           className={`
-            px-3 py-1.5 rounded-lg font-medium text-sm
+            px-3 py-1 rounded-full text-xs font-medium
             transition-all duration-200 cursor-pointer
             ${isActive(config.key) ? config.activeColor : config.color}
           `}
         >
-          {config.label}: {config.count}
+          {config.label} {config.count}
         </button>
       ))}
     </div>

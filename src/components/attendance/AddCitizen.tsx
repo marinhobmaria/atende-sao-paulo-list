@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -23,6 +22,7 @@ interface AddCitizenProps {
   };
   filters: any;
   setFilters: (filters: any) => void;
+  isCollapsible?: boolean;
 }
 
 // Mock data for citizens already in queue
@@ -50,7 +50,16 @@ const scheduledAppointments = {
   }
 };
 
-export const AddCitizen = ({ open, onOpenChange, queueCount, waitingCount, statusCounts, filters, setFilters }: AddCitizenProps) => {
+export const AddCitizen = ({ 
+  open, 
+  onOpenChange, 
+  queueCount, 
+  waitingCount, 
+  statusCounts, 
+  filters, 
+  setFilters,
+  isCollapsible = false 
+}: AddCitizenProps) => {
   const [selectedCitizen, setSelectedCitizen] = useState("");
   const [selectedProfessional, setSelectedProfessional] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("");
@@ -121,6 +130,176 @@ export const AddCitizen = ({ open, onOpenChange, queueCount, waitingCount, statu
   };
 
   const isFormValid = selectedCitizen && selectedServiceTypes.length > 0 && (selectedProfessional || selectedTeam);
+
+  if (isCollapsible) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border p-4">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Munícipe Field */}
+            <div className="space-y-2">
+              <Label htmlFor="citizen" className="text-sm font-medium">
+                Munícipe *
+              </Label>
+              <div className="relative">
+                <CitizenOnlySearch
+                  value={selectedCitizen}
+                  onChange={setSelectedCitizen}
+                  onCitizenSelect={handleCitizenSelect}
+                  citizensInQueue={citizensInQueue}
+                />
+                {selectedCitizen && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+                    onClick={() => clearField('citizen')}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Profissional Field */}
+            <div className="space-y-2">
+              <Label htmlFor="professional" className="text-sm font-medium">
+                Profissional
+              </Label>
+              <div className="relative">
+                <ProfessionalSearch
+                  value={selectedProfessional}
+                  onChange={setSelectedProfessional}
+                  onProfessionalSelect={(professional) => {
+                    setSelectedProfessional(professional.name);
+                    setSelectedTeam(""); // Clear team when professional is selected
+                  }}
+                  disabled={useScheduledAppointment}
+                />
+                {selectedProfessional && !useScheduledAppointment && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 z-10"
+                    onClick={() => clearField('professional')}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Equipe Field */}
+            <div className="space-y-2">
+              <Label htmlFor="team" className="text-sm font-medium">
+                Equipe
+              </Label>
+              <div className="relative">
+                <TeamSearch
+                  value={selectedTeam}
+                  onChange={setSelectedTeam}
+                  onTeamSelect={(team) => {
+                    setSelectedTeam(team.name);
+                    setSelectedProfessional(""); // Clear professional when team is selected
+                  }}
+                  disabled={useScheduledAppointment}
+                />
+                {selectedTeam && !useScheduledAppointment && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 z-10"
+                    onClick={() => clearField('team')}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Tipo de Serviço Field */}
+            <div className="space-y-2">
+              <Label htmlFor="serviceTypes" className="text-sm font-medium">
+                Tipo de Serviço *
+              </Label>
+              <div className="relative">
+                <ServiceTypeSearch
+                  value={selectedServiceTypes}
+                  onChange={setSelectedServiceTypes}
+                />
+                {selectedServiceTypes.length > 0 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 z-10"
+                    onClick={() => clearField('serviceTypes')}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Scheduled Appointment Section */}
+          {scheduledInfo && (
+            <div className="p-3 bg-blue-50 rounded-lg border">
+              <div className="flex items-center space-x-2 mb-2">
+                <Checkbox
+                  id="useScheduled"
+                  checked={useScheduledAppointment}
+                  onCheckedChange={handleUseScheduledAppointment}
+                />
+                <Label htmlFor="useScheduled" className="text-sm font-medium">
+                  Usar próximo agendamento
+                </Label>
+              </div>
+              <div className="text-sm text-gray-600">
+                <p><span className="font-medium">Profissional:</span> {scheduledInfo.professional}</p>
+                <p><span className="font-medium">Especialidade:</span> {scheduledInfo.specialty}</p>
+                <p><span className="font-medium">Equipe:</span> {scheduledInfo.team}</p>
+                <p><span className="font-medium">Data/Hora:</span> {scheduledInfo.date} às {scheduledInfo.time}</p>
+              </div>
+              {useScheduledAppointment && (
+                <div className="mt-2 text-sm text-blue-600 font-medium">
+                  ✓ Profissional e equipe preenchidos automaticamente
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSelectedCitizen("");
+                setSelectedProfessional("");
+                setSelectedTeam("");
+                setSelectedServiceTypes([]);
+                setUseScheduledAppointment(false);
+                setScheduledInfo(null);
+              }}
+              size="sm"
+            >
+              Limpar
+            </Button>
+            <Button 
+              onClick={handleAddCitizen}
+              disabled={!isFormValid}
+              className="bg-blue-600 hover:bg-blue-700"
+              size="sm"
+            >
+              Adicionar à Fila
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
