@@ -1,4 +1,3 @@
-
 import { AttendanceCard } from "./AttendanceCard";
 
 interface AttendanceListProps {

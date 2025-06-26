@@ -1,162 +1,128 @@
 
-import { useState, useMemo, useRef, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { Search, Stethoscope } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
-export interface ServiceType {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-}
-
-const mockServiceTypes: ServiceType[] = [
-  {
-    id: "service_1",
-    name: "Consulta Médica",
-    description: "Consulta médica geral",
-    category: "Médica"
-  },
-  {
-    id: "service_2",
-    name: "Consulta de Enfermagem",
-    description: "Consulta de enfermagem",
-    category: "Enfermagem"
-  },
-  {
-    id: "service_3",
-    name: "Escuta Inicial",
-    description: "Acolhimento e escuta inicial",
-    category: "Acolhimento"
-  },
-  {
-    id: "service_4",
-    name: "Vacinação",
-    description: "Aplicação de vacinas",
-    category: "Imunização"
-  },
-  {
-    id: "service_5",
-    name: "Curativo",
-    description: "Realização de curativos",
-    category: "Procedimento"
-  },
-  {
-    id: "service_6",
-    name: "Consulta Odontológica",
-    description: "Consulta odontológica",
-    category: "Odontologia"
-  }
+const serviceTypes = [
+  "ADMINISTRAÇÃO DE MEDICAMENTO",
+  "CURATIVO",
+  "DEMANDA ESPONTÂNEA",
+  "ESCUTA INICIAL",
+  "EXAMES",
+  "NEBULIZAÇÃO",
+  "ODONTOLOGIA",
+  "PROCEDIMENTOS",
+  "VACINA"
 ];
 
 interface ServiceTypeSearchProps {
-  value: string;
-  onChange: (value: string) => void;
-  onServiceTypeSelect?: (serviceType: ServiceType) => void;
-  disabled?: boolean;
+  value: string[];
+  onChange: (value: string[]) => void;
 }
 
-export const ServiceTypeSearch = ({ 
-  value, 
-  onChange, 
-  onServiceTypeSelect,
-  disabled = false
-}: ServiceTypeSearchProps) => {
+export const ServiceTypeSearch = ({ value, onChange }: ServiceTypeSearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
 
-  const filteredServiceTypes = useMemo(() => {
-    if (!value.trim()) return [];
-    
-    const term = value.toLowerCase().trim();
-    return mockServiceTypes.filter(serviceType => 
-      serviceType.name.toLowerCase().includes(term) ||
-      serviceType.description.toLowerCase().includes(term) ||
-      serviceType.category.toLowerCase().includes(term)
-    );
-  }, [value]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleInputChange = (newValue: string) => {
-    if (disabled) return;
+  const handleServiceTypeToggle = (serviceType: string) => {
+    const newValue = value.includes(serviceType)
+      ? value.filter(item => item !== serviceType)
+      : [...value, serviceType];
     onChange(newValue);
-    setIsOpen(true);
   };
 
-  const handleServiceTypeSelect = (serviceType: ServiceType) => {
-    onChange(serviceType.name);
-    setIsOpen(false);
-    onServiceTypeSelect?.(serviceType);
+  const clearAll = () => {
+    onChange([]);
+  };
+
+  const selectAll = () => {
+    onChange(serviceTypes);
   };
 
   return (
-    <div className="relative" ref={searchRef}>
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-        <Input
-          placeholder={disabled ? "Preenchido automaticamente" : "Nome do serviço ou categoria"}
-          value={value}
-          onChange={(e) => handleInputChange(e.target.value)}
-          onFocus={() => !disabled && setIsOpen(true)}
-          className="pl-10 pr-8"
-          disabled={disabled}
-        />
-      </div>
-
-      {isOpen && !disabled && (
-        <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
-          {filteredServiceTypes.length > 0 ? (
-            <div className="p-2 space-y-2">
-              {filteredServiceTypes.map((serviceType) => (
-                <Card 
-                  key={serviceType.id}
-                  className="cursor-pointer hover:bg-gray-50 transition-colors"
-                  onClick={() => handleServiceTypeSelect(serviceType)}
-                >
-                  <CardContent className="p-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="flex-shrink-0">
-                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                          <Stethoscope className="w-4 h-4 text-green-600" />
-                        </div>
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 truncate">
-                          {serviceType.name}
-                        </h4>
-                        
-                        <div className="mt-1 flex flex-wrap gap-1 text-xs">
-                          <Badge variant="outline" className="text-xs px-2 py-0.5">
-                            {serviceType.category}
-                          </Badge>
-                          <span className="text-gray-500">{serviceType.description}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className="w-full justify-between text-left font-normal"
+        >
+          <div className="flex flex-wrap gap-1">
+            {value.length === 0 ? (
+              <span className="text-muted-foreground">Selecione os serviços</span>
+            ) : value.length <= 2 ? (
+              value.map((service) => (
+                <Badge key={service} variant="secondary" className="text-xs">
+                  {service}
+                </Badge>
+              ))
+            ) : (
+              <>
+                <Badge variant="secondary" className="text-xs">
+                  {value[0]}
+                </Badge>
+                <Badge variant="secondary" className="text-xs">
+                  +{value.length - 1} mais
+                </Badge>
+              </>
+            )}
+          </div>
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      
+      <PopoverContent className="w-80 p-0" align="start">
+        <div className="p-3 border-b">
+          <div className="flex justify-between items-center mb-2">
+            <span className="font-medium text-sm">Tipos de Serviço</span>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={selectAll}
+                className="text-xs h-6"
+              >
+                Todos
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearAll}
+                className="text-xs h-6"
+              >
+                Limpar
+              </Button>
             </div>
-          ) : value.trim() && (
-            <div className="p-4 text-center">
-              <p className="text-gray-500">Nenhum tipo de serviço encontrado</p>
-            </div>
-          )}
+          </div>
         </div>
-      )}
-    </div>
+        
+        <div className="max-h-60 overflow-y-auto">
+          {serviceTypes.map((serviceType) => (
+            <div
+              key={serviceType}
+              className="flex items-center space-x-2 p-3 hover:bg-gray-50 cursor-pointer"
+              onClick={() => handleServiceTypeToggle(serviceType)}
+            >
+              <Checkbox
+                checked={value.includes(serviceType)}
+                onCheckedChange={() => handleServiceTypeToggle(serviceType)}
+              />
+              <label className="text-sm cursor-pointer flex-1">
+                {serviceType}
+              </label>
+            </div>
+          ))}
+        </div>
+        
+        {value.length > 0 && (
+          <div className="p-3 border-t bg-gray-50">
+            <div className="text-xs text-gray-600">
+              {value.length} serviço{value.length !== 1 ? 's' : ''} selecionado{value.length !== 1 ? 's' : ''}
+            </div>
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
   );
 };
