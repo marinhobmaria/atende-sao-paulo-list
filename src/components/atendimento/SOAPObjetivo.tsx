@@ -1,276 +1,1375 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Baby, Heart, Users } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Badge } from "@/components/ui/badge";
+import { 
+  ChevronDown, 
+  ChevronUp,
+  Bold, 
+  Italic, 
+  Underline, 
+  Strikethrough,
+  Quote,
+  Undo,
+  Redo,
+  CalendarIcon,
+  Info,
+  Trash2,
+  X,
+  Search,
+  AlertTriangle
+} from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+
+// Mock data para exames SIGTAP
+const examCodesSigtap = [
+  { code: "0202010295", name: "Dosagem de Colesterol Total" },
+  { code: "0202010279", name: "Dosagem de Colesterol HDL" },
+  { code: "0202010287", name: "Dosagem de Colesterol LDL" },
+  { code: "0202010678", name: "Dosagem de Triglicerídeos" },
+  { code: "0202010317", name: "Dosagem de Creatinina" },
+  { code: "0202050025", name: "Clearance de Creatinina" },
+  { code: "0301010021", name: "Consulta médica em atenção básica" },
+  { code: "0301100276", name: "Curativo especial" },
+];
+
+const numericExamCodes = [
+  "0202010295", "0202010279", "0202010287", 
+  "0202010678", "0202010317", "0202050025"
+];
+
+interface ExamResult {
+  id: string;
+  code: string;
+  name: string;
+  realizadoEm: Date;
+  resultadoEm?: Date;
+  solicitadoEm?: Date;
+  resultado: string;
+  valorNumerico?: number;
+  descricao?: string;
+  profissional: string;
+  dataAvaliacao: Date;
+}
 
 export const SOAPObjetivo = () => {
-  const [showPrenatalModal, setShowPrenatalModal] = useState(false);
+  const [objetivoTexto, setObjetivoTexto] = useState("");
+  const [ultimaMenstruacao, setUltimaMenstruacao] = useState<Date>();
+  const [showUltimaMenstruacao, setShowUltimaMenstruacao] = useState(false);
+  
+  // Antropometria e Sinais Vitais
+  const [antropometriaOpen, setAntropometriaOpen] = useState(false);
+  const [peso, setPeso] = useState("");
+  const [altura, setAltura] = useState("");
+  const [imc, setImc] = useState("");
+  const [perimetroCefalico, setPerimetroCefalico] = useState("");
+  const [circunferenciaAbdominal, setCircunferenciaAbdominal] = useState("");
+  const [perimetroPanturrilha, setPerimetroPanturrilha] = useState("");
+  const [pressaoArterial, setPressaoArterial] = useState("");
+  const [frequenciaRespiratoria, setFrequenciaRespiratoria] = useState("");
+  const [frequenciaCardiaca, setFrequenciaCardiaca] = useState("");
+  const [temperatura, setTemperatura] = useState("");
+  const [saturacaoO2, setSaturacaoO2] = useState("");
+  const [glicemiaCapilar, setGlicemiaCapilar] = useState("");
+  
+  // Marcadores de consumo alimentar
+  const [marcadoresOpen, setMarcadoresOpen] = useState(false);
+  const [refeicaoTv, setRefeicaoTv] = useState("");
+  const [refeicoesDia, setRefeicoesDia] = useState<string[]>([]);
+  const [consumoOntem, setConsumoOntem] = useState<{[key: string]: string}>({});
+  
+  // Marcadores específicos por idade
+  const [marcadoresMenor6Meses, setMarcadoresMenor6Meses] = useState<{[key: string]: string}>({});
+  const [marcadores6a23Meses, setMarcadores6a23Meses] = useState<{[key: string]: string}>({});
+  const [marcadores2AnosOuMais, setMarcadores2AnosOuMais] = useState<{[key: string]: string}>({});
+  
+  // Vacinação
+  const [vacinacaoEmDia, setVacinacaoEmDia] = useState("");
+  
+  // Exames
+  const [examResults, setExamResults] = useState<ExamResult[]>([]);
+  const [showAddExamModal, setShowAddExamModal] = useState(false);
+  const [showExamHistoryModal, setShowExamHistoryModal] = useState(false);
+  const [showDeleteExamDialog, setShowDeleteExamDialog] = useState<string | null>(null);
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [currentExam, setCurrentExam] = useState<{
+    code: string;
+    name: string;
+    realizadoEm?: Date;
+    resultadoEm?: Date;
+    resultado: string;
+    valorNumerico?: number;
+    descricao?: string;
+  } | null>(null);
+  const [examSearch, setExamSearch] = useState("");
+  const [examHistorySearch, setExamHistorySearch] = useState("");
+
+  // Mock user data - normalmente viria do contexto
+  const patientAge = 25; // anos
+  const patientSex = "feminino"; // ou "masculino"
+  const isPregnant = false;
+
+  // Calcular idade em meses para determinar questionário
+  const patientAgeInMonths = patientAge * 12; // Simplificado - normalmente seria calculado da data de nascimento
+
+  // Determinar botões especiais baseado na idade e condições
+  const showPuericultura = patientAge <= 18;
+  const showIdoso = patientAge >= 60;
+  const showPreNatal = patientSex === "feminino" && isPregnant;
+
+  // Mostrar campo DUM para mulheres >= 10 anos
+  const shouldShowDUM = patientSex === "feminino" && patientAge >= 10;
+
+  // Determinar qual questionário de marcadores mostrar baseado na idade
+  const showMarcadoresMenor6Meses = patientAgeInMonths < 6;
+  const showMarcadores6a23Meses = patientAgeInMonths >= 6 && patientAgeInMonths <= 23;
+  const showMarcadores2AnosOuMais = patientAgeInMonths >= 24;
+
+  // Funções de formatação de texto
+  const handleTextFormat = (format: string) => {
+    console.log(`Aplicando formatação: ${format}`);
+  };
+
+  // Função para validar perímetros
+  const validatePerimeter = (value: string, min: number, max: number) => {
+    const numericValue = parseFloat(value.replace(',', '.'));
+    if (isNaN(numericValue)) return "";
+    if (numericValue < min || numericValue > max) {
+      return `Deve ter valor entre ${min} e ${max}`;
+    }
+    return "";
+  };
+
+  // Função para calcular risco cardiovascular
+  const getCardiovascularRisk = (circunferencia: string, sexo: string) => {
+    const valor = parseFloat(circunferencia.replace(',', '.'));
+    if (isNaN(valor)) return null;
+    
+    if (sexo === "masculino") {
+      return valor >= 102 ? "Alto risco cardiovascular" : "Risco cardiovascular normal";
+    } else {
+      return valor >= 88 ? "Alto risco cardiovascular" : "Risco cardiovascular normal";
+    }
+  };
+
+  // Função para limpar campos dos marcadores baseado na idade
+  const clearMarcadoresSpecific = () => {
+    if (showMarcadoresMenor6Meses) {
+      setMarcadoresMenor6Meses({});
+    } else if (showMarcadores6a23Meses) {
+      setMarcadores6a23Meses({});
+    } else if (showMarcadores2AnosOuMais) {
+      setRefeicaoTv("");
+      setRefeicoesDia([]);
+      setMarcadores2AnosOuMais({});
+    }
+  };
+
+  // Questionários específicos por idade
+  const perguntas6Meses = [
+    "Leite de peito",
+    "Mingau", 
+    "Água / Chá",
+    "Leite de vaca",
+    "Fórmula infantil",
+    "Suco de fruta",
+    "Fruta",
+    "Comida de sal (comida de panela, papa ou sopa)",
+    "Outros alimentos/Bebidas"
+  ];
+
+  const perguntas6a23Meses = [
+    {
+      key: "leite_peito",
+      label: "Leite de peito?",
+      type: "simple"
+    },
+    {
+      key: "fruta_inteira",
+      label: "Fruta inteira, em pedaços ou amassada",
+      type: "conditional",
+      followUp: "Se sim, quantas vezes?",
+      followUpOptions: ["Uma vez", "Duas vezes", "Três vezes ou mais", "Não sabe"]
+    },
+    {
+      key: "comida_sal",
+      label: "Comida de sal (comida de panela, papa ou sopa)",
+      type: "conditional",
+      followUp: "Se sim, quantas vezes?",
+      followUpOptions: ["Uma vez", "Duas vezes", "Três vezes ou mais", "Não sabe"],
+      secondFollowUp: "Se sim, essa comida foi oferecida:",
+      secondFollowUpOptions: ["Em pedaços", "Amassada", "Passada na peneira", "Liquidificada", "Só o caldo", "Não sabe"]
+    },
+    {
+      key: "outro_leite",
+      label: "Outro leite que não o leite de peito",
+      type: "simple"
+    },
+    {
+      key: "mingau_leite",
+      label: "Mingau com leite",
+      type: "simple"
+    },
+    {
+      key: "iogurte",
+      label: "Iogurte",
+      type: "simple"
+    },
+    {
+      key: "legumes",
+      label: "Legumes (não considerar os utilizados como temperos, nem batata, mandioca / aipim / macaxeira, cará e inhame)",
+      type: "simple"
+    },
+    {
+      key: "vegetal_alaranjado",
+      label: "Vegetal ou fruta de cor alaranjada ou folhas verde-escuras (Frutas alaranjadas: abóbora ou jerimum, cenoura, mamão, manga - Folhas verde-escuras: couve, caruru, beldroega, bertalha, espinafre, mostarda)",
+      type: "simple"
+    },
+    {
+      key: "verdura_folha",
+      label: "Verdura de folha (alface, acelga, repolho)",
+      type: "simple"
+    },
+    {
+      key: "carne_ovo",
+      label: "Carne ou ovo (carne de boi, frango, peixe, porco, miúdos, outras)",
+      type: "simple"
+    },
+    {
+      key: "figado",
+      label: "Fígado",
+      type: "simple"
+    },
+    {
+      key: "feijao",
+      label: "Feijão",
+      type: "simple"
+    },
+    {
+      key: "arroz_batata",
+      label: "Arroz, batata, inhame, aipim / macaxeira/ mandioca, farinha ou macarrão (sem ser instantâneo)",
+      type: "simple"
+    },
+    {
+      key: "hamburguer_embutidos",
+      label: "Hambúrguer e / ou embutidos (presunto, mortadela, salame, linguiça, salsicha)",
+      type: "simple"
+    },
+    {
+      key: "bebidas_adocadas",
+      label: "Bebidas adoçadas (refrigerante, suco de caixinha, suco em pó, água de coco de caixinha, xarope de guaraná / groselha ou suco de fruta com adição de açúcar)",
+      type: "simple"
+    },
+    {
+      key: "macarrao_instantaneo",
+      label: "Macarrão instantâneo, salgadinho de pacote ou biscoitos salgados",
+      type: "simple"
+    },
+    {
+      key: "biscoito_recheado",
+      label: "Biscoito recheado, doces ou guloseimas (balas, pirulitos, chiclete, caramelo, gelatina)",
+      type: "simple"
+    }
+  ];
+
+  // Função para adicionar/remover refeições
+  const toggleRefeicao = (refeicao: string) => {
+    setRefeicoesDia(prev => 
+      prev.includes(refeicao) 
+        ? prev.filter(r => r !== refeicao)
+        : [...prev, refeicao]
+    );
+  };
+
+  // Função para salvar exame
+  const saveExam = () => {
+    if (!currentExam) return;
+    
+    const newExam: ExamResult = {
+      id: Date.now().toString(),
+      code: currentExam.code,
+      name: currentExam.name,
+      realizadoEm: currentExam.realizadoEm || new Date(),
+      resultadoEm: currentExam.resultadoEm,
+      resultado: currentExam.resultado,
+      valorNumerico: currentExam.valorNumerico,
+      descricao: currentExam.descricao,
+      profissional: "Dr. João Silva - Clínico Geral",
+      dataAvaliacao: new Date()
+    };
+    
+    setExamResults(prev => [...prev, newExam]);
+    setCurrentExam(null);
+    setShowAddExamModal(false);
+  };
+
+  // Filtrar exames para busca
+  const filteredExams = examCodesSigtap.filter(exam =>
+    exam.name.toLowerCase().includes(examSearch.toLowerCase()) ||
+    exam.code.includes(examSearch)
+  );
+
+  const filteredExamHistory = examResults.filter(exam =>
+    exam.name.toLowerCase().includes(examHistorySearch.toLowerCase()) ||
+    exam.code.includes(examHistorySearch)
+  );
 
   return (
     <div className="space-y-6">
-      {/* Botões especializados */}
       <Card>
         <CardHeader>
-          <CardTitle>Programas Especiais</CardTitle>
+          <CardTitle>Objetivo</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 h-auto p-4"
-              onClick={() => console.log("Puericultura clicked")}
-            >
-              <Baby className="h-5 w-5 text-blue-600" />
-              <span>Puericultura</span>
-            </Button>
-            
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 h-auto p-4"
-              onClick={() => setShowPrenatalModal(true)}
-            >
-              <Heart className="h-5 w-5 text-pink-600" />
-              <span>Pré-Natal</span>
-            </Button>
-            
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 h-auto p-4"
-              onClick={() => console.log("Idoso clicked")}
-            >
-              <Users className="h-5 w-5 text-green-600" />
-              <span>Idoso</span>
-            </Button>
+        <CardContent>
+          <p className="text-muted-foreground mb-6">
+            Dados objetivos coletados durante o exame físico, sinais vitais e resultados de exames.
+          </p>
+
+          {/* Botões especiais baseados na idade/condição */}
+          <div className="flex gap-2 mb-6">
+            {showPuericultura && (
+              <Button variant="outline" className="flex items-center gap-2">
+                Puericultura
+              </Button>
+            )}
+            {showIdoso && (
+              <Button variant="outline" className="flex items-center gap-2">
+                Idoso
+              </Button>
+            )}
+            {showPreNatal && (
+              <Button variant="outline" className="flex items-center gap-2">
+                Pré-natal
+              </Button>
+            )}
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Seções existentes do SOAP Objetivo */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Exame Físico</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Área para registro do exame físico do paciente.
-          </p>
-        </CardContent>
-      </Card>
+          {/* Campo de texto livre */}
+          <div className="space-y-3 mb-6">
+            <Label htmlFor="objetivo-texto" className="text-base font-medium">
+              Dados do Exame Físico
+            </Label>
+            
+            {/* Barra de formatação */}
+            <div className="flex items-center gap-1 p-2 border rounded-md bg-gray-50">
+              <ToggleGroup type="multiple" className="gap-1">
+                <ToggleGroupItem 
+                  value="bold" 
+                  onClick={() => handleTextFormat('bold')}
+                  className="h-8 w-8 p-0"
+                >
+                  <Bold className="h-4 w-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem 
+                  value="italic" 
+                  onClick={() => handleTextFormat('italic')}
+                  className="h-8 w-8 p-0"
+                >
+                  <Italic className="h-4 w-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem 
+                  value="underline" 
+                  onClick={() => handleTextFormat('underline')}
+                  className="h-8 w-8 p-0"
+                >
+                  <Underline className="h-4 w-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem 
+                  value="strikethrough" 
+                  onClick={() => handleTextFormat('strikethrough')}
+                  className="h-8 w-8 p-0"
+                >
+                  <Strikethrough className="h-4 w-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem 
+                  value="quote" 
+                  onClick={() => handleTextFormat('quote')}
+                  className="h-8 w-8 p-0"
+                >
+                  <Quote className="h-4 w-4" />
+                </ToggleGroupItem>
+              </ToggleGroup>
+              
+              <div className="w-px h-6 bg-gray-300 mx-2" />
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleTextFormat('undo')}
+                className="h-8 w-8 p-0"
+              >
+                <Undo className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleTextFormat('redo')}
+                className="h-8 w-8 p-0"
+              >
+                <Redo className="h-4 w-4" />
+              </Button>
+            </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Antropometria, Sinais Vitais e Glicemia Capilar</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Registro de dados antropométricos, sinais vitais e glicemia.
-          </p>
-        </CardContent>
-      </Card>
+            <Textarea
+              id="objetivo-texto"
+              placeholder="Descreva os dados objetivos do exame físico..."
+              value={objetivoTexto}
+              onChange={(e) => setObjetivoTexto(e.target.value)}
+              className="min-h-[120px] resize-y"
+              maxLength={4000}
+            />
+            <div className="text-sm text-gray-500 text-right">
+              {objetivoTexto.length}/4000 caracteres
+            </div>
+          </div>
 
-      {/* Modal do Pré-Natal */}
-      <Dialog open={showPrenatalModal} onOpenChange={setShowPrenatalModal}>
-        <DialogContent className="max-w-4xl max-h-[80vh]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Heart className="h-5 w-5 text-pink-600" />
-              Documento de Regras de Negócio - Pré-Natal
-            </DialogTitle>
-          </DialogHeader>
-          
-          <ScrollArea className="max-h-[70vh] pr-4">
-            <div className="space-y-6">
-              {/* 1.1 Contexto */}
-              <section>
-                <h3 className="text-lg font-semibold mb-3">1.1 Contexto</h3>
-                <p className="text-sm text-gray-700 leading-relaxed">
-                  O acompanhamento do pré-natal é uma das mais importantes ações de cuidado da Atenção Primária à Saúde. 
-                  O sistema organiza o módulo de pré-natal a partir do preenchimento de dados estruturados no modelo SOAP, 
-                  alimentando automaticamente o Cartão da Gestante com dados clínicos e epidemiológicos essenciais. 
-                  A entrada de dados se inicia com o registro da gravidez e prossegue com o acompanhamento, medições clínicas, 
-                  exames e desfecho gestacional.
-                </p>
-                <p className="text-sm text-gray-700 leading-relaxed mt-2">
-                  O correto preenchimento dos campos relacionados ao pré-natal possibilita ao sistema identificar automaticamente 
-                  o início do acompanhamento, classificar o risco gestacional, controlar indicadores, gerar projeções de agendamentos 
-                  conforme o Caderno de Atenção Básica nº 32 e oferecer recursos de impressão para facilitar o cuidado compartilhado 
-                  entre serviços.
-                </p>
-              </section>
+          {/* Data da Última Menstruação */}
+          {shouldShowDUM && (
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center gap-2">
+                <Label className="text-base font-medium">
+                  Data da Última Menstruação (DUM)
+                </Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-gray-400" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Preencher mesmo se a cidadã estiver com dúvidas</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal",
+                      !ultimaMenstruacao && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {ultimaMenstruacao ? (
+                      format(ultimaMenstruacao, "dd/MM/yyyy", { locale: ptBR })
+                    ) : (
+                      <span>Selecionar data</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={ultimaMenstruacao}
+                    onSelect={setUltimaMenstruacao}
+                    disabled={(date) => date > new Date()}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          )}
 
-              {/* 1.2 Processo Relacionado */}
-              <section>
-                <h3 className="text-lg font-semibold mb-3">1.2 Processo Relacionado</h3>
-                <p className="text-sm text-gray-700 mb-2">
-                  O processo de acompanhamento do pré-natal está inserido no fluxo assistencial do prontuário e ocorre em etapas:
-                </p>
-                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 ml-4">
-                  <li>Registro inicial da condição de gravidez no bloco "Problemas/Condições e Alergias" na seção "Avaliação" por meio de registro CIAP-2 ou CID-10</li>
-                  <li>Ativação automática do bloco de pré-natal (primeira consulta)</li>
-                  <li>Registro das condições clínicas e dados obstétricos</li>
-                  <li>Evoluções subsequentes do acompanhamento (SOAP Objetivo)</li>
-                  <li>Desfecho gestacional com encerramento da condição</li>
-                  <li>Projeção automática de consultas futuras até o parto</li>
-                  <li>Impressão e visualização do cartão da gestante</li>
-                </ul>
-              </section>
+          {/* Antropometria, Sinais Vitais e Glicemia */}
+          <Collapsible open={antropometriaOpen} onOpenChange={setAntropometriaOpen}>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="w-full justify-between mb-4">
+                <span className="text-base font-medium">
+                  Antropometria, sinais vitais e glicemia capilar
+                </span>
+                {antropometriaOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 border rounded-md bg-gray-50">
+                {/* Peso */}
+                <div className="space-y-2">
+                  <Label htmlFor="peso">Peso (kg)</Label>
+                  <Input
+                    id="peso"
+                    placeholder="Ex: 70,5"
+                    value={peso}
+                    onChange={(e) => setPeso(e.target.value)}
+                  />
+                </div>
 
-              {/* 1.3 Atores */}
-              <section>
-                <h3 className="text-lg font-semibold mb-3">1.3 Atores</h3>
-                <p className="text-sm text-gray-700">
-                  Podem acessar o SOAP e preencher o pré-natal: profissionais de saúde (médicos, enfermeiros, técnicos de enfermagem, cirurgião dentista).
-                </p>
-              </section>
+                {/* Altura */}
+                <div className="space-y-2">
+                  <Label htmlFor="altura">Altura (cm)</Label>
+                  <Input
+                    id="altura"
+                    placeholder="Ex: 175"
+                    value={altura}
+                    onChange={(e) => setAltura(e.target.value)}
+                  />
+                </div>
 
-              {/* 1.4 Seção: Pré Natal */}
-              <section>
-                <h3 className="text-lg font-semibold mb-4">1.4 Seção: Pré-Natal</h3>
-                
-                {/* #01 Registro da condição de gravidez */}
-                <div className="mb-6">
-                  <h4 className="text-md font-medium mb-2">#01 Registro da condição de gravidez</h4>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h5 className="font-medium mb-2">Regras:</h5>
-                    <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 ml-2">
-                      <li>O início do acompanhamento pré-natal se dá por meio do registro de uma condição de gravidez ativa, obrigatoriamente no campo "Problema e/ou Condição Detectada" do bloco Avaliação da evolução SOAP.</li>
-                      <li>Para que o sistema ative automaticamente o módulo de pré-natal e exiba os campos clínicos correspondentes, é necessário que o profissional registre um dos códigos de gravidez, mantendo o status da condição como "Ativo".</li>
-                    </ul>
-                    
-                    <div className="mt-3">
-                      <h6 className="font-medium mb-2">Códigos que ativam o acompanhamento pré-natal:</h6>
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="font-medium text-sm">CIAP-2:</p>
-                          <ul className="list-disc list-inside text-xs text-gray-600 ml-2">
-                            <li>W71 – Infecções que complicam a gravidez</li>
-                            <li>W78 – Gravidez</li>
-                            <li>W79 – Gravidez não desejada</li>
-                            <li>W80 – Gravidez ectópica</li>
-                            <li>W81 – Toxemia gravídica – DHEG</li>
-                            <li>W84 – Gravidez de alto risco</li>
-                            <li>W85 – Diabetes gestacional</li>
-                          </ul>
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm">CID-10:</p>
-                          <ul className="list-disc list-inside text-xs text-gray-600 ml-2">
-                            <li>Z34 – Supervisão de gravidez normal (e subgrupos)</li>
-                            <li>Z35 – Supervisão de gravidez de alto risco (e subgrupos)</li>
-                          </ul>
-                        </div>
-                      </div>
+                {/* IMC */}
+                <div className="space-y-2">
+                  <Label htmlFor="imc">IMC</Label>
+                  <Input
+                    id="imc"
+                    placeholder="Calculado automaticamente"
+                    value={imc}
+                    onChange={(e) => setImc(e.target.value)}
+                    readOnly
+                  />
+                </div>
+
+                {/* Perímetro Cefálico */}
+                <div className="space-y-2">
+                  <Label htmlFor="perimetro-cefalico">Perímetro cefálico (cm)</Label>
+                  <Input
+                    id="perimetro-cefalico"
+                    placeholder="Ex: 56,5"
+                    value={perimetroCefalico}
+                    onChange={(e) => setPerimetroCefalico(e.target.value)}
+                  />
+                  {perimetroCefalico && validatePerimeter(perimetroCefalico, 10, 200) && (
+                    <p className="text-sm text-red-500">
+                      {validatePerimeter(perimetroCefalico, 10, 200)}
+                    </p>
+                  )}
+                </div>
+
+                {/* Circunferência Abdominal */}
+                <div className="space-y-2">
+                  <Label htmlFor="circunferencia-abdominal">Circunferência abdominal (cm)</Label>
+                  <Input
+                    id="circunferencia-abdominal"
+                    placeholder="Ex: 85,0"
+                    value={circunferenciaAbdominal}
+                    onChange={(e) => setCircunferenciaAbdominal(e.target.value)}
+                  />
+                  {circunferenciaAbdominal && getCardiovascularRisk(circunferenciaAbdominal, patientSex) && (
+                    <div className={cn(
+                      "flex items-center gap-2 p-2 rounded text-sm",
+                      getCardiovascularRisk(circunferenciaAbdominal, patientSex)?.includes("Alto") 
+                        ? "bg-red-50 text-red-700 border border-red-200"
+                        : "bg-green-50 text-green-700 border border-green-200"
+                    )}>
+                      <AlertTriangle className="h-4 w-4" />
+                      {getCardiovascularRisk(circunferenciaAbdominal, patientSex)}
                     </div>
-                    
-                    <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                      <p className="text-sm text-yellow-800">
-                        <strong>Importante:</strong> Após o registro da condição de gravidez, o sistema exige o preenchimento da Data da Última Menstruação (DUM) para permitir a finalização da consulta. 
-                        Caso a DUM não seja informada, o sistema bloqueia a finalização e exibe uma mensagem de erro: "Informe a DUM para concluir o registro de gestação."
+                  )}
+                </div>
+
+                {/* Perímetro da Panturrilha */}
+                <div className="space-y-2">
+                  <Label htmlFor="perimetro-panturrilha">Perímetro da panturrilha (cm)</Label>
+                  <Input
+                    id="perimetro-panturrilha"
+                    placeholder="Ex: 34,5"
+                    value={perimetroPanturrilha}
+                    onChange={(e) => setPerimetroPanturrilha(e.target.value)}
+                  />
+                  {perimetroPanturrilha && validatePerimeter(perimetroPanturrilha, 10, 99) && (
+                    <p className="text-sm text-red-500">
+                      {validatePerimeter(perimetroPanturrilha, 10, 99)}
+                    </p>
+                  )}
+                </div>
+
+                {/* Pressão Arterial */}
+                <div className="space-y-2">
+                  <Label htmlFor="pressao-arterial">Pressão arterial (mmHg)</Label>
+                  <Input
+                    id="pressao-arterial"
+                    placeholder="Ex: 120/80"
+                    value={pressaoArterial}
+                    onChange={(e) => setPressaoArterial(e.target.value)}
+                  />
+                </div>
+
+                {/* Frequência Respiratória */}
+                <div className="space-y-2">
+                  <Label htmlFor="frequencia-respiratoria">Frequência respiratória (mpm)</Label>
+                  <Input
+                    id="frequencia-respiratoria"
+                    placeholder="Ex: 16"
+                    value={frequenciaRespiratoria}
+                    onChange={(e) => setFrequenciaRespiratoria(e.target.value)}
+                  />
+                </div>
+
+                {/* Frequência Cardíaca */}
+                <div className="space-y-2">
+                  <Label htmlFor="frequencia-cardiaca">Frequência cardíaca (bpm)</Label>
+                  <Input
+                    id="frequencia-cardiaca"
+                    placeholder="Ex: 72"
+                    value={frequenciaCardiaca}
+                    onChange={(e) => setFrequenciaCardiaca(e.target.value)}
+                  />
+                </div>
+
+                {/* Temperatura */}
+                <div className="space-y-2">
+                  <Label htmlFor="temperatura">Temperatura (ºC)</Label>
+                  <Input
+                    id="temperatura"
+                    placeholder="Ex: 36,5"
+                    value={temperatura}
+                    onChange={(e) => setTemperatura(e.target.value)}
+                  />
+                </div>
+
+                {/* Saturação O2 */}
+                <div className="space-y-2">
+                  <Label htmlFor="saturacao-o2">Saturação de O2 (%)</Label>
+                  <Input
+                    id="saturacao-o2"
+                    placeholder="Ex: 98"
+                    value={saturacaoO2}
+                    onChange={(e) => setSaturacaoO2(e.target.value)}
+                  />
+                </div>
+
+                {/* Glicemia Capilar */}
+                <div className="space-y-2">
+                  <Label htmlFor="glicemia-capilar">Glicemia capilar (mg/dL)</Label>
+                  <Input
+                    id="glicemia-capilar"
+                    placeholder="Ex: 95"
+                    value={glicemiaCapilar}
+                    onChange={(e) => setGlicemiaCapilar(e.target.value)}
+                  />
+                </div>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Marcadores de consumo alimentar - Idade específica */}
+          <Collapsible open={marcadoresOpen} onOpenChange={setMarcadoresOpen}>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="w-full justify-between mb-4">
+                <span className="text-base font-medium">
+                  Marcadores de consumo alimentar
+                </span>
+                {marcadoresOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 mb-6">
+              <div className="p-4 border rounded-md bg-gray-50 space-y-4">
+                {/* Informações baseadas na idade */}
+                {showMarcadoresMenor6Meses && (
+                  <div className="space-y-2">
+                    <p className="font-bold text-sm">
+                      Crianças menores de 6 meses.
+                    </p>
+                    <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                      <Info className="h-4 w-4 text-blue-600" />
+                      <p className="text-sm text-blue-700">
+                        Para registrar os marcadores de consumo alimentar todas as perguntas devem ser respondidas
                       </p>
                     </div>
                   </div>
-                </div>
+                )}
 
-                {/* #02 Exibição do quadro de Pré-Natal na Folha de Rosto */}
-                <div className="mb-6">
-                  <h4 className="text-md font-medium mb-2">#02 Exibição do quadro de Pré-Natal na Folha de Rosto</h4>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h5 className="font-medium mb-2">Regras:</h5>
-                    <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 ml-2">
-                      <li>O quadro "Acompanhamento do Pré Natal" é exibido de forma fixa na Folha de Rosto do Prontuário Eletrônico.</li>
-                      <li>Após o encerramento da primeira consulta com condição de gravidez ativa e DUM informada, o sistema passa a exibir automaticamente o quadro "Pré-Natal" na Folha de Rosto.</li>
-                      <li>O quadro sintetiza informações clínicas e de acompanhamento, sendo atualizado dinamicamente a partir dos registros feitos em cada consulta.</li>
-                    </ul>
-                    
-                    <div className="mt-3">
-                      <h6 className="font-medium mb-2">Informações exibidas:</h6>
-                      <ul className="list-disc list-inside text-xs text-gray-600 ml-2 space-y-1">
-                        <li>Risco da gestação: Habitual ou Alto (ícone colorido)</li>
-                        <li>DUM (Data da Última Menstruação)</li>
-                        <li>IG cronológica (calculada automaticamente com base na DUM)</li>
-                        <li>DPP cronológica (calculada pela regra de Naegele, com base na DUM)</li>
-                        <li>DPP ecográfica: informada manualmente, se disponível</li>
-                        <li>Tipo de gravidez: única, gemelar, múltipla, ignorada</li>
-                        <li>Consultas realizadas: número total de atendimentos do pré-natal registrados</li>
-                        <li>Data da última consulta</li>
-                        <li>Última consulta odontológica: preenchido a partir dos atendimentos vinculados à gestação</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                {/* #03 Registro da primeira consulta de pré-natal */}
-                <div className="mb-6">
-                  <h4 className="text-md font-medium mb-2">#03 Registro da primeira consulta de pré-natal</h4>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h5 className="font-medium mb-2">Regras:</h5>
-                    <p className="text-sm text-gray-700 mb-3">
-                      A primeira consulta de pré-natal deve ser realizada preferencialmente até a 12ª semana de gestação e é registrada no sistema e-SUS APS por meio da evolução clínica no modelo SOAP.
+                {showMarcadores6a23Meses && (
+                  <div className="space-y-2">
+                    <p className="font-bold text-sm">
+                      Crianças de 6 meses a 23 meses.
                     </p>
-                    
-                    <div className="mt-3">
-                      <h6 className="font-medium mb-2">Campos a serem preenchidos:</h6>
-                      <div className="grid md:grid-cols-2 gap-3">
-                        <ul className="list-disc list-inside text-xs text-gray-600 space-y-1">
-                          <li><strong>Tipo de gravidez:</strong> Única, Dupla/Gemelar, Tripla ou mais, Ignorada</li>
-                          <li><strong>Altura uterina (cm):</strong> Campo livre para inserção em centímetros</li>
-                          <li><strong>Risco da gravidez:</strong> Exibido automaticamente como "Habitual"</li>
-                          <li><strong>Edema:</strong> – (ausente), +, ++, +++</li>
-                        </ul>
-                        <ul className="list-disc list-inside text-xs text-gray-600 space-y-1">
-                          <li><strong>Movimentação fetal:</strong> Sim / Não</li>
-                          <li><strong>Gravidez planejada:</strong> Sim / Não</li>
-                          <li><strong>Batimento cardíaco fetal (bpm):</strong> Campo livre</li>
-                          <li><strong>Data da última menstruação (DUM):</strong> Campo data obrigatório</li>
-                        </ul>
-                      </div>
+                    <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                      <Info className="h-4 w-4 text-blue-600" />
+                      <p className="text-sm text-blue-700">
+                        Para registrar os marcadores de consumo alimentar todas as perguntas devem ser respondidas
+                      </p>
                     </div>
                   </div>
-                </div>
+                )}
 
-                {/* #04 Classificação do Risco Gestacional */}
-                <div className="mb-6">
-                  <h4 className="text-md font-medium mb-2">#04 Classificação do Risco Gestacional</h4>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-700 mb-2">
-                      Sempre que for registrado ou atualizado um problema ou condição relacionada à gravidez, o sistema deve avaliar automaticamente o risco gestacional da gestante.
+                {showMarcadores2AnosOuMais && (
+                  <div className="space-y-2">
+                    <p className="font-bold text-sm">
+                      Crianças com 2 anos ou mais, adolescentes, adultos, gestantes e pessoas idosas.
                     </p>
-                    <div className="grid md:grid-cols-2 gap-4 mt-3">
-                      <div className="p-3 bg-green-50 border border-green-200 rounded">
-                        <h6 className="font-medium text-green-800 mb-1">Risco Habitual (baixo risco):</h6>
-                        <p className="text-xs text-green-700">W78 (CIAP2 – Gravidez) ou Z34 (CID-10 – Supervisão de gravidez normal)</p>
+                    <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                      <Info className="h-4 w-4 text-blue-600" />
+                      <p className="text-sm text-blue-700">
+                        Para registrar os marcadores de consumo alimentar todas as perguntas devem ser respondidas
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-end">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={clearMarcadoresSpecific}
+                    disabled={
+                      (showMarcadoresMenor6Meses && Object.keys(marcadoresMenor6Meses).length === 0) &&
+                      (showMarcadores6a23Meses && Object.keys(marcadores6a23Meses).length === 0) &&
+                      (showMarcadores2AnosOuMais && !refeicaoTv && refeicoesDia.length === 0 && Object.keys(marcadores2AnosOuMais).length === 0)
+                    }
+                  >
+                    Limpar campos
+                  </Button>
+                </div>
+
+                {/* Questionário para menores de 6 meses */}
+                {showMarcadoresMenor6Meses && (
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-sm">Ontem a criança consumiu:</h4>
+                    {perguntas6Meses.map((pergunta, index) => (
+                      <div key={index} className="space-y-3">
+                        <Label className="text-sm font-medium">{pergunta}</Label>
+                        <div className="flex items-center gap-4">
+                          <RadioGroup 
+                            value={marcadoresMenor6Meses[`pergunta_${index}`] || ""} 
+                            onValueChange={(value) => setMarcadoresMenor6Meses(prev => ({...prev, [`pergunta_${index}`]: value}))}
+                          >
+                            <div className="flex gap-6">
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="sim" id={`menor6_${index}_sim`} />
+                                <Label htmlFor={`menor6_${index}_sim`}>Sim</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="nao" id={`menor6_${index}_nao`} />
+                                <Label htmlFor={`menor6_${index}_nao`}>Não</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="nao-sabe" id={`menor6_${index}_nao-sabe`} />
+                                <Label htmlFor={`menor6_${index}_nao-sabe`}>Não sabe</Label>
+                              </div>
+                            </div>
+                          </RadioGroup>
+                          {marcadoresMenor6Meses[`pergunta_${index}`] && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setMarcadoresMenor6Meses(prev => {
+                                const newState = {...prev};
+                                delete newState[`pergunta_${index}`];
+                                return newState;
+                              })}
+                              className="h-6 w-6 p-0"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                      <div className="p-3 bg-red-50 border border-red-200 rounded">
-                        <h6 className="font-medium text-red-800 mb-1">Alto Risco:</h6>
-                        <p className="text-xs text-red-700">Qualquer outro código da lista definida para complicações ou condições especiais da gestação</p>
+                    ))}
+                  </div>
+                )}
+
+                {/* Questionário para 6 a 23 meses */}
+                {showMarcadores6a23Meses && (
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-sm">Ontem a criança consumiu:</h4>
+                    {perguntas6a23Meses.map((pergunta, index) => (
+                      <div key={pergunta.key} className="space-y-3">
+                        <Label className="text-sm font-medium">{pergunta.label}</Label>
+                        <div className="flex items-center gap-4">
+                          <RadioGroup 
+                            value={marcadores6a23Meses[pergunta.key] || ""} 
+                            onValueChange={(value) => setMarcadores6a23Meses(prev => ({...prev, [pergunta.key]: value}))}
+                          >
+                            <div className="flex gap-6">
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="sim" id={`6a23_${pergunta.key}_sim`} />
+                                <Label htmlFor={`6a23_${pergunta.key}_sim`}>Sim</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="nao" id={`6a23_${pergunta.key}_nao`} />
+                                <Label htmlFor={`6a23_${pergunta.key}_nao`}>Não</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="nao-sabe" id={`6a23_${pergunta.key}_nao-sabe`} />
+                                <Label htmlFor={`6a23_${pergunta.key}_nao-sabe`}>Não sabe</Label>
+                              </div>
+                            </div>
+                          </RadioGroup>
+                          {marcadores6a23Meses[pergunta.key] && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setMarcadores6a23Meses(prev => {
+                                const newState = {...prev};
+                                delete newState[pergunta.key];
+                                if (pergunta.type === "conditional") {
+                                  delete newState[`${pergunta.key}_followup`];
+                                  delete newState[`${pergunta.key}_second_followup`];
+                                }
+                                return newState;
+                              })}
+                              className="h-6 w-6 p-0"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+
+                        {/* Follow-up questions for conditional items */}
+                        {pergunta.type === "conditional" && marcadores6a23Meses[pergunta.key] === "sim" && (
+                          <div className="ml-4 space-y-3">
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium">{pergunta.followUp}</Label>
+                              <RadioGroup 
+                                value={marcadores6a23Meses[`${pergunta.key}_followup`] || ""} 
+                                onValueChange={(value) => setMarcadores6a23Meses(prev => ({...prev, [`${pergunta.key}_followup`]: value}))}
+                              >
+                                <div className="flex gap-4 flex-wrap">
+                                  {pergunta.followUpOptions?.map((option) => (
+                                    <div key={option} className="flex items-center space-x-2">
+                                      <RadioGroupItem value={option.toLowerCase().replace(/\s+/g, '-')} id={`${pergunta.key}_followup_${option.toLowerCase().replace(/\s+/g, '-')}`} />
+                                      <Label htmlFor={`${pergunta.key}_followup_${option.toLowerCase().replace(/\s+/g, '-')}`}>{option}</Label>
+                                    </div>
+                                  ))}
+                                </div>
+                              </RadioGroup>
+                            </div>
+
+                            {/* Second follow-up for comida_sal */}
+                            {pergunta.key === "comida_sal" && pergunta.secondFollowUp && (
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium">{pergunta.secondFollowUp}</Label>
+                                <RadioGroup 
+                                  value={marcadores6a23Meses[`${pergunta.key}_second_followup`] || ""} 
+                                  onValueChange={(value) => setMarcadores6a23Meses(prev => ({...prev, [`${pergunta.key}_second_followup`]: value}))}
+                                >
+                                  <div className="flex gap-4 flex-wrap">
+                                    {pergunta.secondFollowUpOptions?.map((option) => (
+                                      <div key={option} className="flex items-center space-x-2">
+                                        <RadioGroupItem value={option.toLowerCase().replace(/\s+/g, '-')} id={`${pergunta.key}_second_${option.toLowerCase().replace(/\s+/g, '-')}`} />
+                                        <Label htmlFor={`${pergunta.key}_second_${option.toLowerCase().replace(/\s+/g, '-')}`}>{option}</Label>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </RadioGroup>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Questionário para 2 anos ou mais */}
+                {showMarcadores2AnosOuMais && (
+                  <div className="space-y-4">
+                    {/* Pergunta sobre TV/computador */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">
+                        Você tem costume de realizar as refeições assistindo à TV, mexendo no computador e/ou celular?
+                      </Label>
+                      <div className="flex items-center gap-4">
+                        <RadioGroup value={refeicaoTv} onValueChange={setRefeicaoTv}>
+                          <div className="flex gap-6">
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="sim" id="tv-sim" />
+                              <Label htmlFor="tv-sim">Sim</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="nao" id="tv-nao" />
+                              <Label htmlFor="tv-nao">Não</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="nao-sabe" id="tv-nao-sabe" />
+                              <Label htmlFor="tv-nao-sabe">Não sabe</Label>
+                            </div>
+                          </div>
+                        </RadioGroup>
+                        {refeicaoTv && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setRefeicaoTv("")}
+                            className="h-6 w-6 p-0"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Refeições do dia */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">
+                        Quais refeições você faz ao longo do dia?
+                      </Label>
+                      <div className="space-y-2">
+                        {[
+                          "Café da manhã",
+                          "Lanche da manhã", 
+                          "Almoço",
+                          "Lanche da tarde",
+                          "Jantar",
+                          "Ceia"
+                        ].map((refeicao) => (
+                          <div key={refeicao} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={refeicao}
+                              checked={refeicoesDia.includes(refeicao)}
+                              onCheckedChange={() => toggleRefeicao(refeicao)}
+                            />
+                            <Label htmlFor={refeicao}>{refeicao}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Consumo de ontem */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">
+                        Ontem a pessoa consumiu:
+                      </Label>
+                      <div className="space-y-3">
+                        {[
+                          "Feijão",
+                          "Frutas frescas (não considerar suco de frutas)",
+                          "Verduras e/ou legumes (não considerar batata, mandioca / aipim / macaxeira, cará e inhame)",
+                          "Hambúrguer e/ou embutidos (presunto, mortadela, salame, linguiça, salsicha)",
+                          "Bebidas adoçadas (refrigerante, suco de caixinha, suco em pó, água de coco de caixinha, xarope de guaraná / groselha ou suco de fruta com adição de açúcar)",
+                          "Macarrão instantâneo, salgadinho de pacote ou biscoitos salgados",
+                          "Biscoito recheado, doces ou guloseimas (balas, pirulitos, chiclete, caramelo, gelatina)"
+                        ].map((item) => (
+                          <div key={item} className="space-y-2">
+                            <Label className="text-sm">{item}</Label>
+                            <div className="flex items-center gap-4">
+                              <RadioGroup 
+                                value={marcadores2AnosOuMais[item] || ""} 
+                                onValueChange={(value) => setMarcadores2AnosOuMais(prev => ({...prev, [item]: value}))}
+                              >
+                                <div className="flex gap-6">
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="sim" id={`2anos_${item}_sim`} />
+                                    <Label htmlFor={`2anos_${item}_sim`}>Sim</Label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="nao" id={`2anos_${item}_nao`} />
+                                    <Label htmlFor={`2anos_${item}_nao`}>Não</Label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="nao-sabe" id={`2anos_${item}_nao-sabe`} />
+                                    <Label htmlFor={`2anos_${item}_nao-sabe`}>Não sabe</Label>
+                                  </div>
+                                </div>
+                              </RadioGroup>
+                              {marcadores2AnosOuMais[item] && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setMarcadores2AnosOuMais(prev => {
+                                    const newState = {...prev};
+                                    delete newState[item];
+                                    return newState;
+                                  })}
+                                  className="h-6 w-6 p-0"
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
 
-                {/* Continuar com outras seções... */}
-                <div className="space-y-4">
-                  <h5 className="font-medium text-gray-800">Outras seções importantes:</h5>
-                  <div className="grid gap-2 text-sm text-gray-600">
-                    <p><strong>#05</strong> - Preenchimento dos dados obstétricos no Bloco "Antecedentes"</p>
-                    <p><strong>#06</strong> - Registro de sinais vitais e medidas clínicas gestacionais</p>
-                    <p><strong>#07</strong> - Visualização de sinais vitais e medidas clínicas gestacionais</p>
-                    <p><strong>#08</strong> - Solicitação de exames recomendados no pré-natal</p>
-                    <p><strong>#09</strong> - Histórico da condição</p>
-                    <p><strong>#10</strong> - Agendamento de consultas do Pré-natal</p>
-                    <p><strong>#11</strong> - Registro do desfecho da gestação</p>
-                    <p><strong>#12</strong> - Impressão do Cartão de Acompanhamento da Gestante</p>
-                    <p><strong>#13</strong> - Acompanhamento do Pré Natal</p>
+          {/* Vacinação em dia */}
+          <div className="space-y-3 mb-6">
+            <Label className="text-base font-medium">Vacinação em dia</Label>
+            <div className="flex items-center gap-4">
+              <RadioGroup value={vacinacaoEmDia} onValueChange={setVacinacaoEmDia}>
+                <div className="flex gap-4">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="sim" id="vacinacao-sim" />
+                    <Label htmlFor="vacinacao-sim">SIM</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="nao" id="vacinacao-nao" />
+                    <Label htmlFor="vacinacao-nao">Não</Label>
                   </div>
                 </div>
-              </section>
+              </RadioGroup>
+              {vacinacaoEmDia && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setVacinacaoEmDia("")}
+                  className="h-6 w-6 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
             </div>
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
+          </div>
+
+          {/* Resultados de exames */}
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Dialog open={showAddExamModal} onOpenChange={setShowAddExamModal}>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Resultados de exames</Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Adicionar resultados de exames</DialogTitle>
+                  </DialogHeader>
+                  
+                  <div className="space-y-4">
+                    {/* Campo de busca */}
+                    <div className="relative">
+                      <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Adicionar exame sem solicitação"
+                        value={examSearch}
+                        onChange={(e) => setExamSearch(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+
+                    {/* Lista de exames filtrados */}
+                    {examSearch && filteredExams.length > 0 && (
+                      <div className="border rounded-md max-h-40 overflow-y-auto">
+                        {filteredExams.map((exam) => (
+                          <button
+                            key={exam.code}
+                            className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                            onClick={() => {
+                              setCurrentExam({
+                                code: exam.code,
+                                name: exam.name,
+                                resultado: "",
+                              });
+                              setExamSearch("");
+                            }}
+                          >
+                            <div className="font-medium text-sm">{exam.code}</div>
+                            <div className="text-gray-600 text-xs">{exam.name}</div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Exame selecionado */}
+                    {currentExam && (
+                      <div className="space-y-4 p-4 border rounded-md bg-gray-50">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium">
+                            {currentExam.name} - {currentExam.code}
+                          </h4>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowDeleteExamDialog(currentExam.code)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+
+                        {/* Datas opcionais */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Exame realizado em (DD/MM/AAAA)</Label>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start">
+                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                  {currentExam.realizadoEm ? 
+                                    format(currentExam.realizadoEm, "dd/MM/yyyy") : 
+                                    "Selecionar data"
+                                  }
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                  mode="single"
+                                  selected={currentExam.realizadoEm}
+                                  onSelect={(date) => setCurrentExam(prev => prev ? {...prev, realizadoEm: date} : null)}
+                                  disabled={(date) => date > new Date()}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label>Resultado em (DD/MM/AAAA)</Label>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start">
+                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                  {currentExam.resultadoEm ? 
+                                    format(currentExam.resultadoEm, "dd/MM/yyyy") : 
+                                    "Selecionar data"
+                                  }
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                  mode="single"
+                                  selected={currentExam.resultadoEm}
+                                  onSelect={(date) => setCurrentExam(prev => prev ? {...prev, resultadoEm: date} : null)}
+                                  disabled={(date) => date > new Date()}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                        </div>
+
+                        {/* Campo numérico para exames específicos */}
+                        {numericExamCodes.includes(currentExam.code) && (
+                          <div className="space-y-2">
+                            <Label>Valor numérico *</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              max="10000"
+                              placeholder="Digite o valor entre 1 e 10000"
+                              value={currentExam.valorNumerico || ""}
+                              onChange={(e) => {
+                                const value = parseInt(e.target.value);
+                                if (value > 10000) {
+                                  alert("Deve ter valor entre 1 e 10000");
+                                  return;
+                                }
+                                setCurrentExam(prev => prev ? {...prev, valorNumerico: value} : null);
+                              }}
+                            />
+                          </div>
+                        )}
+
+                        {/* Resultado (obrigatório) */}
+                        <div className="space-y-2">
+                          <Label>Resultado de exame *</Label>
+                          <Textarea
+                            placeholder="Digite o resultado do exame..."
+                            value={currentExam.resultado}
+                            onChange={(e) => setCurrentExam(prev => prev ? {...prev, resultado: e.target.value} : null)}
+                            maxLength={2000}
+                            rows={4}
+                          />
+                          <div className="text-sm text-gray-500 text-right">
+                            {currentExam.resultado.length}/2000 caracteres
+                          </div>
+                        </div>
+
+                        {/* Descrição para exames numéricos */}
+                        {numericExamCodes.includes(currentExam.code) && currentExam.valorNumerico && (
+                          <div className="space-y-2">
+                            <Label>Descrição</Label>
+                            <Textarea
+                              placeholder="Digite a descrição..."
+                              value={currentExam.descricao || ""}
+                              onChange={(e) => setCurrentExam(prev => prev ? {...prev, descricao: e.target.value} : null)}
+                              maxLength={2000}
+                              rows={3}
+                            />
+                            <div className="text-sm text-gray-500 text-right">
+                              {(currentExam.descricao || "").length}/2000 caracteres
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <DialogFooter>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowExitDialog(true)}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button 
+                      onClick={saveExam}
+                      disabled={!currentExam || !currentExam.resultado.trim()}
+                    >
+                      Salvar
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={showExamHistoryModal} onOpenChange={setShowExamHistoryModal}>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="outline"
+                    disabled={examResults.length === 0}
+                  >
+                    Histórico de resultado de exames
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Histórico de resultados de exames</DialogTitle>
+                  </DialogHeader>
+                  
+                  <div className="space-y-4">
+                    {/* Campo de busca */}
+                    <div className="relative">
+                      <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Pesquise por exame ou código"
+                        value={examHistorySearch}
+                        onChange={(e) => setExamHistorySearch(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+
+                    {/* Lista de exames do histórico */}
+                    <div className="space-y-2">
+                      {filteredExamHistory.map((exam) => (
+                        <Collapsible key={exam.id}>
+                          <CollapsibleTrigger asChild>
+                            <Button variant="outline" className="w-full justify-between">
+                              <div className="text-left">
+                                <div className="font-medium">{exam.name} - {exam.code}</div>
+                                <div className="text-sm text-gray-500">
+                                  Realizado em: {format(exam.realizadoEm, "dd/MM/yyyy")} | 
+                                  Última avaliação em: {format(exam.dataAvaliacao, "dd/MM/yyyy")}
+                                </div>
+                              </div>
+                              <ChevronDown className="h-4 w-4" />
+                            </Button>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="p-4 border rounded-md bg-gray-50 mt-2">
+                            <div className="space-y-2 text-sm">
+                              <div><strong>Realizado em:</strong> {format(exam.realizadoEm, "dd/MM/yyyy")}</div>
+                              <div><strong>Resultado em:</strong> {exam.resultadoEm ? format(exam.resultadoEm, "dd/MM/yyyy") : "-"}</div>
+                              {exam.valorNumerico && (
+                                <div><strong>Resultado (mg/dL):</strong> {exam.valorNumerico}</div>
+                              )}
+                              <div><strong>Resultado:</strong> {exam.resultado}</div>
+                              {exam.descricao && (
+                                <div><strong>Descrição:</strong> {exam.descricao}</div>
+                              )}
+                              <div><strong>Avaliado por:</strong> {exam.profissional}</div>
+                            </div>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      ))}
+                    </div>
+
+                    <div className="text-sm text-gray-500 text-center pt-4 border-t">
+                      Total de exames: {filteredExamHistory.length}
+                    </div>
+                  </div>
+
+                  <DialogFooter>
+                    <Button onClick={() => setShowExamHistoryModal(false)}>
+                      Fechar
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            {/* Lista de exames incluídos no atendimento */}
+            {examResults.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="font-medium">Exames registrados neste atendimento:</h4>
+                {examResults.map((exam) => (
+                  <Collapsible key={exam.id}>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="outline" className="w-full justify-between">
+                        <div className="flex items-center gap-2">
+                          <span>{exam.name}</span>
+                          <Badge variant="secondary">registrado agora</Badge>
+                        </div>
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="p-4 border rounded-md bg-gray-50 mt-2">
+                      <div className="space-y-2 text-sm">
+                        <div><strong>Nome do exame:</strong> {exam.name}</div>
+                        <div><strong>Data da realização:</strong> {format(exam.realizadoEm, "dd/MM/yyyy")}</div>
+                        <div><strong>Data de resultado:</strong> {exam.resultadoEm ? format(exam.resultadoEm, "dd/MM/yyyy") : "-"}</div>
+                        <div><strong>Data de solicitação:</strong> {exam.solicitadoEm ? format(exam.solicitadoEm, "dd/MM/yyyy") : "-"}</div>
+                        {exam.valorNumerico && (
+                          <div><strong>Resultado (mg/dL):</strong> {exam.valorNumerico}</div>
+                        )}
+                        <div><strong>Resultado:</strong> {exam.resultado}</div>
+                        {exam.descricao && (
+                          <div><strong>Descrição:</strong> {exam.descricao}</div>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Dialog de confirmação de exclusão */}
+          <AlertDialog open={!!showDeleteExamDialog} onOpenChange={() => setShowDeleteExamDialog(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Deseja excluir este exame?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Os dados deste exame não serão salvos.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setShowDeleteExamDialog(null)}>
+                  Cancelar
+                </AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={() => {
+                    setCurrentExam(null);
+                    setShowDeleteExamDialog(null);
+                  }}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  Excluir
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          {/* Dialog de confirmação de saída */}
+          <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Deseja sair sem salvar?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  As alterações realizadas serão perdidas.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setShowExitDialog(false)}>
+                  Não, continuar aqui
+                </AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={() => {
+                    setCurrentExam(null);
+                    setShowAddExamModal(false);
+                    setShowExitDialog(false);
+                  }}
+                >
+                  Sim, sair da tela
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </CardContent>
+      </Card>
     </div>
   );
 };

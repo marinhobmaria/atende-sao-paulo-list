@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -278,7 +279,10 @@ export const AttendanceCard = ({ attendance, onCallPatient }: AttendanceCardProp
                   </TooltipContent>
                 </Tooltip>
               )}
-              <AttendanceActions onAddCitizen={() => console.log("Add citizen")} />
+              <AttendanceActions 
+                attendance={mockAttendanceForActions} 
+                onStatusChange={handleStatusChange}
+              />
             </div>
           </div>
         </CardContent>
