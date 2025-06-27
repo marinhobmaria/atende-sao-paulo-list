@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { UserPlus, Phone } from "lucide-react";
 import { AddCitizen } from "./AddCitizen";
 import { PasswordCaller } from "./PasswordCaller";
@@ -38,13 +37,23 @@ export const AttendanceActions = ({ onAddCitizen }: AttendanceActionsProps) => {
 
       {/* Modais */}
       <AddCitizen
-        isOpen={showAddCitizen}
-        onClose={() => setShowAddCitizen(false)}
+        open={showAddCitizen}
+        onOpenChange={setShowAddCitizen}
+        queueCount={0}
+        waitingCount={0}
+        statusCounts={{
+          waiting: 0,
+          'in-service': 0,
+          'initial-listening': 0,
+          vaccination: 0
+        }}
+        filters={{}}
+        setFilters={() => {}}
       />
 
       <PasswordCaller
-        isOpen={showPasswordCaller}
-        onClose={() => setShowPasswordCaller(false)}
+        open={showPasswordCaller}
+        onOpenChange={setShowPasswordCaller}
       />
     </div>
   );

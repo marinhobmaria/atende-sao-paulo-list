@@ -12,6 +12,7 @@ const Index = () => {
   const [showMyAttendances, setShowMyAttendances] = useState(false);
   const [sortBy, setSortBy] = useState("risk");
   const [showFilters, setShowFilters] = useState(false);
+  const [showTodayAppointments, setShowTodayAppointments] = useState(false);
   const [filters, setFilters] = useState({
     status: ["waiting", "in-service", "initial-listening", "vaccination"],
     period: { start: new Date(), end: new Date() },
@@ -31,7 +32,16 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 space-y-6">
-        <AttendanceHeader />
+        <AttendanceHeader
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          showMyAttendances={showMyAttendances}
+          setShowMyAttendances={setShowMyAttendances}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          filters={filters}
+          setFilters={setFilters}
+        />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Coluna principal - Lista de atendimentos */}
@@ -49,15 +59,18 @@ const Index = () => {
 
           {/* Coluna lateral - Agendamentos de hoje */}
           <div className="space-y-6">
-            <TodayAppointmentsList />
+            <TodayAppointmentsList 
+              isOpen={showTodayAppointments}
+              onClose={() => setShowTodayAppointments(false)}
+            />
           </div>
         </div>
 
         <FilterModal
-          isOpen={showFilters}
-          onClose={() => setShowFilters(false)}
+          open={showFilters}
+          onOpenChange={setShowFilters}
           filters={filters}
-          onFiltersChange={setFilters}
+          setFilters={setFilters}
         />
       </div>
     </div>
