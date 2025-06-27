@@ -256,7 +256,7 @@ export const SOAPObjetivo = () => {
                       <p className="text-xs text-gray-600">Card na folha de rosto com resumo das dimensões alteradas.</p>
                     </div>
                   </div>
-                </div>
+                </section>
               </div>
             </ScrollArea>
           </DialogContent>
