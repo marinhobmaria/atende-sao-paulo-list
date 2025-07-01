@@ -1,4 +1,5 @@
-import { Search, Filter, RefreshCw } from "lucide-react";
+
+import { Search, Filter, RefreshCw, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,6 +15,8 @@ interface AttendanceHeaderProps {
   setSortBy: (sort: string) => void;
   filters: any;
   setFilters: (filters: any) => void;
+  showAddCitizenButton?: boolean;
+  onAddCitizenClick?: () => void;
 }
 
 export const AttendanceHeader = ({
@@ -24,7 +27,9 @@ export const AttendanceHeader = ({
   sortBy,
   setSortBy,
   filters,
-  setFilters
+  setFilters,
+  showAddCitizenButton = false,
+  onAddCitizenClick
 }: AttendanceHeaderProps) => {
   const [showFilterModal, setShowFilterModal] = useState(false);
 
@@ -55,8 +60,8 @@ export const AttendanceHeader = ({
   return (
     <div className="bg-white rounded-lg shadow-sm border">
       <div className="p-4">
-        {/* Search and Main Controls */}
-        <div className="flex gap-3 items-center">
+        {/* Search and Add Citizen Button */}
+        <div className="flex gap-3 items-center mb-4">
           {/* Search */}
           <div className="flex-1">
             <div className="relative">
@@ -70,8 +75,23 @@ export const AttendanceHeader = ({
             </div>
           </div>
 
-          {/* Controls */}
-          <div className="flex items-center gap-2">
+          {/* Add Citizen Button */}
+          {showAddCitizenButton && (
+            <Button
+              onClick={onAddCitizenClick}
+              variant="secondary"
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Adicionar munícipe
+            </Button>
+          )}
+        </div>
+
+        {/* Filters and Sort Controls */}
+        <div className="flex items-center justify-between">
+          {/* Left side - My Attendances and Filters */}
+          <div className="flex items-center gap-4">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="myAttendances"
@@ -98,9 +118,14 @@ export const AttendanceHeader = ({
               )}
             </Button>
           </div>
+
+          {/* Right side - Sort */}
+          <div className="text-sm text-gray-600">
+            Ordenação por classificação de risco
+          </div>
         </div>
 
-        {/* Active Filters Summary - Made more compact */}
+        {/* Active Filters Summary */}
         {(getActiveFiltersCount() > 0 || showMyAttendances) && (
           <div className="flex flex-wrap gap-1 text-sm pt-3 border-t mt-3">
             {showMyAttendances && (

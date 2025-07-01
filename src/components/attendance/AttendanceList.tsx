@@ -1,4 +1,3 @@
-
 import { AttendanceCard } from "./AttendanceCard";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -490,31 +489,15 @@ export const AttendanceList = ({
           Lista de Atendimentos
         </h2>
         
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <ArrowUpDown className="h-4 w-4 text-gray-500" />
-            <Select defaultValue="risk">
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Ordenar por..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="risk">Classificação de risco</SelectItem>
-                <SelectItem value="arrival-asc">Ordem de chegada crescente</SelectItem>
-                <SelectItem value="arrival-desc">Ordem de chegada decrescente</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <Button
-            variant="outline"
-            onClick={handleRefresh}
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Atualizar
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          onClick={handleRefresh}
+          size="sm"
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Atualizar
+        </Button>
       </div>
       
       <div className="space-y-3">

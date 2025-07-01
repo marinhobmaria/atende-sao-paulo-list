@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { AttendanceList, getStatusCounts } from "@/components/attendance/AttendanceList";
 import { AttendanceHeader } from "@/components/attendance/AttendanceHeader";
@@ -61,12 +62,7 @@ const Index = () => {
             <h1 className="text-2xl font-bold text-gray-900">Fila de atendimento</h1>
           </div>
 
-          {/* Password Caller - Above filters */}
-          <div className="flex justify-center">
-            <PasswordCaller />
-          </div>
-
-          {/* Header */}
+          {/* Header with search and add citizen button */}
           <AttendanceHeader
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
@@ -76,25 +72,18 @@ const Index = () => {
             setSortBy={setSortBy}
             filters={filters}
             setFilters={setFilters}
+            showAddCitizenButton={true}
+            onAddCitizenClick={() => setShowAddCitizen(!showAddCitizen)}
           />
 
-          {/* Status Counters and Add Citizen Button */}
-          <div className="flex items-center justify-between gap-4">
+          {/* Status Counters */}
+          <div className="flex items-center justify-center">
             <StatusCounters
               statusCounts={statusCounts}
               filters={filters}
               setFilters={setFilters}
               queueCount={mockQueueCount}
             />
-            
-            <Button
-              onClick={() => setShowAddCitizen(!showAddCitizen)}
-              variant="secondary"
-              className="flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Adicionar munícipe
-            </Button>
           </div>
 
           {/* Add Citizen Collapsible */}
@@ -111,14 +100,24 @@ const Index = () => {
             />
           )}
 
-          {/* Attendance List */}
-          <AttendanceList
-            searchTerm={searchTerm}
-            showMyAttendances={showMyAttendances}
-            sortBy={sortBy}
-            filters={filters}
-            onCallPatient={handleCallPatient}
-          />
+          {/* Main Content Area with Fixed Password Caller */}
+          <div className="flex gap-6">
+            {/* Fixed Password Caller */}
+            <div className="sticky top-6 h-fit">
+              <PasswordCaller />
+            </div>
+
+            {/* Attendance List */}
+            <div className="flex-1">
+              <AttendanceList
+                searchTerm={searchTerm}
+                showMyAttendances={showMyAttendances}
+                sortBy={sortBy}
+                filters={filters}
+                onCallPatient={handleCallPatient}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </TooltipProvider>
