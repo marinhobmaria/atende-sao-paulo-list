@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { AttendanceList, getStatusCounts } from "@/components/attendance/AttendanceList";
 import { AttendanceHeader } from "@/components/attendance/AttendanceHeader";
@@ -16,7 +17,7 @@ const mockWaitingCount = getStatusCounts().waiting;
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showMyAttendances, setShowMyAttendances] = useState(false);
-  const [sortBy, setSortBy] = useState("arrival");
+  const [sortBy, setSortBy] = useState("risk"); // Default to risk classification
   const [showAddCitizen, setShowAddCitizen] = useState(false);
   const [currentCall, setCurrentCall] = useState<string | null>(null);
   const [filters, setFilters] = useState({

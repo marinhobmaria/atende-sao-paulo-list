@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Volume2, UserCheck } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Volume2, UserCheck, ChevronDown, ChevronUp } from "lucide-react";
 
 // Mock data for queue
 const mockQueue = [
@@ -17,6 +18,7 @@ export const PasswordCaller = () => {
   const [queue, setQueue] = useState(mockQueue);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [showButtons, setShowButtons] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const callNext = () => {
     const nextPatient = queue.find(p => p.status === "waiting");
@@ -64,59 +66,69 @@ export const PasswordCaller = () => {
 
   return (
     <Card className="w-full max-w-xs">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm flex items-center gap-2">
-          <Volume2 className="h-4 w-4" />
-          Chamar próximo da fila
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {/* Current Call Display */}
-        {currentCall && (
-          <div className="bg-blue-50 p-2 rounded border text-center">
-            <div className="text-xs text-gray-600 mb-1">Chamando agora:</div>
-            <div className="text-lg font-bold text-blue-600">{currentCall}</div>
-            {countdown !== null && countdown > 0 && (
-              <div className="text-sm text-gray-600 mt-1">
-                Expira em: {countdown}s
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger asChild>
+          <CardHeader className="pb-2 cursor-pointer hover:bg-gray-50">
+            <CardTitle className="text-sm flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Volume2 className="h-4 w-4" />
+                Chamar próximo da fila
+              </div>
+              {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </CardTitle>
+          </CardHeader>
+        </CollapsibleTrigger>
+        
+        <CollapsibleContent>
+          <CardContent className="space-y-3">
+            {/* Current Call Display */}
+            {currentCall && (
+              <div className="bg-blue-50 p-2 rounded border text-center">
+                <div className="text-xs text-gray-600 mb-1">Chamando agora:</div>
+                <div className="text-lg font-bold text-blue-600">{currentCall}</div>
+                {countdown !== null && countdown > 0 && (
+                  <div className="text-sm text-gray-600 mt-1">
+                    Expira em: {countdown}s
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
 
-        {/* Action Buttons */}
-        <div className="flex gap-2">
-          {!showButtons ? (
-            <Button 
-              onClick={callNext}
-              disabled={waitingCount === 0 || countdown !== null}
-              className="flex-1 bg-green-600 hover:bg-green-700 h-7 text-xs"
-              size="sm"
-            >
-              <UserCheck className="h-3 w-3 mr-1" />
-              Chamar próximo munícipe ({waitingCount})
-            </Button>
-          ) : (
-            <>
-              <Button 
-                onClick={callAgain}
-                className="flex-1 bg-orange-600 hover:bg-orange-700 h-7 text-xs"
-                size="sm"
-              >
-                Chamar novamente
-              </Button>
-              <Button 
-                onClick={callNext}
-                disabled={waitingCount === 0}
-                className="flex-1 bg-green-600 hover:bg-green-700 h-7 text-xs"
-                size="sm"
-              >
-                Chamar próximo
-              </Button>
-            </>
-          )}
-        </div>
-      </CardContent>
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              {!showButtons ? (
+                <Button 
+                  onClick={callNext}
+                  disabled={waitingCount === 0 || countdown !== null}
+                  className="flex-1 bg-green-600 hover:bg-green-700 h-7 text-xs"
+                  size="sm"
+                >
+                  <UserCheck className="h-3 w-3 mr-1" />
+                  Chamar próximo munícipe ({waitingCount})
+                </Button>
+              ) : (
+                <>
+                  <Button 
+                    onClick={callAgain}
+                    className="flex-1 bg-orange-600 hover:bg-orange-700 h-7 text-xs"
+                    size="sm"
+                  >
+                    Chamar novamente
+                  </Button>
+                  <Button 
+                    onClick={callNext}
+                    disabled={waitingCount === 0}
+                    className="flex-1 bg-green-600 hover:bg-green-700 h-7 text-xs"
+                    size="sm"
+                  >
+                    Chamar próximo
+                  </Button>
+                </>
+              )}
+            </div>
+          </CardContent>
+        </CollapsibleContent>
+      </Collapsible>
     </Card>
   );
 };

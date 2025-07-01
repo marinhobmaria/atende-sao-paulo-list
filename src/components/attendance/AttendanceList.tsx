@@ -1,6 +1,5 @@
 import { AttendanceCard } from "./AttendanceCard";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FilterModal } from "./FilterModal";
 import { RefreshCw, Filter } from "lucide-react";
@@ -468,7 +467,7 @@ export const AttendanceList = ({
       onlyUnfinished: false
     });
     setShowMyAttendances(false);
-    setSortBy("arrival");
+    setSortBy("risk");
   };
 
   const getActiveFiltersCount = () => {
@@ -478,6 +477,7 @@ export const AttendanceList = ({
     if (filters.professional && filters.professional.length > 0) count++;
     if (filters.onlyUnfinished) count++;
     if (filters.status.length !== 4) count++;
+    if (showMyAttendances) count++;
     return count;
   };
 
@@ -491,25 +491,12 @@ export const AttendanceList = ({
     return matchesSearch && matchesStatus;
   });
 
+  // Always sort by risk classification (default behavior)
   const sortedAttendances = [...filteredAttendances].sort((a, b) => {
-    switch (sortBy) {
-      case "risk":
-        // Sort by vulnerability: ALTA > MÉDIA > BAIXA > null
-        const riskOrder = { "ALTA": 3, "MÉDIA": 2, "BAIXA": 1, null: 0 };
-        const aRisk = riskOrder[a.vulnerability as keyof typeof riskOrder] || 0;
-        const bRisk = riskOrder[b.vulnerability as keyof typeof riskOrder] || 0;
-        return bRisk - aRisk;
-      case "arrival-asc":
-        return a.arrivalTime.localeCompare(b.arrivalTime);
-      case "arrival-desc":
-        return b.arrivalTime.localeCompare(a.arrivalTime);
-      default:
-        // Default: sort by risk
-        const defaultRiskOrder = { "ALTA": 3, "MÉDIA": 2, "BAIXA": 1, null: 0 };
-        const aDefaultRisk = defaultRiskOrder[a.vulnerability as keyof typeof defaultRiskOrder] || 0;
-        const bDefaultRisk = defaultRiskOrder[b.vulnerability as keyof typeof defaultRiskOrder] || 0;
-        return bDefaultRisk - aDefaultRisk;
-    }
+    const riskOrder = { "ALTA": 3, "MÉDIA": 2, "BAIXA": 1, null: 0 };
+    const aRisk = riskOrder[a.vulnerability as keyof typeof riskOrder] || 0;
+    const bRisk = riskOrder[b.vulnerability as keyof typeof riskOrder] || 0;
+    return bRisk - aRisk;
   });
 
   const handleRefresh = () => {
@@ -518,13 +505,13 @@ export const AttendanceList = ({
 
   return (
     <div className="space-y-4">
+      {/* Controls - Clean Filters and Refresh */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Lista de Atendimentos
-        </h2>
+        <div className="text-sm text-gray-600">
+          Ordenação: <span className="font-medium">Classificação de risco</span>
+        </div>
         
-        {/* Controls - Filters and Refresh */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {/* My Attendances Checkbox */}
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -553,21 +540,6 @@ export const AttendanceList = ({
             )}
           </Button>
 
-          {/* Sort Select */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 whitespace-nowrap">Ordenar por:</span>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="risk">Classificação de risco</SelectItem>
-                <SelectItem value="arrival-asc">Chegada (mais antigo)</SelectItem>
-                <SelectItem value="arrival-desc">Chegada (mais recente)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Refresh Button */}
           <Button
             variant="outline"
@@ -582,7 +554,7 @@ export const AttendanceList = ({
       </div>
 
       {/* Active Filters Summary */}
-      {(getActiveFiltersCount() > 0 || showMyAttendances) && (
+      {getActiveFiltersCount() > 0 && (
         <div className="flex flex-wrap gap-1 text-sm">
           {showMyAttendances && (
             <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
