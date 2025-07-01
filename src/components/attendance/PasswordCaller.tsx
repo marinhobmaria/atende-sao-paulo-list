@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Volume2, UserCheck, ChevronDown, ChevronUp } from "lucide-react";
+import { Volume2, UserCheck, ChevronLeft, ChevronRight } from "lucide-react";
 
 // Mock data for queue
 const mockQueue = [
@@ -18,7 +17,7 @@ export const PasswordCaller = () => {
   const [queue, setQueue] = useState(mockQueue);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [showButtons, setShowButtons] = useState(false);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const callNext = () => {
     const nextPatient = queue.find(p => p.status === "waiting");
@@ -65,21 +64,19 @@ export const PasswordCaller = () => {
   const waitingCount = queue.filter(p => p.status === "waiting").length;
 
   return (
-    <Card className="w-full max-w-xs">
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleTrigger asChild>
-          <CardHeader className="pb-2 cursor-pointer hover:bg-gray-50">
-            <CardTitle className="text-sm flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Volume2 className="h-4 w-4" />
-                Chamar próximo da fila
-              </div>
-              {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+    <div className="fixed top-1/2 left-0 transform -translate-y-1/2 z-50">
+      <div className={`flex items-center transition-transform duration-300 ${
+        isExpanded ? 'translate-x-0' : '-translate-x-64'
+      }`}>
+        {/* Main Card */}
+        <Card className="w-72 shadow-lg border-r-0">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Volume2 className="h-4 w-4" />
+              Chamar próximo da fila
             </CardTitle>
           </CardHeader>
-        </CollapsibleTrigger>
-        
-        <CollapsibleContent>
+          
           <CardContent className="space-y-3">
             {/* Current Call Display */}
             {currentCall && (
@@ -127,8 +124,21 @@ export const PasswordCaller = () => {
               )}
             </div>
           </CardContent>
-        </CollapsibleContent>
-      </Collapsible>
-    </Card>
+        </Card>
+
+        {/* Toggle Button */}
+        <Button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="h-12 w-8 rounded-l-none rounded-r-lg bg-blue-600 hover:bg-blue-700 p-0 shadow-lg"
+          size="sm"
+        >
+          {isExpanded ? (
+            <ChevronLeft className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
+    </div>
   );
 };

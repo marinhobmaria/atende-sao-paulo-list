@@ -491,27 +491,56 @@ export const AttendanceList = ({
     return matchesSearch && matchesStatus;
   });
 
-  // Always sort by risk classification (default behavior)
+  // Sorting logic based on sortBy value
   const sortedAttendances = [...filteredAttendances].sort((a, b) => {
-    const riskOrder = { "ALTA": 3, "MÉDIA": 2, "BAIXA": 1, null: 0 };
-    const aRisk = riskOrder[a.vulnerability as keyof typeof riskOrder] || 0;
-    const bRisk = riskOrder[b.vulnerability as keyof typeof riskOrder] || 0;
-    return bRisk - aRisk;
+    if (sortBy === "risk") {
+      const riskOrder = { "ALTA": 3, "MÉDIA": 2, "BAIXA": 1, null: 0 };
+      const aRisk = riskOrder[a.vulnerability as keyof typeof riskOrder] || 0;
+      const bRisk = riskOrder[b.vulnerability as keyof typeof riskOrder] || 0;
+      return bRisk - aRisk;
+    } else if (sortBy === "inclusion-asc") {
+      // Sort by ID (assuming lower ID = earlier inclusion)
+      return parseInt(a.id) - parseInt(b.id);
+    } else if (sortBy === "inclusion-desc") {
+      // Sort by ID descending (assuming higher ID = later inclusion)
+      return parseInt(b.id) - parseInt(a.id);
+    }
+    return 0;
   });
 
   const handleRefresh = () => {
     console.log("Refreshing attendance queue...");
   };
 
+  const getSortLabel = () => {
+    switch (sortBy) {
+      case "risk": return "Classificação de risco";
+      case "inclusion-asc": return "Ordem de inclusão (crescente)";
+      case "inclusion-desc": return "Ordem de inclusão (decrescente)";
+      default: return "Classificação de risco";
+    }
+  };
+
   return (
     <div className="space-y-4">
-      {/* Controls - Clean Filters and Refresh */}
+      {/* Controls */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600">
-          Ordenação: <span className="font-medium">Classificação de risco</span>
+          Ordenação: <span className="font-medium">{getSortLabel()}</span>
         </div>
         
         <div className="flex items-center gap-3">
+          {/* Sort Dropdown */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="text-sm border border-gray-300 rounded px-2 py-1 bg-white"
+          >
+            <option value="risk">Classificação de risco</option>
+            <option value="inclusion-asc">Inclusão crescente</option>
+            <option value="inclusion-desc">Inclusão decrescente</option>
+          </select>
+
           {/* My Attendances Checkbox */}
           <div className="flex items-center space-x-2">
             <Checkbox

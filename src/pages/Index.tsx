@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AttendanceList, getStatusCounts } from "@/components/attendance/AttendanceList";
 import { AttendanceHeader } from "@/components/attendance/AttendanceHeader";
@@ -57,11 +56,6 @@ const Index = () => {
             </BreadcrumbList>
           </Breadcrumb>
 
-          {/* Main Title */}
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Fila de atendimento</h1>
-          </div>
-
           {/* Header with search and add citizen button */}
           <AttendanceHeader
             searchTerm={searchTerm}
@@ -94,28 +88,21 @@ const Index = () => {
             />
           )}
 
-          {/* Main Content Area with Fixed Password Caller */}
-          <div className="flex gap-6">
-            {/* Fixed Password Caller */}
-            <div className="sticky top-6 h-fit">
-              <PasswordCaller />
-            </div>
-
-            {/* Attendance List */}
-            <div className="flex-1">
-              <AttendanceList
-                searchTerm={searchTerm}
-                showMyAttendances={showMyAttendances}
-                setShowMyAttendances={setShowMyAttendances}
-                sortBy={sortBy}
-                setSortBy={setSortBy}
-                filters={filters}
-                setFilters={setFilters}
-                onCallPatient={handleCallPatient}
-              />
-            </div>
-          </div>
+          {/* Attendance List */}
+          <AttendanceList
+            searchTerm={searchTerm}
+            showMyAttendances={showMyAttendances}
+            setShowMyAttendances={setShowMyAttendances}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            filters={filters}
+            setFilters={setFilters}
+            onCallPatient={handleCallPatient}
+          />
         </div>
+
+        {/* Fixed Side Password Caller */}
+        <PasswordCaller />
       </div>
     </TooltipProvider>
   );
