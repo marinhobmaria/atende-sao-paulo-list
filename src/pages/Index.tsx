@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AttendanceList, getStatusCounts } from "@/components/attendance/AttendanceList";
 import { AttendanceHeader } from "@/components/attendance/AttendanceHeader";
@@ -66,12 +65,6 @@ const Index = () => {
           <AttendanceHeader
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
-            showMyAttendances={showMyAttendances}
-            setShowMyAttendances={setShowMyAttendances}
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-            filters={filters}
-            setFilters={setFilters}
             showAddCitizenButton={true}
             onAddCitizenClick={() => setShowAddCitizen(!showAddCitizen)}
           />
@@ -112,8 +105,11 @@ const Index = () => {
               <AttendanceList
                 searchTerm={searchTerm}
                 showMyAttendances={showMyAttendances}
+                setShowMyAttendances={setShowMyAttendances}
                 sortBy={sortBy}
+                setSortBy={setSortBy}
                 filters={filters}
+                setFilters={setFilters}
                 onCallPatient={handleCallPatient}
               />
             </div>

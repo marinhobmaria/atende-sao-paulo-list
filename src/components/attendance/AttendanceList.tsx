@@ -1,7 +1,10 @@
 import { AttendanceCard } from "./AttendanceCard";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RefreshCw, ArrowUpDown } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { FilterModal } from "./FilterModal";
+import { RefreshCw, Filter } from "lucide-react";
+import { useState } from "react";
 
 // Mock data with more citizens - 30 with photos and 20 without
 const mockAttendances = [
@@ -428,7 +431,9 @@ export const getStatusCounts = () => {
 interface AttendanceListProps {
   searchTerm: string;
   showMyAttendances: boolean;
+  setShowMyAttendances: (show: boolean) => void;
   sortBy: string;
+  setSortBy: (sort: string) => void;
   filters: {
     status: string[];
     period: { start: Date; end: Date };
@@ -437,16 +442,45 @@ interface AttendanceListProps {
     professional: string[];
     onlyUnfinished: boolean;
   };
+  setFilters: (filters: any) => void;
   onCallPatient?: (patientId: string, patientName: string) => void;
 }
 
 export const AttendanceList = ({ 
   searchTerm, 
-  showMyAttendances, 
-  sortBy, 
+  showMyAttendances,
+  setShowMyAttendances,
+  sortBy,
+  setSortBy,
   filters,
+  setFilters,
   onCallPatient 
 }: AttendanceListProps) => {
+  const [showFilterModal, setShowFilterModal] = useState(false);
+
+  const resetFilters = () => {
+    setFilters({
+      status: ["waiting", "in-service", "initial-listening", "vaccination"],
+      period: { start: new Date(), end: new Date() },
+      serviceType: [],
+      team: [],
+      professional: [],
+      onlyUnfinished: false
+    });
+    setShowMyAttendances(false);
+    setSortBy("arrival");
+  };
+
+  const getActiveFiltersCount = () => {
+    let count = 0;
+    if (filters.serviceType && filters.serviceType.length > 0) count++;
+    if (filters.team && filters.team.length > 0) count++;
+    if (filters.professional && filters.professional.length > 0) count++;
+    if (filters.onlyUnfinished) count++;
+    if (filters.status.length !== 4) count++;
+    return count;
+  };
+
   const filteredAttendances = mockAttendances.filter(attendance => {
     const matchesSearch = attendance.citizen.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          attendance.citizen.cpf.includes(searchTerm) ||
@@ -489,16 +523,99 @@ export const AttendanceList = ({
           Lista de Atendimentos
         </h2>
         
-        <Button
-          variant="outline"
-          onClick={handleRefresh}
-          size="sm"
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Atualizar
-        </Button>
+        {/* Controls - Filters and Refresh */}
+        <div className="flex items-center gap-4">
+          {/* My Attendances Checkbox */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="myAttendances"
+              checked={showMyAttendances}
+              onCheckedChange={setShowMyAttendances}
+            />
+            <label htmlFor="myAttendances" className="text-sm whitespace-nowrap">
+              Meus atendimentos
+            </label>
+          </div>
+
+          {/* Filters Button */}
+          <Button
+            variant="outline"
+            onClick={() => setShowFilterModal(true)}
+            size="sm"
+            className="flex items-center gap-2 relative"
+          >
+            <Filter className="h-4 w-4" />
+            Filtros
+            {getActiveFiltersCount() > 0 && (
+              <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {getActiveFiltersCount()}
+              </span>
+            )}
+          </Button>
+
+          {/* Sort Select */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600 whitespace-nowrap">Ordenar por:</span>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="risk">Classificação de risco</SelectItem>
+                <SelectItem value="arrival-asc">Chegada (mais antigo)</SelectItem>
+                <SelectItem value="arrival-desc">Chegada (mais recente)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Refresh Button */}
+          <Button
+            variant="outline"
+            onClick={handleRefresh}
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Atualizar
+          </Button>
+        </div>
       </div>
+
+      {/* Active Filters Summary */}
+      {(getActiveFiltersCount() > 0 || showMyAttendances) && (
+        <div className="flex flex-wrap gap-1 text-sm">
+          {showMyAttendances && (
+            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+              Meus atendimentos
+            </span>
+          )}
+          
+          {filters.serviceType && filters.serviceType.length > 0 && (
+            <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+              {filters.serviceType.length} serviço{filters.serviceType.length > 1 ? 's' : ''}
+            </span>
+          )}
+          
+          {filters.team && filters.team.length > 0 && (
+            <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">
+              {filters.team.length} equipe{filters.team.length > 1 ? 's' : ''}
+            </span>
+          )}
+          
+          {filters.professional && filters.professional.length > 0 && (
+            <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">
+              {filters.professional.length} prof.
+            </span>
+          )}
+
+          <button
+            onClick={resetFilters}
+            className="text-blue-600 hover:text-blue-800 text-xs underline ml-1"
+          >
+            Limpar
+          </button>
+        </div>
+      )}
       
       <div className="space-y-3">
         {sortedAttendances.map((attendance) => (
@@ -515,6 +632,13 @@ export const AttendanceList = ({
           <p className="text-gray-500">Nenhum atendimento encontrado</p>
         </div>
       )}
+
+      <FilterModal
+        open={showFilterModal}
+        onOpenChange={setShowFilterModal}
+        filters={filters}
+        setFilters={setFilters}
+      />
     </div>
   );
 };
