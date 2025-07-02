@@ -64,12 +64,25 @@ export const PasswordCaller = () => {
   const waitingCount = queue.filter(p => p.status === "waiting").length;
 
   return (
-    <div className="fixed top-1/2 left-0 transform -translate-y-1/2 z-50">
+    <div className="fixed top-1/2 right-0 transform -translate-y-1/2 z-50">
       <div className={`flex items-center transition-transform duration-300 ${
-        isExpanded ? 'translate-x-0' : '-translate-x-64'
+        isExpanded ? 'translate-x-0' : 'translate-x-64'
       }`}>
+        {/* Toggle Button */}
+        <Button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="h-12 w-8 rounded-r-none rounded-l-lg bg-blue-600 hover:bg-blue-700 p-0 shadow-lg"
+          size="sm"
+        >
+          {isExpanded ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
+        </Button>
+
         {/* Main Card */}
-        <Card className="w-72 shadow-lg border-r-0">
+        <Card className="w-72 shadow-lg border-l-0">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <Volume2 className="h-4 w-4" />
@@ -125,19 +138,6 @@ export const PasswordCaller = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Toggle Button */}
-        <Button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="h-12 w-8 rounded-l-none rounded-r-lg bg-blue-600 hover:bg-blue-700 p-0 shadow-lg"
-          size="sm"
-        >
-          {isExpanded ? (
-            <ChevronLeft className="h-4 w-4" />
-          ) : (
-            <ChevronRight className="h-4 w-4" />
-          )}
-        </Button>
       </div>
     </div>
   );

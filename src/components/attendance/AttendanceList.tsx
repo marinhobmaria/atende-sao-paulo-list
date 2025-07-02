@@ -512,35 +512,11 @@ export const AttendanceList = ({
     console.log("Refreshing attendance queue...");
   };
 
-  const getSortLabel = () => {
-    switch (sortBy) {
-      case "risk": return "Classificação de risco";
-      case "inclusion-asc": return "Ordem de inclusão (crescente)";
-      case "inclusion-desc": return "Ordem de inclusão (decrescente)";
-      default: return "Classificação de risco";
-    }
-  };
-
   return (
     <div className="space-y-4">
       {/* Controls */}
       <div className="flex items-center justify-between">
-        <div className="text-sm text-gray-600">
-          Ordenação: <span className="font-medium">{getSortLabel()}</span>
-        </div>
-        
         <div className="flex items-center gap-3">
-          {/* Sort Dropdown */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="text-sm border border-gray-300 rounded px-2 py-1 bg-white"
-          >
-            <option value="risk">Classificação de risco</option>
-            <option value="inclusion-asc">Inclusão crescente</option>
-            <option value="inclusion-desc">Inclusão decrescente</option>
-          </select>
-
           {/* My Attendances Checkbox */}
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -568,18 +544,18 @@ export const AttendanceList = ({
               </span>
             )}
           </Button>
-
-          {/* Refresh Button */}
-          <Button
-            variant="outline"
-            onClick={handleRefresh}
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Atualizar
-          </Button>
         </div>
+
+        {/* Refresh Button */}
+        <Button
+          variant="outline"
+          onClick={handleRefresh}
+          size="sm"
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Atualizar
+        </Button>
       </div>
 
       {/* Active Filters Summary */}

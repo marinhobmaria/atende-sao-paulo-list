@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { AttendanceList, getStatusCounts } from "@/components/attendance/AttendanceList";
 import { AttendanceHeader } from "@/components/attendance/AttendanceHeader";
@@ -5,9 +6,8 @@ import { AddCitizen } from "@/components/attendance/AddCitizen";
 import { StatusCounters } from "@/components/attendance/StatusCounters";
 import { PasswordCaller } from "@/components/attendance/PasswordCaller";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Home, Plus, RefreshCw } from "lucide-react";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Home } from "lucide-react";
 
 // Mock data for queue counts - in a real app this would come from a store/context
 const mockQueueCount = 50;
@@ -38,8 +38,8 @@ const Index = () => {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-7xl mx-auto space-y-6">
+      <div className="min-h-screen bg-background p-6 pr-80">
+        <div className="max-w-5xl mx-auto space-y-6">
           {/* Breadcrumb */}
           <Breadcrumb>
             <BreadcrumbList>
@@ -51,7 +51,7 @@ const Index = () => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>Lista de Atendimento</BreadcrumbPage>
+                <BreadcrumbPage>Atendimentos</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
