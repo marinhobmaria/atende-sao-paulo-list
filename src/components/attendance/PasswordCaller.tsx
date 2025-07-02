@@ -17,7 +17,7 @@ export const PasswordCaller = () => {
   const [queue, setQueue] = useState(mockQueue);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [showButtons, setShowButtons] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const callNext = () => {
     const nextPatient = queue.find(p => p.status === "waiting");
@@ -64,81 +64,92 @@ export const PasswordCaller = () => {
   const waitingCount = queue.filter(p => p.status === "waiting").length;
 
   return (
-    <div className="fixed top-1/2 right-0 transform -translate-y-1/2 z-50">
-      <div className={`flex items-center transition-transform duration-300 ${
-        isExpanded ? 'translate-x-0' : 'translate-x-64'
+    <div className="fixed top-20 right-4 z-50">
+      <Card className={`transition-all duration-300 shadow-lg border ${
+        isExpanded ? 'w-80' : 'w-12'
       }`}>
         {/* Toggle Button */}
-        <Button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="h-12 w-8 rounded-r-none rounded-l-lg bg-blue-600 hover:bg-blue-700 p-0 shadow-lg"
-          size="sm"
-        >
-          {isExpanded ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
-        </Button>
-
-        {/* Main Card */}
-        <Card className="w-72 shadow-lg border-l-0">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Volume2 className="h-4 w-4" />
-              Chamar próximo da fila
-            </CardTitle>
-          </CardHeader>
-          
-          <CardContent className="space-y-3">
-            {/* Current Call Display */}
-            {currentCall && (
-              <div className="bg-blue-50 p-2 rounded border text-center">
-                <div className="text-xs text-gray-600 mb-1">Chamando agora:</div>
-                <div className="text-lg font-bold text-blue-600">{currentCall}</div>
-                {countdown !== null && countdown > 0 && (
-                  <div className="text-sm text-gray-600 mt-1">
-                    Expira em: {countdown}s
-                  </div>
-                )}
-              </div>
+        <div className="absolute top-2 left-2">
+          <Button
+            onClick={() => setIsExpanded(!isExpanded)}
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+          >
+            {isExpanded ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
             )}
+          </Button>
+        </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-2">
-              {!showButtons ? (
-                <Button 
-                  onClick={callNext}
-                  disabled={waitingCount === 0 || countdown !== null}
-                  className="flex-1 bg-green-600 hover:bg-green-700 h-7 text-xs"
-                  size="sm"
-                >
-                  <UserCheck className="h-3 w-3 mr-1" />
-                  Chamar próximo munícipe ({waitingCount})
-                </Button>
-              ) : (
-                <>
-                  <Button 
-                    onClick={callAgain}
-                    className="flex-1 bg-orange-600 hover:bg-orange-700 h-7 text-xs"
-                    size="sm"
-                  >
-                    Chamar novamente
-                  </Button>
+        {isExpanded && (
+          <>
+            <CardHeader className="pb-2 pt-12">
+              <CardTitle className="text-sm flex items-center gap-2 justify-center">
+                <Volume2 className="h-4 w-4" />
+                Chamar próximo da fila
+              </CardTitle>
+            </CardHeader>
+            
+            <CardContent className="space-y-3">
+              {/* Current Call Display */}
+              {currentCall && (
+                <div className="bg-blue-50 p-3 rounded border text-center">
+                  <div className="text-xs text-gray-600 mb-1">Chamando agora:</div>
+                  <div className="text-xl font-bold text-blue-600">{currentCall}</div>
+                  {countdown !== null && countdown > 0 && (
+                    <div className="text-sm text-gray-600 mt-1">
+                      Expira em: {countdown}s
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex gap-2">
+                {!showButtons ? (
                   <Button 
                     onClick={callNext}
-                    disabled={waitingCount === 0}
-                    className="flex-1 bg-green-600 hover:bg-green-700 h-7 text-xs"
+                    disabled={waitingCount === 0 || countdown !== null}
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-xs"
                     size="sm"
                   >
-                    Chamar próximo
+                    <UserCheck className="h-3 w-3 mr-1" />
+                    Chamar próximo ({waitingCount})
                   </Button>
-                </>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                ) : (
+                  <>
+                    <Button 
+                      onClick={callAgain}
+                      className="flex-1 bg-orange-600 hover:bg-orange-700 text-xs"
+                      size="sm"
+                    >
+                      Chamar novamente
+                    </Button>
+                    <Button 
+                      onClick={callNext}
+                      disabled={waitingCount === 0}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-xs"
+                      size="sm"
+                    >
+                      Chamar próximo
+                    </Button>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </>
+        )}
+
+        {/* Collapsed state indicator */}
+        {!isExpanded && (
+          <div className="p-2 flex items-center justify-center">
+            <Volume2 className="h-4 w-4 text-gray-500" />
+          </div>
+        )}
+      </Card>
     </div>
   );
 };

@@ -1,6 +1,8 @@
+
 import { AttendanceCard } from "./AttendanceCard";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FilterModal } from "./FilterModal";
 import { RefreshCw, Filter } from "lucide-react";
 import { useState } from "react";
@@ -527,6 +529,21 @@ export const AttendanceList = ({
             <label htmlFor="myAttendances" className="text-sm whitespace-nowrap">
               Meus atendimentos
             </label>
+          </div>
+
+          {/* Sort By Select */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">Ordenação:</span>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="risk">Classificação de risco</SelectItem>
+                <SelectItem value="inclusion-asc">Ordem crescente de inclusão</SelectItem>
+                <SelectItem value="inclusion-desc">Ordem decrescente de inclusão</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Filters Button */}

@@ -5,7 +5,9 @@ import { AttendanceHeader } from "@/components/attendance/AttendanceHeader";
 import { AddCitizen } from "@/components/attendance/AddCitizen";
 import { StatusCounters } from "@/components/attendance/StatusCounters";
 import { PasswordCaller } from "@/components/attendance/PasswordCaller";
+import { AppSidebar } from "@/components/AppSidebar";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Home } from "lucide-react";
 
@@ -38,72 +40,84 @@ const Index = () => {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-background p-6 pr-80">
-        <div className="max-w-5xl mx-auto space-y-6">
-          {/* Breadcrumb */}
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/" className="flex items-center gap-2">
-                  <Home className="h-4 w-4" />
-                  Home
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Atendimentos</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full">
+          <AppSidebar />
+          
+          <SidebarInset className="flex-1">
+            {/* Header with Sidebar Trigger */}
+            <header className="flex h-14 items-center gap-2 border-b px-6">
+              <SidebarTrigger />
+              
+              {/* Breadcrumb */}
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/" className="flex items-center gap-2">
+                      <Home className="h-4 w-4" />
+                      Home
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Fila de atendimento</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </header>
 
-          {/* Header with search and add citizen button */}
-          <AttendanceHeader
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            showAddCitizenButton={true}
-            onAddCitizenClick={() => setShowAddCitizen(!showAddCitizen)}
-          />
+            {/* Main Content */}
+            <div className="p-6 space-y-6">
+              {/* Header with search and add citizen button */}
+              <AttendanceHeader
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                showAddCitizenButton={true}
+                onAddCitizenClick={() => setShowAddCitizen(!showAddCitizen)}
+              />
 
-          {/* Status Counters */}
-          <div className="flex items-center justify-center">
-            <StatusCounters
-              statusCounts={statusCounts}
-              filters={filters}
-              setFilters={setFilters}
-              queueCount={mockQueueCount}
-            />
-          </div>
+              {/* Status Counters */}
+              <div className="flex items-center justify-center">
+                <StatusCounters
+                  statusCounts={statusCounts}
+                  filters={filters}
+                  setFilters={setFilters}
+                  queueCount={mockQueueCount}
+                />
+              </div>
 
-          {/* Add Citizen Collapsible */}
-          {showAddCitizen && (
-            <AddCitizen
-              open={showAddCitizen}
-              onOpenChange={setShowAddCitizen}
-              queueCount={mockQueueCount}
-              waitingCount={mockWaitingCount}
-              statusCounts={statusCounts}
-              filters={filters}
-              setFilters={setFilters}
-              isCollapsible={true}
-            />
-          )}
+              {/* Add Citizen Collapsible */}
+              {showAddCitizen && (
+                <AddCitizen
+                  open={showAddCitizen}
+                  onOpenChange={setShowAddCitizen}
+                  queueCount={mockQueueCount}
+                  waitingCount={mockWaitingCount}
+                  statusCounts={statusCounts}
+                  filters={filters}
+                  setFilters={setFilters}
+                  isCollapsible={true}
+                />
+              )}
 
-          {/* Attendance List */}
-          <AttendanceList
-            searchTerm={searchTerm}
-            showMyAttendances={showMyAttendances}
-            setShowMyAttendances={setShowMyAttendances}
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-            filters={filters}
-            setFilters={setFilters}
-            onCallPatient={handleCallPatient}
-          />
+              {/* Attendance List */}
+              <AttendanceList
+                searchTerm={searchTerm}
+                showMyAttendances={showMyAttendances}
+                setShowMyAttendances={setShowMyAttendances}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+                filters={filters}
+                setFilters={setFilters}
+                onCallPatient={handleCallPatient}
+              />
+            </div>
+          </SidebarInset>
+
+          {/* Fixed Password Caller */}
+          <PasswordCaller />
         </div>
-
-        {/* Fixed Side Password Caller */}
-        <PasswordCaller />
-      </div>
+      </SidebarProvider>
     </TooltipProvider>
   );
 };
