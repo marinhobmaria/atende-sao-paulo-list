@@ -1,8 +1,7 @@
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Search, Plus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface AttendanceHeaderProps {
   searchTerm: string;
@@ -11,33 +10,43 @@ interface AttendanceHeaderProps {
   onAddCitizenClick?: () => void;
 }
 
-export const AttendanceHeader = ({ 
-  searchTerm, 
-  setSearchTerm, 
+export const AttendanceHeader = ({
+  searchTerm,
+  setSearchTerm,
   showAddCitizenButton = false,
-  onAddCitizenClick 
+  onAddCitizenClick
 }: AttendanceHeaderProps) => {
   return (
-    <div className="flex items-center justify-between gap-4">
-      <div className="relative flex-1 max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-        <Input
-          placeholder="Buscar por nome, CPF, CNS..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
-        />
+    <div className="bg-white rounded-lg shadow-sm border">
+      <div className="p-4">
+        {/* Search and Add Citizen Button */}
+        <div className="flex gap-3 items-center">
+          {/* Search */}
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Nome, CPF ou CNS"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          {/* Add Citizen Button */}
+          {showAddCitizenButton && (
+            <Button
+              onClick={onAddCitizenClick}
+              variant="secondary"
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Adicionar munícipe
+            </Button>
+          )}
+        </div>
       </div>
-      
-      {showAddCitizenButton && (
-        <Button 
-          onClick={onAddCitizenClick}
-          className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Incluir na fila
-        </Button>
-      )}
     </div>
   );
 };

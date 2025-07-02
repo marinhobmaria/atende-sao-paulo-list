@@ -1,9 +1,9 @@
+
 import { useState, useMemo, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, User, Calendar, Plus } from "lucide-react";
+import { Search, User, Calendar } from "lucide-react";
 
 // Mock citizen data with birth dates for age calculation and mother names
 const mockCitizens = [
@@ -86,7 +86,6 @@ interface CitizenSearchProps {
   value: string;
   onChange: (value: string) => void;
   onCitizenSelect?: (citizen: Citizen) => void;
-  onNewCitizenClick?: () => void;
   citizensInQueue?: string[];
   disabled?: boolean;
 }
@@ -116,7 +115,6 @@ export const CitizenSearch = ({
   value, 
   onChange, 
   onCitizenSelect,
-  onNewCitizenClick,
   citizensInQueue = [],
   disabled = false
 }: CitizenSearchProps) => {
@@ -161,8 +159,6 @@ export const CitizenSearch = ({
   const isCitizenInQueue = (citizenName: string) => {
     return citizensInQueue.includes(citizenName);
   };
-
-  const showNewCitizenButton = value.trim() && filteredCitizens.length === 0;
 
   return (
     <div className="relative" ref={searchRef}>
@@ -236,24 +232,9 @@ export const CitizenSearch = ({
                 );
               })}
             </div>
-          ) : showNewCitizenButton ? (
-            <div className="p-4 text-center space-y-3">
-              <p className="text-gray-500">Nenhum munícipe encontrado</p>
-              <Button 
-                onClick={() => {
-                  setIsOpen(false);
-                  onNewCitizenClick?.();
-                }}
-                className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
-                size="sm"
-              >
-                <Plus className="h-4 w-4" />
-                Novo munícipe
-              </Button>
-            </div>
           ) : value.trim() && (
             <div className="p-4 text-center">
-              <p className="text-gray-500">Digite para buscar munícipes</p>
+              <p className="text-gray-500">Nenhum munícipe encontrado</p>
             </div>
           )}
         </div>
