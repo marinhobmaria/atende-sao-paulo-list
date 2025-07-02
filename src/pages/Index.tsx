@@ -40,7 +40,7 @@ const Index = () => {
 
   return (
     <TooltipProvider>
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={false}>
         <div className="min-h-screen flex w-full">
           <AppSidebar />
           
@@ -67,7 +67,7 @@ const Index = () => {
             </header>
 
             {/* Main Content */}
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 mr-[320px]">
               {/* Header with search and add citizen button */}
               <AttendanceHeader
                 searchTerm={searchTerm}

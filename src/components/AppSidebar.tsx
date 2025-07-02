@@ -42,7 +42,7 @@ export function AppSidebar() {
   const isCollapsed = state === "collapsed";
 
   return (
-    <Sidebar className="border-r">
+    <Sidebar className="border-r" collapsible="icon">
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -59,12 +59,12 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navegação</SidebarGroupLabel>
+          {!isCollapsed && <SidebarGroupLabel>Navegação</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild tooltip={isCollapsed ? item.title : undefined}>
                     <NavLink
                       to={item.url}
                       className={({ isActive }) =>
