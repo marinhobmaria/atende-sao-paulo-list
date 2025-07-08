@@ -10,28 +10,22 @@ export const useAntropometriaValidation = () => {
 
     switch (fieldName) {
       case "peso":
-        if (numValue < 0.5) warnings[fieldName] = "Peso muito baixo";
-        else if (numValue > 500) warnings[fieldName] = "Peso não pode exceder 500kg";
+        if (numValue < 0.5 || numValue > 500) warnings[fieldName] = "Deve ter valor entre 0,5 e 500.";
         else delete warnings[fieldName];
         break;
       case "altura":
-        if (numValue < 20) warnings[fieldName] = "Altura muito baixa";
-        else if (numValue > 250) warnings[fieldName] = "Altura não pode exceder 250cm";
+        if (numValue < 20 || numValue > 250) warnings[fieldName] = "Deve ter valor entre 20 e 250.";
         else delete warnings[fieldName];
         break;
       case "circunferenciaAbdominal":
-        if (numValue > 200) warnings[fieldName] = "Valor muito alto para circunferência abdominal";
-        else delete warnings[fieldName];
+        delete warnings[fieldName];
         break;
       case "perimetroCefalico":
-        if (numValue < 30) warnings[fieldName] = "Valor muito baixo para perímetro cefálico";
-        else if (numValue > 70) warnings[fieldName] = "Valor muito alto para perímetro cefálico";
+        if (numValue < 10 || numValue > 200) warnings[fieldName] = "Deve ter valor entre 10 e 200.";
         else delete warnings[fieldName];
         break;
       case "perimetroPanturrilha":
-        if (numValue < 15) warnings[fieldName] = "Valor muito baixo para perímetro da panturrilha";
-        else if (numValue > 60) warnings[fieldName] = "Valor muito alto para perímetro da panturrilha";
-        else delete warnings[fieldName];
+        delete warnings[fieldName];
         break;
     }
 

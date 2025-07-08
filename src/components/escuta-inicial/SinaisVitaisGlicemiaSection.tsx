@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { FieldAlert } from "./FieldAlert";
-import { useState } from "react";
+import { useSinaisVitaisValidation } from "./hooks/useSinaisVitaisValidation";
 
 interface SinaisVitaisGlicemiaSectionProps {
   form: any;
@@ -13,56 +13,13 @@ interface SinaisVitaisGlicemiaSectionProps {
 }
 
 export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVitaisGlicemiaSectionProps) => {
-  const [fieldWarnings, setFieldWarnings] = useState<Record<string, string>>({});
+  const { fieldWarnings, handleFieldChange } = useSinaisVitaisValidation();
 
-  const handleFieldChange = (fieldName: string, value: string) => {
+  const handleFieldChangeWrapper = (fieldName: string, value: string) => {
     const currentValues = form.getValues();
     const newValues = { ...currentValues, [fieldName]: value };
     onValuesChange(newValues);
-
-    // Check field limits and show warnings
-    const warnings = { ...fieldWarnings };
-    const numValue = parseFloat(value);
-
-    switch (fieldName) {
-      case "pressaoSistolica":
-        if (numValue < 70) warnings[fieldName] = "Valor muito baixo para pressão sistólica";
-        else if (numValue > 250) warnings[fieldName] = "Valor muito alto para pressão sistólica";
-        else delete warnings[fieldName];
-        break;
-      case "pressaoDiastolica":
-        if (numValue < 40) warnings[fieldName] = "Valor muito baixo para pressão diastólica";
-        else if (numValue > 150) warnings[fieldName] = "Valor muito alto para pressão diastólica";
-        else delete warnings[fieldName];
-        break;
-      case "frequenciaCardiaca":
-        if (numValue < 30) warnings[fieldName] = "Frequência cardíaca muito baixa";
-        else if (numValue > 220) warnings[fieldName] = "Frequência cardíaca muito alta";
-        else delete warnings[fieldName];
-        break;
-      case "frequenciaRespiratoria":
-        if (numValue < 8) warnings[fieldName] = "Frequência respiratória muito baixa";
-        else if (numValue > 80) warnings[fieldName] = "Frequência respiratória muito alta";
-        else delete warnings[fieldName];
-        break;
-      case "temperatura":
-        if (numValue < 32) warnings[fieldName] = "Temperatura muito baixa";
-        else if (numValue > 42) warnings[fieldName] = "Temperatura muito alta";
-        else delete warnings[fieldName];
-        break;
-      case "saturacaoOxigenio":
-        if (numValue < 70) warnings[fieldName] = "Saturação muito baixa";
-        else if (numValue > 100) warnings[fieldName] = "Saturação não pode exceder 100%";
-        else delete warnings[fieldName];
-        break;
-      case "glicemiaCapilar":
-        if (numValue < 20) warnings[fieldName] = "Glicemia muito baixa";
-        else if (numValue > 600) warnings[fieldName] = "Glicemia muito alta";
-        else delete warnings[fieldName];
-        break;
-    }
-
-    setFieldWarnings(warnings);
+    handleFieldChange(fieldName, value);
   };
 
   const preventInvalidInput = (fieldName: string, min: number, max: number) => {
@@ -111,7 +68,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                         const value = e.target.value;
                         if (value === '' || (parseFloat(value) >= 70 && parseFloat(value) <= 250)) {
                           field.onChange(e);
-                          handleFieldChange("pressaoSistolica", e.target.value);
+                          handleFieldChangeWrapper("pressaoSistolica", e.target.value);
                         }
                       }}
                     />
@@ -144,7 +101,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                         const value = e.target.value;
                         if (value === '' || (parseFloat(value) >= 40 && parseFloat(value) <= 150)) {
                           field.onChange(e);
-                          handleFieldChange("pressaoDiastolica", e.target.value);
+                          handleFieldChangeWrapper("pressaoDiastolica", e.target.value);
                         }
                       }}
                     />
@@ -188,7 +145,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                         const value = e.target.value;
                         if (value === '' || (parseFloat(value) >= 30 && parseFloat(value) <= 220)) {
                           field.onChange(e);
-                          handleFieldChange("frequenciaCardiaca", e.target.value);
+                          handleFieldChangeWrapper("frequenciaCardiaca", e.target.value);
                         }
                       }}
                     />
@@ -221,7 +178,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                         const value = e.target.value;
                         if (value === '' || (parseFloat(value) >= 8 && parseFloat(value) <= 80)) {
                           field.onChange(e);
-                          handleFieldChange("frequenciaRespiratoria", e.target.value);
+                          handleFieldChangeWrapper("frequenciaRespiratoria", e.target.value);
                         }
                       }}
                     />
@@ -265,7 +222,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                         const value = e.target.value;
                         if (value === '' || (parseFloat(value) >= 32 && parseFloat(value) <= 42)) {
                           field.onChange(e);
-                          handleFieldChange("temperatura", e.target.value);
+                          handleFieldChangeWrapper("temperatura", e.target.value);
                         }
                       }}
                     />
@@ -297,7 +254,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                         const value = e.target.value;
                         if (value === '' || (parseFloat(value) >= 70 && parseFloat(value) <= 100)) {
                           field.onChange(e);
-                          handleFieldChange("saturacaoOxigenio", e.target.value);
+                          handleFieldChangeWrapper("saturacaoOxigenio", e.target.value);
                         }
                       }}
                     />
@@ -340,7 +297,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                         const value = e.target.value;
                         if (value === '' || (parseFloat(value) >= 20 && parseFloat(value) <= 600)) {
                           field.onChange(e);
-                          handleFieldChange("glicemiaCapilar", e.target.value);
+                          handleFieldChangeWrapper("glicemiaCapilar", e.target.value);
                         }
                       }}
                     />

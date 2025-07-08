@@ -56,13 +56,11 @@ export const AnthropometricField = ({
                     field.onChange(e);
                     onFieldChange(name, value);
                   } else if (numValue > max) {
-                    // Show error message
                     form.setError(name, {
                       type: 'manual',
                       message: `Permitido até ${max} ${unit}`
                     });
                   } else if (numValue < min) {
-                    // Show error message
                     form.setError(name, {
                       type: 'manual', 
                       message: `Permitido até ${max} ${unit}`

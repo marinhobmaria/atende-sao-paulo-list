@@ -60,21 +60,21 @@ export const ProcedimentosSection = ({ form, procedimentosAutomaticos }: Procedi
         {procedimentosSigtap.length > 0 && (
           <div>
             <h4 className="font-medium text-sm mb-2">Procedimentos SIGTAP selecionados:</h4>
-            <div className="flex flex-wrap gap-1">
+            <div className="space-y-1">
               {procedimentosSigtap.map((procedimento, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-1 bg-green-50 border border-green-200 rounded px-2 py-1"
+                  className="flex items-center justify-between bg-green-50 border border-green-200 rounded px-3 py-2"
                 >
-                  <span className="text-xs text-green-800">{procedimento}</span>
+                  <span className="text-sm text-green-800">{procedimento}</span>
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="h-4 w-4 p-0 hover:bg-green-200 rounded-full"
+                    className="h-6 w-6 p-0 hover:bg-green-200 rounded-full"
                     onClick={() => removerProcedimento(procedimento)}
                   >
-                    <X className="h-3 w-3" />
+                    <X className="h-4 w-4" />
                   </Button>
                 </div>
               ))}

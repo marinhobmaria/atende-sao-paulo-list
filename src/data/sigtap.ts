@@ -7,6 +7,26 @@ export interface SigtapProcedure {
 // Mock data do SIGTAP - em produção viria de uma API
 export const sigtapProcedures: SigtapProcedure[] = [
   {
+    code: "0101040024",
+    shortCode: "AVAN",
+    description: "AVALIAÇÃO ANTROPOMÉTRICA"
+  },
+  {
+    code: "0301100039",
+    shortCode: "AFPA",
+    description: "AFERIÇÃO DE PRESSÃO ARTERIAL"
+  },
+  {
+    code: "0301100250",
+    shortCode: "AFTE",
+    description: "AFERIÇÃO DE TEMPERATURA"
+  },
+  {
+    code: "0214010015",
+    shortCode: "GLCA",
+    description: "GLICEMIA CAPILAR"
+  },
+  {
     code: "0301010010",
     shortCode: "AFVD",
     description: "Aferição de sinais vitais"
