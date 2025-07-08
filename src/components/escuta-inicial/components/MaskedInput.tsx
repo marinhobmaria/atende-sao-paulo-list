@@ -149,18 +149,27 @@ export const MaskedInput = ({
   };
 
   return (
-    <input
-      type="text"
-      value={displayValue ? `${displayValue} ${getUnit()}` : ''}
-      onChange={(e) => {
-        const input = e.target.value.replace(new RegExp(` ${getUnit()}$`), '');
-        handleInputChange({ target: { value: input } } as React.ChangeEvent<HTMLInputElement>);
-      }}
-      onKeyDown={handleKeyPress}
-      onBlur={onBlur}
-      placeholder={placeholder || getPlaceholderMask()}
-      className={`flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
-      disabled={disabled}
-    />
+    <div className="relative group">
+      <input
+        type="text"
+        value={displayValue ? `${displayValue} ${getUnit()}` : ''}
+        onChange={(e) => {
+          const input = e.target.value.replace(new RegExp(` ${getUnit()}$`), '');
+          handleInputChange({ target: { value: input } } as React.ChangeEvent<HTMLInputElement>);
+        }}
+        onKeyDown={handleKeyPress}
+        onBlur={onBlur}
+        placeholder={placeholder || getPlaceholderMask()}
+        className={`flex h-10 w-full rounded-lg border-2 border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-all duration-200 
+          placeholder:text-muted-foreground/70 placeholder:font-normal
+          focus:border-primary focus:ring-2 focus:ring-primary/20 focus:bg-accent/5
+          hover:border-accent hover:bg-accent/5
+          disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted/30
+          group-hover:border-accent/70 ${className}`}
+        disabled={disabled}
+      />
+      <div className={`absolute inset-0 rounded-lg border-2 border-transparent pointer-events-none transition-all duration-200
+        ${!disabled ? 'group-hover:border-primary/20 group-hover:shadow-sm' : ''}`} />
+    </div>
   );
 };

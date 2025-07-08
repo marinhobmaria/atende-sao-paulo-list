@@ -52,7 +52,7 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
         <CollapsibleContent>
           <CardContent className="space-y-4 p-4">
         {/* Primeira linha: Peso, Altura, IMC, Perímetro cefálico */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <AnthropometricField
             form={form}
             name="peso"
@@ -100,7 +100,7 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
         </div>
 
         {/* Segunda linha: Circunferência abdominal, Perímetro panturrilha, PA Sistólica, PA Diastólica */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <AnthropometricField
             form={form}
             name="circunferenciaAbdominal"
@@ -155,7 +155,7 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
         </div>
 
         {/* Terceira linha: Frequência respiratória, Frequência cardíaca, Temperatura, Saturação O2 */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <AnthropometricField
             form={form}
             name="frequenciaRespiratoria"
@@ -210,7 +210,7 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
         </div>
 
         {/* Quarta linha: Glicemia capilar e Momento da coleta */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           <AnthropometricField
             form={form}
             name="glicemiaCapilar"
