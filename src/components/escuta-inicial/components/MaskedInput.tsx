@@ -160,8 +160,8 @@ export const MaskedInput = ({
         onKeyDown={handleKeyPress}
         onBlur={onBlur}
         placeholder={placeholder || getPlaceholderMask()}
-        className={`flex h-10 w-full rounded-lg border-2 border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-all duration-200 
-          placeholder:text-muted-foreground/70 placeholder:font-normal
+        className={`flex h-10 w-full min-w-[140px] rounded-lg border-2 border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition-all duration-200 
+          placeholder:text-muted-foreground/70 placeholder:font-normal placeholder:text-xs
           focus:border-primary focus:ring-2 focus:ring-primary/20 focus:bg-accent/5
           hover:border-accent hover:bg-accent/5
           disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted/30

@@ -31,7 +31,7 @@ export const AnthropometricField = ({
   step = "0.1",
   warning,
   onFieldChange,
-  className = "w-full max-w-[90px]",
+  className = "w-full min-w-[120px]",
   type
 }: AnthropometricFieldProps) => {
   const { validateField, validateNumericOnly, getErrorMessage } = useFieldValidation();
