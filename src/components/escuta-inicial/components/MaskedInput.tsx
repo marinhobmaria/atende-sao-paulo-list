@@ -157,10 +157,10 @@ export const MaskedInput = ({
         onKeyDown={handleKeyPress}
         onBlur={onBlur}
         placeholder={placeholder || getPlaceholderMask()}
-        className={className}
+        className={`flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-12 ${className}`}
         disabled={disabled}
       />
-      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 pointer-events-none">
+      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-muted-foreground pointer-events-none font-medium">
         {getUnit()}
       </span>
     </div>
