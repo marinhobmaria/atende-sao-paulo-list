@@ -44,7 +44,7 @@ export const ClassificacaoRiscoSection = ({ form }: ClassificacaoRiscoSectionPro
           <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4">
         <FormField
           control={form.control}
           name="classificacaoRisco"
@@ -60,7 +60,7 @@ export const ClassificacaoRiscoSection = ({ form }: ClassificacaoRiscoSectionPro
                   {classificacoes.map((classificacao) => (
                     <div
                       key={classificacao.value}
-                      className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50"
+                      className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50"
                     >
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>

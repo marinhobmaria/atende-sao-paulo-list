@@ -28,7 +28,7 @@ export const AnthropometricField = ({
   step = "0.1",
   warning,
   onFieldChange,
-  className = "w-full max-w-[100px]"
+  className = "w-full max-w-[90px]"
 }: AnthropometricFieldProps) => {
   return (
     <div>
@@ -47,9 +47,26 @@ export const AnthropometricField = ({
                 {...field}
                 onChange={(e) => {
                   const value = e.target.value;
-                  if (value === '' || (parseFloat(value) >= min && parseFloat(value) <= max)) {
+                  const numValue = parseFloat(value);
+                  
+                  if (value === '') {
                     field.onChange(e);
                     onFieldChange(name, value);
+                  } else if (numValue >= min && numValue <= max) {
+                    field.onChange(e);
+                    onFieldChange(name, value);
+                  } else if (numValue > max) {
+                    // Show error message
+                    form.setError(name, {
+                      type: 'manual',
+                      message: `Permitido até ${max} ${unit}`
+                    });
+                  } else if (numValue < min) {
+                    // Show error message
+                    form.setError(name, {
+                      type: 'manual', 
+                      message: `Permitido até ${max} ${unit}`
+                    });
                   }
                 }}
               />

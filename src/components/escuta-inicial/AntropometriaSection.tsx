@@ -30,14 +30,14 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
           Antropometria
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6 p-6">
+      <CardContent className="space-y-4 p-4">
         {/* Peso e Altura */}
         <div>
           <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
             <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
             Medidas Básicas
           </h4>
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <AnthropometricField
               form={form}
               name="peso"
@@ -70,7 +70,7 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
           </div>
         </div>
 
-        <Separator className="my-6" />
+        <Separator className="my-4" />
 
         {/* Circunferência Abdominal */}
         <div>
@@ -85,7 +85,7 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
           />
         </div>
 
-        <Separator className="my-6" />
+        <Separator className="my-4" />
 
         {/* Perímetros */}
         <div>

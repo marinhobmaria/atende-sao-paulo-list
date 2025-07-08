@@ -78,7 +78,7 @@ export const DesfechoSection = ({ form }: DesfechoSectionProps) => {
           <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 p-4">
         <FormField
           control={form.control}
           name="desfecho"
@@ -97,7 +97,7 @@ export const DesfechoSection = ({ form }: DesfechoSectionProps) => {
                   {desfechos.map((desfecho) => (
                     <div
                       key={desfecho.value}
-                      className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50"
+                      className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50"
                     >
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
@@ -123,7 +123,7 @@ export const DesfechoSection = ({ form }: DesfechoSectionProps) => {
 
         {/* Campos condicionais baseados no desfecho */}
         {selectedDesfecho === "adicionar_lista" && (
-          <div className="space-y-4 p-4 border rounded-lg bg-muted/20">
+          <div className="space-y-3 p-3 border rounded-lg bg-muted/20">
             <h4 className="font-medium">Dados para adicionar na lista de atendimentos:</h4>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -206,7 +206,7 @@ export const DesfechoSection = ({ form }: DesfechoSectionProps) => {
         )}
 
         {selectedDesfecho === "agendar" && (
-          <div className="space-y-4 p-4 border rounded-lg bg-muted/20">
+          <div className="space-y-3 p-3 border rounded-lg bg-muted/20">
             <h4 className="font-medium">Dados para agendamento:</h4>
             
             <FormField
@@ -307,8 +307,9 @@ export const DesfechoSection = ({ form }: DesfechoSectionProps) => {
                   <FormLabel>Observações (opcional)</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Observações sobre o agendamento..."
+                      placeholder="Informe observações sobre o agendamento..."
                       maxLength={200}
+                      className="min-h-[60px]"
                       {...field}
                     />
                   </FormControl>

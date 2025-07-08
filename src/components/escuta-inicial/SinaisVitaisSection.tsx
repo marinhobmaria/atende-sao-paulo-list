@@ -82,9 +82,9 @@ export const SinaisVitaisSection = ({ form, onValuesChange }: SinaisVitaisSectio
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-teal-700">Sinais Vitais</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 p-4">
         {/* Pressão Arterial - Linha 1 */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="lg:col-span-1">
             <FormField
               control={form.control}
@@ -95,15 +95,21 @@ export const SinaisVitaisSection = ({ form, onValuesChange }: SinaisVitaisSectio
                   <FormControl>
                     <Input
                       type="number"
-                      className="w-full max-w-[120px]"
+                      className="w-full max-w-[100px]"
                       placeholder="120"
                       {...field}
                       onKeyDown={preventInvalidInput("pressaoSistolica", 70, 250)}
                       onChange={(e) => {
                         const value = e.target.value;
-                        if (value === '' || (parseFloat(value) >= 70 && parseFloat(value) <= 250)) {
+                        const numValue = parseFloat(value);
+                        if (value === '' || (numValue >= 70 && numValue <= 250)) {
                           field.onChange(e);
                           handleFieldChange("pressaoSistolica", e.target.value);
+                        } else if (numValue > 250) {
+                          form.setError("pressaoSistolica", {
+                            type: 'manual',
+                            message: 'Permitido até 250 mmHg'
+                          });
                         }
                       }}
                     />
@@ -227,7 +233,7 @@ export const SinaisVitaisSection = ({ form, onValuesChange }: SinaisVitaisSectio
         </div>
 
         {/* Temperatura e Saturação - Linha 2 */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="lg:col-span-1">
             <FormField
               control={form.control}
@@ -299,7 +305,7 @@ export const SinaisVitaisSection = ({ form, onValuesChange }: SinaisVitaisSectio
         </div>
 
         {/* Glicemia Capilar - Linha 3 */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           <div className="lg:col-span-1">
             <FormField
               control={form.control}

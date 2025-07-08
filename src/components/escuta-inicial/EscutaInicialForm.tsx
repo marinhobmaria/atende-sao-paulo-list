@@ -48,11 +48,11 @@ export const EscutaInicialForm = ({ onSubmit, onCancel, isLoading }: EscutaInici
   return (
     <div className="max-w-4xl mx-auto">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
           {/* Motivo da Consulta */}
           <MotivoConsultaSection form={form} />
 
-          <Separator className="my-8" />
+          <Separator className="my-6" />
 
           {/* Antropometria */}
           <AntropometriaSection 
@@ -60,7 +60,7 @@ export const EscutaInicialForm = ({ onSubmit, onCancel, isLoading }: EscutaInici
             onValuesChange={updateProcedimentosAutomaticos}
           />
 
-          <Separator className="my-8" />
+          <Separator className="my-6" />
 
           {/* Sinais Vitais e Glicemia */}
           <SinaisVitaisGlicemiaSection 
@@ -68,7 +68,7 @@ export const EscutaInicialForm = ({ onSubmit, onCancel, isLoading }: EscutaInici
             onValuesChange={updateProcedimentosAutomaticos}
           />
 
-          <Separator className="my-8" />
+          <Separator className="my-6" />
 
           {/* Procedimentos */}
           <ProcedimentosSection 
@@ -76,19 +76,26 @@ export const EscutaInicialForm = ({ onSubmit, onCancel, isLoading }: EscutaInici
             procedimentosAutomaticos={procedimentosAutomaticos}
           />
 
-          <Separator className="my-8" />
+          <Separator className="my-6" />
 
           {/* Classificação de Risco */}
           <ClassificacaoRiscoSection form={form} />
 
-          <Separator className="my-8" />
+          <Separator className="my-6" />
 
           {/* Desfecho */}
           <DesfechoSection form={form} />
 
           {/* Botões de ação */}
-          <div className="pt-6">
+          <div className="pt-4">
             <FormActions onCancel={onCancel} isLoading={isLoading} />
+          </div>
+          
+          {/* Rodapé com rascunho */}
+          <div className="pt-4 border-t mt-6">
+            <div className="text-xs text-gray-500 text-center">
+              Rascunho salvo automaticamente às 14:17
+            </div>
           </div>
         </form>
       </Form>

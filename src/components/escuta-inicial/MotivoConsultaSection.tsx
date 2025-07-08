@@ -65,7 +65,7 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
           <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6 p-6">
+      <CardContent className="space-y-4 p-4">
         <FormField
           control={form.control}
           name="ciap2"
@@ -95,10 +95,10 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
                   <PopoverContent className="w-full p-0" align="start">
                     <Command>
                       <CommandInput 
-                        placeholder="Digite código ou descrição (ex: A03 ou Febre)" 
+                        placeholder="Pesquise código ou descrição (ex: A03 ou Febre)" 
                         value={searchTerm}
                         onValueChange={setSearchTerm}
-                        className="h-11"
+                        className="h-9"
                       />
                       <CommandList>
                         <CommandEmpty>
@@ -179,7 +179,7 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
               <FormControl>
                 <Textarea
                   placeholder="Informe as informações subjetivas do profissional e as expressadas pelo cidadão"
-                  className="min-h-[120px] resize-none border-gray-300 focus:border-teal-500 focus:ring-teal-500"
+                  className="min-h-[80px] resize-none border-gray-300 focus:border-teal-500 focus:ring-teal-500"
                   maxLength={4000}
                   {...field}
                 />
