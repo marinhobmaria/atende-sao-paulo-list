@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { FieldAlert } from "./FieldAlert";
+import { MaskedInput } from "./components/MaskedInput";
 import { useSinaisVitaisValidation } from "./hooks/useSinaisVitaisValidation";
 
 interface SinaisVitaisGlicemiaSectionProps {
@@ -288,26 +289,27 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                 <FormItem>
                   <FormLabel className="text-sm font-medium">Glicemia Capilar</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      className="w-full max-w-[140px]"
-                      placeholder="90"
-                      {...field}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value === '' || (parseFloat(value) >= 20 && parseFloat(value) <= 600)) {
-                          field.onChange(e);
-                          handleFieldChangeWrapper("glicemiaCapilar", e.target.value);
+                    <MaskedInput
+                      value={field.value || ''}
+                      onChange={(value) => {
+                        field.onChange(value);
+                        handleFieldChangeWrapper("glicemiaCapilar", value);
+                      }}
+                      onBlur={() => {
+                        const currentValue = form.getValues().glicemiaCapilar;
+                        if (currentValue) {
+                          handleFieldChangeWrapper("glicemiaCapilar", currentValue);
                         }
                       }}
+                      placeholder="000"
+                      className="w-full max-w-[140px]"
+                      type="glicemia"
                     />
                   </FormControl>
                   <div className="text-xs text-gray-500">20-600 mg/dL</div>
-                  <FieldAlert 
-                    type="warning" 
-                    message={fieldWarnings.glicemiaCapilar || ""} 
-                    show={!!fieldWarnings.glicemiaCapilar} 
-                  />
+                  {fieldWarnings.glicemiaCapilar && (
+                    <div className="text-xs text-red-600 mt-1">{fieldWarnings.glicemiaCapilar}</div>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -318,7 +320,12 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
               name="momentoColeta"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">Momento da Coleta</FormLabel>
+                  <FormLabel className="text-sm font-medium">
+                    Momento da Coleta
+                    {form.watch("glicemiaCapilar") && (
+                      <span className="text-red-600 ml-1">*</span>
+                    )}
+                  </FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="max-w-[200px]">
@@ -326,7 +333,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="nao_especificado">Não especificado</SelectItem>
+                      <SelectItem value="nao_especificado">Momento da coleta não especificado</SelectItem>
                       <SelectItem value="jejum">Jejum</SelectItem>
                       <SelectItem value="pre_prandial">Pré-prandial</SelectItem>
                       <SelectItem value="pos_prandial">Pós-prandial</SelectItem>

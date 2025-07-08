@@ -1,7 +1,9 @@
 
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { FieldAlert } from "../FieldAlert";
+import { MaskedInput } from "./MaskedInput";
+import { useFieldValidation } from "../hooks/useFieldValidation";
+import { useState } from "react";
 
 interface AnthropometricFieldProps {
   form: any;
@@ -15,6 +17,7 @@ interface AnthropometricFieldProps {
   warning?: string;
   onFieldChange: (fieldName: string, value: string) => void;
   className?: string;
+  type: 'peso' | 'altura' | 'temperatura' | 'pressao' | 'frequencia' | 'saturacao' | 'glicemia';
 }
 
 export const AnthropometricField = ({
@@ -28,8 +31,39 @@ export const AnthropometricField = ({
   step = "0.1",
   warning,
   onFieldChange,
-  className = "w-full max-w-[90px]"
+  className = "w-full max-w-[90px]",
+  type
 }: AnthropometricFieldProps) => {
+  const { validateField, validateNumericOnly, getErrorMessage } = useFieldValidation();
+  const [validationError, setValidationError] = useState<string>('');
+  const [numericError, setNumericError] = useState<string>('');
+
+  const handleValueChange = (value: string) => {
+    // Validar se contém apenas números
+    if (!validateNumericOnly(value) && value !== '') {
+      setNumericError(getErrorMessage(false));
+      return;
+    }
+    setNumericError('');
+
+    // Validar limites
+    const fieldError = validateField(name, value);
+    setValidationError(fieldError);
+
+    // Se não há erros, atualizar o form
+    if (!fieldError && validateNumericOnly(value)) {
+      onFieldChange(name, value);
+    }
+  };
+
+  const handleBlur = () => {
+    const currentValue = form.getValues()[name];
+    if (currentValue) {
+      const fieldError = validateField(name, currentValue);
+      setValidationError(fieldError);
+    }
+  };
+
   return (
     <div>
       <FormField
@@ -39,37 +73,28 @@ export const AnthropometricField = ({
           <FormItem>
             <FormLabel className="text-sm font-medium">{label}</FormLabel>
             <FormControl>
-              <Input
-                type="number"
-                step={step}
-                className={className}
-                placeholder={placeholder}
-                {...field}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  const numValue = parseFloat(value);
-                  
-                  if (value === '') {
-                    field.onChange(e);
-                    onFieldChange(name, value);
-                  } else if (numValue >= min && numValue <= max) {
-                    field.onChange(e);
-                    onFieldChange(name, value);
-                  } else if (numValue > max) {
-                    form.setError(name, {
-                      type: 'manual',
-                      message: `Permitido até ${max} ${unit}`
-                    });
-                  } else if (numValue < min) {
-                    form.setError(name, {
-                      type: 'manual', 
-                      message: `Permitido até ${max} ${unit}`
-                    });
-                  }
+              <MaskedInput
+                value={field.value || ''}
+                onChange={(value) => {
+                  field.onChange(value);
+                  handleValueChange(value);
                 }}
+                onBlur={handleBlur}
+                placeholder={placeholder}
+                className={className}
+                type={type}
               />
             </FormControl>
             <div className="text-xs text-gray-500">{min}-{max} {unit}</div>
+            
+            {numericError && (
+              <div className="text-xs text-red-600 mt-1">{numericError}</div>
+            )}
+            
+            {validationError && (
+              <div className="text-xs text-red-600 mt-1">{validationError}</div>
+            )}
+            
             <FieldAlert 
               type="warning" 
               message={warning || ""} 

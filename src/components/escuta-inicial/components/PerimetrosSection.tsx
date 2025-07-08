@@ -27,6 +27,7 @@ export const PerimetrosSection = ({
         max={70}
         warning={fieldWarnings.perimetroCefalico}
         onFieldChange={onFieldChange}
+        type="altura"
       />
 
       <AnthropometricField
@@ -39,6 +40,7 @@ export const PerimetrosSection = ({
         max={60}
         warning={fieldWarnings.perimetroPanturrilha}
         onFieldChange={onFieldChange}
+        type="altura"
       />
 
       <div className="lg:col-span-2">

@@ -27,6 +27,7 @@ export const CircunferenciaAbdominalSection = ({
         max={200}
         warning={fieldWarnings.circunferenciaAbdominal}
         onFieldChange={onFieldChange}
+        type="altura"
       />
 
       <div className="lg:col-span-3">

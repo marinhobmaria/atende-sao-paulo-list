@@ -42,25 +42,27 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
               form={form}
               name="peso"
               label="Peso (kg)"
-              placeholder="90"
+              placeholder="0,000"
               unit="kg"
               min={0.5}
               max={500}
               step="0.001"
               warning={fieldWarnings.peso}
               onFieldChange={handleFieldChangeWrapper}
+              type="peso"
             />
 
             <AnthropometricField
               form={form}
               name="altura"
               label="Altura (cm)"
-              placeholder="170"
+              placeholder="000,0"
               unit="cm"
               min={20}
               max={250}
               warning={fieldWarnings.altura}
               onFieldChange={handleFieldChangeWrapper}
+              type="altura"
             />
 
             <IMCDisplay 
