@@ -1,11 +1,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { IMCDisplay } from "./components/IMCDisplay";
 import { AnthropometricField } from "./components/AnthropometricField";
-import { CircunferenciaAbdominalSection } from "./components/CircunferenciaAbdominalSection";
-import { PerimetrosSection } from "./components/PerimetrosSection";
 import { useAntropometriaValidation } from "./hooks/useAntropometriaValidation";
+import { useSinaisVitaisValidation } from "./hooks/useSinaisVitaisValidation";
 
 interface AntropometriaSectionProps {
   form: any;
@@ -13,93 +13,234 @@ interface AntropometriaSectionProps {
 }
 
 export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSectionProps) => {
-  const { fieldWarnings, handleFieldChange } = useAntropometriaValidation();
+  const { fieldWarnings: antropometriaWarnings, handleFieldChange: handleAntropometriaChange } = useAntropometriaValidation();
+  const { fieldWarnings: sinaisWarnings, handleFieldChange: handleSinaisChange } = useSinaisVitaisValidation();
+  
+  const fieldWarnings = { ...antropometriaWarnings, ...sinaisWarnings };
 
   const handleFieldChangeWrapper = (fieldName: string, value: string) => {
     const currentValues = form.getValues();
     const newValues = { ...currentValues, [fieldName]: value };
     onValuesChange(newValues);
-    handleFieldChange(fieldName, value);
+    
+    // Use the appropriate validation hook
+    if (['peso', 'altura', 'circunferenciaAbdominal', 'perimetroCefalico', 'perimetroPanturrilha'].includes(fieldName)) {
+      handleAntropometriaChange(fieldName, value);
+    } else {
+      handleSinaisChange(fieldName, value);
+    }
   };
 
   return (
     <Card className="shadow-sm border-gray-200">
-      <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 to-indigo-50">
-        <CardTitle className="text-lg font-semibold text-blue-800 flex items-center gap-2">
-          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-          Antropometria
+      <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <CardTitle className="text-base font-semibold text-blue-800 flex items-center gap-2">
+          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+          Antropometria, sinais vitais e glicemia capilar
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 p-4">
-        {/* Peso e Altura */}
-        <div>
-          <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
-            Medidas Básicas
-          </h4>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <AnthropometricField
-              form={form}
-              name="peso"
-              label="Peso (kg)"
-              placeholder="0,000"
-              unit="kg"
-              min={0.5}
-              max={500}
-              step="0.001"
-              warning={fieldWarnings.peso}
-              onFieldChange={handleFieldChangeWrapper}
-              type="peso"
-            />
+        {/* Primeira linha: Peso, Altura, IMC, Perímetro cefálico */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <AnthropometricField
+            form={form}
+            name="peso"
+            label="Peso (kg)"
+            placeholder="0,000"
+            unit="kg"
+            min={0.5}
+            max={500}
+            step="0.001"
+            warning={fieldWarnings.peso}
+            onFieldChange={handleFieldChangeWrapper}
+            type="peso"
+          />
 
-            <AnthropometricField
-              form={form}
-              name="altura"
-              label="Altura (cm)"
-              placeholder="000,0"
-              unit="cm"
-              min={20}
-              max={250}
-              warning={fieldWarnings.altura}
-              onFieldChange={handleFieldChangeWrapper}
-              type="altura"
-            />
+          <AnthropometricField
+            form={form}
+            name="altura"
+            label="Altura (cm)"
+            placeholder="000,0"
+            unit="cm"
+            min={20}
+            max={250}
+            warning={fieldWarnings.altura}
+            onFieldChange={handleFieldChangeWrapper}
+            type="altura"
+          />
 
-            <IMCDisplay 
-              peso={form.watch("peso")} 
-              altura={form.watch("altura")} 
+          <IMCDisplay 
+            peso={form.watch("peso")} 
+            altura={form.watch("altura")} 
+          />
+
+          <AnthropometricField
+            form={form}
+            name="perimetroCefalico"
+            label="Perímetro cefálico (cm)"
+            placeholder="00"
+            unit="cm"
+            min={10}
+            max={200}
+            warning={fieldWarnings.perimetroCefalico}
+            onFieldChange={handleFieldChangeWrapper}
+            type="altura"
+          />
+        </div>
+
+        {/* Segunda linha: Circunferência abdominal, Perímetro panturrilha, PA Sistólica, PA Diastólica */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <AnthropometricField
+            form={form}
+            name="circunferenciaAbdominal"
+            label="Circunferência abdominal (cm)"
+            placeholder="000"
+            unit="cm"
+            min={0}
+            max={200}
+            warning={fieldWarnings.circunferenciaAbdominal}
+            onFieldChange={handleFieldChangeWrapper}
+            type="altura"
+          />
+
+          <AnthropometricField
+            form={form}
+            name="perimetroPanturrilha"
+            label="Perímetro da panturrilha (cm)"
+            placeholder="00"
+            unit="cm"
+            min={15}
+            max={60}
+            warning={fieldWarnings.perimetroPanturrilha}
+            onFieldChange={handleFieldChangeWrapper}
+            type="altura"
+          />
+
+          <AnthropometricField
+            form={form}
+            name="pressaoSistolica"
+            label="Pressão arterial (mmHg)"
+            placeholder="000"
+            unit="mmHg"
+            min={70}
+            max={250}
+            warning={fieldWarnings.pressaoSistolica}
+            onFieldChange={handleFieldChangeWrapper}
+            type="pressao"
+          />
+
+          <AnthropometricField
+            form={form}
+            name="pressaoDiastolica"
+            label="/"
+            placeholder="000"
+            unit=""
+            min={40}
+            max={150}
+            warning={fieldWarnings.pressaoDiastolica}
+            onFieldChange={handleFieldChangeWrapper}
+            type="pressao"
+          />
+        </div>
+
+        {/* Terceira linha: Frequência respiratória, Frequência cardíaca, Temperatura, Saturação O2 */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <AnthropometricField
+            form={form}
+            name="frequenciaRespiratoria"
+            label="Frequência respiratória (mpm)"
+            placeholder="00"
+            unit="mpm"
+            min={8}
+            max={80}
+            warning={fieldWarnings.frequenciaRespiratoria}
+            onFieldChange={handleFieldChangeWrapper}
+            type="frequencia"
+          />
+
+          <AnthropometricField
+            form={form}
+            name="frequenciaCardiaca"
+            label="Frequência cardíaca (bpm)"
+            placeholder="000"
+            unit="bpm"
+            min={30}
+            max={220}
+            warning={fieldWarnings.frequenciaCardiaca}
+            onFieldChange={handleFieldChangeWrapper}
+            type="frequencia"
+          />
+
+          <AnthropometricField
+            form={form}
+            name="temperatura"
+            label="Temperatura (°C)"
+            placeholder="00,0"
+            unit="°C"
+            min={20}
+            max={45}
+            warning={fieldWarnings.temperatura}
+            onFieldChange={handleFieldChangeWrapper}
+            type="temperatura"
+          />
+
+          <AnthropometricField
+            form={form}
+            name="saturacaoOxigenio"
+            label="Saturação de O2 (%)"
+            placeholder="000"
+            unit="%"
+            min={70}
+            max={100}
+            warning={fieldWarnings.saturacaoOxigenio}
+            onFieldChange={handleFieldChangeWrapper}
+            type="saturacao"
+          />
+        </div>
+
+        {/* Quarta linha: Glicemia capilar e Momento da coleta */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+          <AnthropometricField
+            form={form}
+            name="glicemiaCapilar"
+            label="Glicemia capilar (mg/dL)"
+            placeholder="000"
+            unit="mg/dL"
+            min={20}
+            max={600}
+            warning={fieldWarnings.glicemiaCapilar}
+            onFieldChange={handleFieldChangeWrapper}
+            type="glicemia"
+          />
+
+          <div>
+            <FormField
+              control={form.control}
+              name="momentoColeta"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">
+                    Momento da coleta
+                    {form.watch("glicemiaCapilar") && <span className="text-red-600 ml-1">*</span>}
+                  </FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="nao_especificado">Momento da coleta não especificado</SelectItem>
+                      <SelectItem value="jejum">Jejum</SelectItem>
+                      <SelectItem value="pre_prandial">Pré-prandial</SelectItem>
+                      <SelectItem value="pos_prandial">Pós-prandial</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
           </div>
-        </div>
-
-        <Separator className="my-4" />
-
-        {/* Circunferência Abdominal */}
-        <div>
-          <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
-            Circunferência
-          </h4>
-          <CircunferenciaAbdominalSection
-            form={form}
-            fieldWarnings={fieldWarnings}
-            onFieldChange={handleFieldChangeWrapper}
-          />
-        </div>
-
-        <Separator className="my-4" />
-
-        {/* Perímetros */}
-        <div>
-          <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
-            Perímetros
-          </h4>
-          <PerimetrosSection
-            form={form}
-            fieldWarnings={fieldWarnings}
-            onFieldChange={handleFieldChangeWrapper}
-          />
         </div>
       </CardContent>
     </Card>

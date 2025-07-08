@@ -54,16 +54,8 @@ export const EscutaInicialForm = ({ onSubmit, onCancel, isLoading }: EscutaInici
 
           <Separator className="my-6" />
 
-          {/* Antropometria */}
+          {/* Antropometria, Sinais Vitais e Glicemia */}
           <AntropometriaSection 
-            form={form} 
-            onValuesChange={updateProcedimentosAutomaticos}
-          />
-
-          <Separator className="my-6" />
-
-          {/* Sinais Vitais e Glicemia */}
-          <SinaisVitaisGlicemiaSection 
             form={form} 
             onValuesChange={updateProcedimentosAutomaticos}
           />
