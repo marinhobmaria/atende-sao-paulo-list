@@ -137,32 +137,30 @@ export const MaskedInput = ({
 
   const getPlaceholderMask = (): string => {
     switch (type) {
-      case 'peso': return '0,000';
-      case 'altura': return '000,0';
-      case 'temperatura': return '00,0';
-      case 'pressao': return '000';
-      case 'frequencia': return '000';
-      case 'saturacao': return '000';
-      case 'glicemia': return '000';
+      case 'peso': return `0,000 ${getUnit()}`;
+      case 'altura': return `000,0 ${getUnit()}`;
+      case 'temperatura': return `00,0 ${getUnit()}`;
+      case 'pressao': return `000 ${getUnit()}`;
+      case 'frequencia': return `000 ${getUnit()}`;
+      case 'saturacao': return `000 ${getUnit()}`;
+      case 'glicemia': return `000 ${getUnit()}`;
       default: return '';
     }
   };
 
   return (
-    <div className="relative">
-      <input
-        type="text"
-        value={displayValue}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyPress}
-        onBlur={onBlur}
-        placeholder={placeholder || getPlaceholderMask()}
-        className={`flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-12 ${className}`}
-        disabled={disabled}
-      />
-      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-muted-foreground pointer-events-none font-medium">
-        {getUnit()}
-      </span>
-    </div>
+    <input
+      type="text"
+      value={displayValue ? `${displayValue} ${getUnit()}` : ''}
+      onChange={(e) => {
+        const input = e.target.value.replace(new RegExp(` ${getUnit()}$`), '');
+        handleInputChange({ target: { value: input } } as React.ChangeEvent<HTMLInputElement>);
+      }}
+      onKeyDown={handleKeyPress}
+      onBlur={onBlur}
+      placeholder={placeholder || getPlaceholderMask()}
+      className={`flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      disabled={disabled}
+    />
   );
 };
