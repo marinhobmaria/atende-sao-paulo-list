@@ -85,7 +85,6 @@ export const AnthropometricField = ({
                 type={type}
               />
             </FormControl>
-            <div className="text-xs text-gray-500">{min}-{max} {unit}</div>
             
             {numericError && (
               <div className="text-xs text-red-600 mt-1">{numericError}</div>

@@ -2,6 +2,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 import { IMCDisplay } from "./components/IMCDisplay";
 import { AnthropometricField } from "./components/AnthropometricField";
 import { useAntropometriaValidation } from "./hooks/useAntropometriaValidation";
@@ -13,6 +16,7 @@ interface AntropometriaSectionProps {
 }
 
 export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSectionProps) => {
+  const [isOpen, setIsOpen] = useState(true);
   const { fieldWarnings: antropometriaWarnings, handleFieldChange: handleAntropometriaChange } = useAntropometriaValidation();
   const { fieldWarnings: sinaisWarnings, handleFieldChange: handleSinaisChange } = useSinaisVitaisValidation();
   
@@ -32,21 +36,28 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
   };
 
   return (
-    <Card className="shadow-sm border-gray-200">
-      <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50">
-        <CardTitle className="text-base font-semibold text-blue-800 flex items-center gap-2">
-          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-          Antropometria, sinais vitais e glicemia capilar
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4 p-4">
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <Card className="shadow-sm border-gray-200">
+        <CollapsibleTrigger asChild>
+          <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50 cursor-pointer hover:bg-gradient-to-r hover:from-blue-100 hover:to-indigo-100 transition-colors">
+            <CardTitle className="text-base font-semibold text-blue-800 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                Antropometria, sinais vitais e glicemia capilar
+              </div>
+              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+            </CardTitle>
+          </CardHeader>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <CardContent className="space-y-4 p-4">
         {/* Primeira linha: Peso, Altura, IMC, Perímetro cefálico */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <AnthropometricField
             form={form}
             name="peso"
-            label="Peso (kg)"
-            placeholder="0,000"
+            label="Peso"
+            placeholder="0,5-500 kg"
             unit="kg"
             min={0.5}
             max={500}
@@ -59,8 +70,8 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
           <AnthropometricField
             form={form}
             name="altura"
-            label="Altura (cm)"
-            placeholder="000,0"
+            label="Altura"
+            placeholder="20-250 cm"
             unit="cm"
             min={20}
             max={250}
@@ -77,8 +88,8 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
           <AnthropometricField
             form={form}
             name="perimetroCefalico"
-            label="Perímetro cefálico (cm)"
-            placeholder="00"
+            label="Perímetro cefálico"
+            placeholder="10-200 cm"
             unit="cm"
             min={10}
             max={200}
@@ -93,8 +104,8 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
           <AnthropometricField
             form={form}
             name="circunferenciaAbdominal"
-            label="Circunferência abdominal (cm)"
-            placeholder="000"
+            label="Circunferência abdominal"
+            placeholder="0-200 cm"
             unit="cm"
             min={0}
             max={200}
@@ -106,8 +117,8 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
           <AnthropometricField
             form={form}
             name="perimetroPanturrilha"
-            label="Perímetro da panturrilha (cm)"
-            placeholder="00"
+            label="Perímetro da panturrilha"
+            placeholder="15-60 cm"
             unit="cm"
             min={15}
             max={60}
@@ -119,8 +130,8 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
           <AnthropometricField
             form={form}
             name="pressaoSistolica"
-            label="Pressão arterial (mmHg)"
-            placeholder="000"
+            label="Pressão arterial"
+            placeholder="70-250 mmHg"
             unit="mmHg"
             min={70}
             max={250}
@@ -133,7 +144,7 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
             form={form}
             name="pressaoDiastolica"
             label="/"
-            placeholder="000"
+            placeholder="40-150"
             unit=""
             min={40}
             max={150}
@@ -148,8 +159,8 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
           <AnthropometricField
             form={form}
             name="frequenciaRespiratoria"
-            label="Frequência respiratória (mpm)"
-            placeholder="00"
+            label="Frequência respiratória"
+            placeholder="8-80 mpm"
             unit="mpm"
             min={8}
             max={80}
@@ -161,8 +172,8 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
           <AnthropometricField
             form={form}
             name="frequenciaCardiaca"
-            label="Frequência cardíaca (bpm)"
-            placeholder="000"
+            label="Frequência cardíaca"
+            placeholder="30-220 bpm"
             unit="bpm"
             min={30}
             max={220}
@@ -174,11 +185,11 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
           <AnthropometricField
             form={form}
             name="temperatura"
-            label="Temperatura (°C)"
-            placeholder="00,0"
+            label="Temperatura"
+            placeholder="32-42 °C"
             unit="°C"
-            min={20}
-            max={45}
+            min={32}
+            max={42}
             warning={fieldWarnings.temperatura}
             onFieldChange={handleFieldChangeWrapper}
             type="temperatura"
@@ -187,8 +198,8 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
           <AnthropometricField
             form={form}
             name="saturacaoOxigenio"
-            label="Saturação de O2 (%)"
-            placeholder="000"
+            label="Saturação de O2"
+            placeholder="70-100 %"
             unit="%"
             min={70}
             max={100}
@@ -203,8 +214,8 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
           <AnthropometricField
             form={form}
             name="glicemiaCapilar"
-            label="Glicemia capilar (mg/dL)"
-            placeholder="000"
+            label="Glicemia capilar"
+            placeholder="20-600 mg/dL"
             unit="mg/dL"
             min={20}
             max={600}
@@ -242,7 +253,9 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
             />
           </div>
         </div>
-      </CardContent>
-    </Card>
+          </CardContent>
+        </CollapsibleContent>
+      </Card>
+    </Collapsible>
   );
 };
