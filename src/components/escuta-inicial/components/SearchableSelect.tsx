@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, X } from "lucide-react";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Search, ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Option {
@@ -38,8 +39,6 @@ export const SearchableSelect = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const resultsRef = useRef<HTMLDivElement>(null);
 
   const filteredOptions = options.filter(item => 
     (item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -55,13 +54,9 @@ export const SearchableSelect = ({
       form.setValue(name, updatedOptions.map(o => `${o.code} - ${o.description}`).join("; "));
     } else {
       form.setValue(name, `${option.code} - ${option.description}`);
-      setSearchTerm(`${option.code} - ${option.description}`);
     }
     setShowResults(false);
-    if (multiple) {
-      setSearchTerm("");
-      inputRef.current?.focus();
-    }
+    setSearchTerm("");
   };
 
   const removeOption = (codeToRemove: string) => {
@@ -69,35 +64,6 @@ export const SearchableSelect = ({
     setSelectedOptions(updatedOptions);
     form.setValue(name, updatedOptions.map(o => `${o.code} - ${o.description}`).join("; "));
   };
-
-  const handleInputChange = (value: string) => {
-    setSearchTerm(value);
-    setShowResults(value.length > 0);
-  };
-
-  const handleInputFocus = () => {
-    if (searchTerm.length > 0) {
-      setShowResults(true);
-    }
-  };
-
-  const handleInputBlur = () => {
-    // Delay to allow click on results
-    setTimeout(() => setShowResults(false), 200);
-  };
-
-  // Close results when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (resultsRef.current && !resultsRef.current.contains(event.target as Node) &&
-          inputRef.current && !inputRef.current.contains(event.target as Node)) {
-        setShowResults(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   return (
     <FormField
@@ -110,63 +76,64 @@ export const SearchableSelect = ({
             {label}
             {required && <span className="text-red-500 ml-1">*</span>}
           </FormLabel>
-          <div className="space-y-2 relative">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                ref={inputRef}
-                type="text"
-                placeholder={placeholder}
-                value={searchTerm}
-                onChange={(e) => handleInputChange(e.target.value)}
-                onFocus={handleInputFocus}
-                onBlur={handleInputBlur}
-                className="pl-10 h-11"
-              />
-            </div>
-            
-            {/* Results dropdown */}
-            {showResults && filteredOptions.length > 0 && (
-              <div 
-                ref={resultsRef}
-                className="absolute z-50 w-full bg-background border border-border rounded-md shadow-lg max-h-60 overflow-auto animate-fade-in"
-                style={{ top: '100%' }}
-              >
-                {filteredOptions.map((item) => (
-                  <div
-                    key={item.code}
-                    onClick={() => handleOptionSelect(item)}
-                    className="flex items-center gap-2 p-3 hover:bg-muted cursor-pointer border-b border-border/50 last:border-b-0"
-                  >
-                    <Badge variant="outline" className="font-mono text-xs px-2 py-0.5">
-                      {item.code}
-                    </Badge>
-                    {item.shortCode && (
-                      <Badge variant="outline" className="font-mono text-xs px-2 py-0.5">
-                        {item.shortCode}
-                      </Badge>
-                    )}
-                    <div className="text-sm text-foreground">{item.description}</div>
+          <div className="space-y-2">
+            <Popover open={showResults} onOpenChange={setShowResults}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className={cn(
+                    "w-full justify-between h-11 px-4",
+                    !searchTerm && "text-muted-foreground"
+                  )}
+                  onClick={() => setShowResults(!showResults)}
+                >
+                  <div className="flex items-center gap-3">
+                    <Search className="h-4 w-4 text-muted-foreground" />
+                    <span>{searchTerm || placeholder}</span>
                   </div>
-                ))}
-              </div>
-            )}
-
-            {/* Empty state */}
-            {showResults && searchTerm.length > 0 && filteredOptions.length === 0 && (
-              <div 
-                ref={resultsRef}
-                className="absolute z-50 w-full bg-background border border-border rounded-md shadow-lg p-3 animate-fade-in"
-                style={{ top: '100%' }}
-              >
-                <div className="text-sm text-muted-foreground text-center">{emptyMessage}</div>
-              </div>
-            )}
+                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0" align="start">
+                <Command>
+                  <CommandInput 
+                    placeholder="Pesquise ou selecione por código ou descrição"
+                    value={searchTerm}
+                    onValueChange={setSearchTerm}
+                    className="h-9"
+                  />
+                  <CommandList>
+                    <CommandEmpty>{emptyMessage}</CommandEmpty>
+                    <CommandGroup>
+                      {filteredOptions.map((item) => (
+                        <CommandItem
+                          key={item.code}
+                          value={item.code}
+                          onSelect={() => handleOptionSelect(item)}
+                          className="flex items-center gap-2 p-3 hover:bg-muted cursor-pointer"
+                        >
+                          <Badge variant="outline" className="font-mono text-xs px-2 py-0.5">
+                            {item.code}
+                          </Badge>
+                          {item.shortCode && (
+                            <Badge variant="outline" className="font-mono text-xs px-2 py-0.5">
+                              {item.shortCode}
+                            </Badge>
+                          )}
+                          <div className="text-sm text-gray-900">{item.description}</div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
             
             {/* Selected Options (for multiple) */}
             {multiple && selectedOptions.length > 0 && (
               <div className="space-y-2">
-                <div className="text-xs font-medium text-foreground">Selecionados:</div>
+                <div className="text-xs font-medium text-gray-700">Selecionados:</div>
                 <div className="flex flex-wrap gap-1">
                   {selectedOptions.map((option) => (
                     <div
