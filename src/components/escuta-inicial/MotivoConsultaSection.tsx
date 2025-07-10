@@ -57,11 +57,11 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
   };
 
   return (
-    <Card className="shadow-sm border-gray-200">
-      <CardHeader className="pb-4 bg-gradient-to-r from-teal-50 to-cyan-50">
-        <CardTitle className="flex items-center gap-2 text-teal-800">
-          <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
-          Motivo da Consulta
+    <Card className="shadow-sm border">
+      <CardHeader className="pb-4 bg-muted/30">
+        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
+          <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+          Motivo da consulta
           <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
         </CardTitle>
       </CardHeader>
@@ -72,7 +72,7 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
           rules={{ required: "Campo obrigatório" }}
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-semibold text-gray-700">Motivo da consulta (CIAP2) *</FormLabel>
+              <FormLabel className="text-sm font-medium text-foreground">Motivo da consulta (CIAP2) *</FormLabel>
               <div className="space-y-3">
                 <Popover open={showResults} onOpenChange={setShowResults}>
                   <PopoverTrigger asChild>
@@ -80,13 +80,13 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
                       variant="outline"
                       role="combobox"
                       className={cn(
-                        "w-full justify-between h-11 px-4 bg-white hover:bg-gray-50 border-gray-300",
-                        !searchTerm && "text-gray-500"
+                        "w-full justify-between h-11 px-4",
+                        !searchTerm && "text-muted-foreground"
                       )}
                       onClick={() => setShowResults(!showResults)}
                     >
                       <div className="flex items-center gap-3">
-                        <Search className="h-4 w-4 text-gray-400" />
+                        <Search className="h-4 w-4 text-muted-foreground" />
                         <span>{searchTerm || "Buscar por código ou descrição..."}</span>
                       </div>
                       <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -110,13 +110,13 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
                               key={item.code}
                               value={item.code}
                               onSelect={() => handleCiap2Select(item.code, item.description)}
-                              className="flex items-center gap-3 p-4 hover:bg-teal-50 cursor-pointer"
+                              className="flex items-center gap-3 p-4 hover:bg-muted cursor-pointer"
                             >
                               <div className="flex items-center gap-3 flex-1">
-                                <Badge variant="outline" className="font-mono text-xs px-2 py-1 bg-gray-100">
+                                <Badge variant="outline" className="font-mono text-xs px-2 py-1">
                                   {item.code}
                                 </Badge>
-                                <div className="text-gray-900">{item.description}</div>
+                                <div className="text-foreground">{item.description}</div>
                               </div>
                             </CommandItem>
                           ))}
@@ -129,23 +129,23 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
                 {/* Selected CIAPs */}
                 {selectedCiaps.length > 0 && (
                   <div className="space-y-2">
-                    <div className="text-sm font-medium text-gray-700">Selecionados:</div>
+                    <div className="text-sm font-medium text-foreground">Selecionados:</div>
                     <div className="flex flex-wrap gap-2">
                       {selectedCiaps.map((ciap) => (
                         <div
                           key={ciap.code}
-                          className="flex items-center gap-2 bg-teal-50 border border-teal-200 rounded-lg px-3 py-2"
+                          className="flex items-center gap-2 bg-muted border rounded-lg px-3 py-2"
                         >
-                          <Badge variant="outline" className="font-mono text-xs bg-white">
+                          <Badge variant="outline" className="font-mono text-xs">
                             {ciap.code}
                           </Badge>
-                          <span className="text-sm text-teal-800">{ciap.description}</span>
+                          <span className="text-sm text-muted-foreground">{ciap.description}</span>
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => removeCiap(ciap.code)}
-                            className="h-5 w-5 p-0 hover:bg-teal-200 rounded-full"
+                            className="h-5 w-5 p-0 hover:bg-muted/80 rounded-full"
                           >
                             <X className="h-3 w-3" />
                           </Button>
@@ -161,7 +161,7 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
                   (item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
                    item.description.toLowerCase().includes(searchTerm.toLowerCase()))
                 ).length > 0 && showResults && (
-                  <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded border">
+                  <div className="text-xs text-muted-foreground p-2 bg-muted rounded border">
                     Alguns itens já foram adicionados e não aparecem na busca
                   </div>
                 )}
@@ -179,7 +179,7 @@ export const MotivoConsultaSection = ({ form }: MotivoConsultaSectionProps) => {
               <FormControl>
                 <Textarea
                   placeholder="Informe as informações subjetivas do profissional e as expressadas pelo cidadão"
-                  className="min-h-[80px] resize-none border-gray-300 focus:border-teal-500 focus:ring-teal-500"
+                  className="min-h-[80px] resize-none"
                   maxLength={4000}
                   {...field}
                 />

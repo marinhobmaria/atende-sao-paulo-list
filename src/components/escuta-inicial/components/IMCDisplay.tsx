@@ -8,10 +8,10 @@ interface IMCDisplayProps {
 
 export const IMCDisplay = ({ peso, altura }: IMCDisplayProps) => {
   const getIMCClassification = (imc: number) => {
-    if (imc < 18.5) return { text: "Baixo peso", color: "bg-blue-500" };
-    if (imc < 25) return { text: "Peso normal", color: "bg-green-500" };
-    if (imc < 30) return { text: "Sobrepeso", color: "bg-yellow-500" };
-    if (imc < 35) return { text: "Obesidade grau I", color: "bg-orange-500" };
+    if (imc < 18.5) return { text: "Baixo peso", color: "bg-info" };
+    if (imc < 25) return { text: "Peso normal", color: "bg-success" };
+    if (imc < 30) return { text: "Sobrepeso", color: "bg-warning" };
+    if (imc < 35) return { text: "Obesidade grau I", color: "bg-risk-orange" };
     if (imc < 40) return { text: "Obesidade grau II", color: "bg-red-500" };
     return { text: "Obesidade grau III", color: "bg-red-700" };
   };

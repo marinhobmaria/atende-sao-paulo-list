@@ -37,12 +37,12 @@ export const AntropometriaSection = ({ form, onValuesChange }: AntropometriaSect
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <Card className="shadow-sm border-gray-200">
+      <Card className="shadow-sm border">
         <CollapsibleTrigger asChild>
-          <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50 cursor-pointer hover:bg-gradient-to-r hover:from-blue-100 hover:to-indigo-100 transition-colors">
-            <CardTitle className="text-base font-semibold text-blue-800 flex items-center justify-between">
+          <CardHeader className="pb-3 bg-muted/30 cursor-pointer hover:bg-muted/50 transition-colors">
+            <CardTitle className="text-lg font-semibold text-foreground flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
                 Antropometria, sinais vitais e glicemia capilar
               </div>
               <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />

@@ -37,17 +37,17 @@ export const CitizenCompactInfo = ({ cidadao, onBack }: CitizenCompactInfoProps)
       return "bg-green-600";
     }
     if (condition === "Gestante") {
-      return "bg-blue-500";
+      return "bg-info";
     }
-    return "bg-gray-500";
+    return "bg-muted";
   };
 
   const getAllergyColor = (allergy: string) => {
-    // Blue for diagnosed, yellow for self-reported
+    // Info for diagnosed, warning for self-reported
     if (allergy === "Dipirona") {
-      return "bg-blue-500";
+      return "bg-info";
     }
-    return "bg-yellow-500";
+    return "bg-warning";
   };
 
   const getStatusColor = (status: string) => {
@@ -56,9 +56,9 @@ export const CitizenCompactInfo = ({ cidadao, onBack }: CitizenCompactInfoProps)
       case "in-service": return "bg-purple-500";
       case "initial-listening": return "bg-pink-500";
       case "vaccination": return "bg-purple-500";
-      case "completed": return "bg-blue-500";
-      case "did-not-wait": return "bg-gray-500";
-      default: return "bg-gray-500";
+      case "completed": return "bg-success";
+      case "did-not-wait": return "bg-muted";
+      default: return "bg-muted";
     }
   };
 

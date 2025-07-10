@@ -71,10 +71,11 @@ export const DesfechoSection = ({ form }: DesfechoSectionProps) => {
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          Desfecho da Escuta Inicial
+    <Card className="shadow-sm border">
+      <CardHeader className="bg-muted/30">
+        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
+          <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+          Desfecho da escuta inicial
           <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
         </CardTitle>
       </CardHeader>

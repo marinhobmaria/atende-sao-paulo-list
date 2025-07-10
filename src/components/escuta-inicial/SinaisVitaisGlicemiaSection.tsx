@@ -37,19 +37,19 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
   };
 
   return (
-    <Card className="shadow-sm border-gray-200">
-      <CardHeader className="pb-4 bg-gradient-to-r from-green-50 to-emerald-50">
-        <CardTitle className="text-lg font-semibold text-green-800 flex items-center gap-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          Sinais Vitais e Glicemia Capilar
+    <Card className="shadow-sm border">
+      <CardHeader className="pb-4 bg-muted/30">
+        <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+          <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+          Sinais vitais e glicemia capilar
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6 p-6">
         {/* Pressão Arterial */}
         <div>
-          <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
-            Pressão Arterial
+          <h4 className="text-sm font-medium text-foreground mb-4 flex items-center gap-2">
+            <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
+            Pressão arterial
           </h4>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
             <FormField
@@ -74,7 +74,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                       }}
                     />
                   </FormControl>
-                  <div className="text-xs text-gray-500">70-250 mmHg</div>
+                  <div className="text-xs text-muted-foreground">70-250 mmHg</div>
                   <FieldAlert 
                     type="warning" 
                     message={fieldWarnings.pressaoSistolica || ""} 
@@ -107,7 +107,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                       }}
                     />
                   </FormControl>
-                  <div className="text-xs text-gray-500">40-150 mmHg</div>
+                  <div className="text-xs text-muted-foreground">40-150 mmHg</div>
                   <FieldAlert 
                     type="warning" 
                     message={fieldWarnings.pressaoDiastolica || ""} 
@@ -124,8 +124,8 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
 
         {/* Frequências */}
         <div>
-          <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+          <h4 className="text-sm font-medium text-foreground mb-4 flex items-center gap-2">
+            <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
             Frequências
           </h4>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
@@ -151,7 +151,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                       }}
                     />
                   </FormControl>
-                  <div className="text-xs text-gray-500">30-220 bpm</div>
+                  <div className="text-xs text-muted-foreground">30-220 bpm</div>
                   <FieldAlert 
                     type="warning" 
                     message={fieldWarnings.frequenciaCardiaca || ""} 
@@ -184,7 +184,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                       }}
                     />
                   </FormControl>
-                  <div className="text-xs text-gray-500">8-80 rpm</div>
+                  <div className="text-xs text-muted-foreground">8-80 rpm</div>
                   <FieldAlert 
                     type="warning" 
                     message={fieldWarnings.frequenciaRespiratoria || ""} 
@@ -201,9 +201,9 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
 
         {/* Temperatura e Saturação */}
         <div>
-          <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
-            Temperatura e Saturação
+          <h4 className="text-sm font-medium text-foreground mb-4 flex items-center gap-2">
+            <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
+            Temperatura e saturação
           </h4>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
             <FormField
@@ -228,7 +228,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                       }}
                     />
                   </FormControl>
-                  <div className="text-xs text-gray-500">32-42°C</div>
+                  <div className="text-xs text-muted-foreground">32-42°C</div>
                   <FieldAlert 
                     type="warning" 
                     message={fieldWarnings.temperatura || ""} 
@@ -260,7 +260,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                       }}
                     />
                   </FormControl>
-                  <div className="text-xs text-gray-500">70-100%</div>
+                  <div className="text-xs text-muted-foreground">70-100%</div>
                   <FieldAlert 
                     type="warning" 
                     message={fieldWarnings.saturacaoOxigenio || ""} 
@@ -277,9 +277,9 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
 
         {/* Glicemia Capilar */}
         <div>
-          <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
-            Glicemia Capilar
+          <h4 className="text-sm font-medium text-foreground mb-4 flex items-center gap-2">
+            <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
+            Glicemia capilar
           </h4>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <FormField
@@ -306,7 +306,7 @@ export const SinaisVitaisGlicemiaSection = ({ form, onValuesChange }: SinaisVita
                       type="glicemia"
                     />
                   </FormControl>
-                  <div className="text-xs text-gray-500">20-600 mg/dL</div>
+                  <div className="text-xs text-muted-foreground">20-600 mg/dL</div>
                   {fieldWarnings.glicemiaCapilar && (
                     <div className="text-xs text-red-600 mt-1">{fieldWarnings.glicemiaCapilar}</div>
                   )}

@@ -32,15 +32,16 @@ export const ClassificacaoRiscoSection = ({ form }: ClassificacaoRiscoSectionPro
       value: "azul",
       label: "Azul - Não Agudo",
       description: "Não urgente — queixas simples, sem sinais de gravidade. Pode ser redirecionado.",
-      color: "bg-blue-500"
+      color: "bg-risk-blue"
     }
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          Classificação de Risco/Vulnerabilidade
+    <Card className="shadow-sm border">
+      <CardHeader className="bg-muted/30">
+        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
+          <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+          Classificação de risco/vulnerabilidade
           <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
         </CardTitle>
       </CardHeader>

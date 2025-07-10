@@ -85,7 +85,7 @@ export const EscutaInicialForm = ({ onSubmit, onCancel, isLoading }: EscutaInici
           
           {/* Rodapé com rascunho */}
           <div className="pt-4 border-t mt-6">
-            <div className="text-xs text-gray-500 text-center">
+            <div className="text-xs text-muted-foreground text-center">
               Rascunho salvo automaticamente às 14:17
             </div>
           </div>

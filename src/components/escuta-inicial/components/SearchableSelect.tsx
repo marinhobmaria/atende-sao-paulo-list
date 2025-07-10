@@ -111,13 +111,13 @@ export const SearchableSelect = ({
                           key={item.code}
                           value={item.code}
                           onSelect={() => handleOptionSelect(item)}
-                          className="flex items-center gap-2 p-3 hover:bg-blue-50 cursor-pointer"
+                          className="flex items-center gap-2 p-3 hover:bg-muted cursor-pointer"
                         >
-                          <Badge variant="outline" className="font-mono text-xs px-2 py-0.5 bg-gray-100">
+                          <Badge variant="outline" className="font-mono text-xs px-2 py-0.5">
                             {item.code}
                           </Badge>
                           {item.shortCode && (
-                            <Badge variant="outline" className="font-mono text-xs px-2 py-0.5 bg-blue-100">
+                            <Badge variant="outline" className="font-mono text-xs px-2 py-0.5">
                               {item.shortCode}
                             </Badge>
                           )}
@@ -138,18 +138,18 @@ export const SearchableSelect = ({
                   {selectedOptions.map((option) => (
                     <div
                       key={option.code}
-                      className="flex items-center gap-1 bg-blue-50 border border-blue-200 rounded px-2 py-1"
+                      className="flex items-center gap-1 bg-muted border rounded px-2 py-1"
                     >
-                      <Badge variant="outline" className="font-mono text-xs bg-white">
+                      <Badge variant="outline" className="font-mono text-xs">
                         {option.code}
                       </Badge>
-                      <span className="text-xs text-blue-800">{option.description}</span>
+                      <span className="text-xs text-muted-foreground">{option.description}</span>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => removeOption(option.code)}
-                        className="h-4 w-4 p-0 hover:bg-blue-200 rounded-full"
+                        className="h-4 w-4 p-0 hover:bg-muted/80 rounded-full"
                       >
                         <X className="h-3 w-3" />
                       </Button>
