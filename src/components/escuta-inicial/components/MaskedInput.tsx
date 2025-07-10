@@ -25,80 +25,65 @@ export const MaskedInput = ({
     // Remove todos os caracteres não numéricos exceto vírgula
     let cleaned = input.replace(/[^\d,]/g, '');
     
+    // Permitir apenas uma vírgula
+    const commaCount = (cleaned.match(/,/g) || []).length;
+    if (commaCount > 1) {
+      const firstCommaIndex = cleaned.indexOf(',');
+      cleaned = cleaned.substring(0, firstCommaIndex + 1) + cleaned.substring(firstCommaIndex + 1).replace(/,/g, '');
+    }
+    
     switch (inputType) {
       case 'peso':
-        // Permitir até 3 casas decimais
+        // Permitir até 3 casas decimais para peso
         if (cleaned.includes(',')) {
           const [intPart, decPart] = cleaned.split(',');
-          return intPart + (decPart ? ',' + decPart.slice(0, 3) : ',');
+          return intPart + ',' + (decPart ? decPart.slice(0, 3) : '');
         }
         return cleaned;
         
       case 'altura':
-        // Permitir até 1 casa decimal
+        // Permitir até 1 casa decimal para altura
         if (cleaned.includes(',')) {
           const [intPart, decPart] = cleaned.split(',');
-          return intPart + (decPart ? ',' + decPart.slice(0, 1) : ',');
+          return intPart + ',' + (decPart ? decPart.slice(0, 1) : '');
         }
         return cleaned;
         
       case 'temperatura':
-        // Permitir até 1 casa decimal
+        // Permitir até 1 casa decimal para temperatura
         if (cleaned.includes(',')) {
           const [intPart, decPart] = cleaned.split(',');
-          return intPart + (decPart ? ',' + decPart.slice(0, 1) : ',');
+          return intPart + ',' + (decPart ? decPart.slice(0, 1) : '');
         }
         return cleaned;
         
       default:
         // Para campos inteiros, remover vírgula
-        return cleaned.replace(',', '');
+        return cleaned.replace(/,/g, '');
     }
   };
 
-  const interpretValue = (input: string, inputType: string): number => {
-    if (!input) return 0;
+  const interpretValue = (input: string): string => {
+    if (!input) return '';
     
-    // Remove espaços e caracteres especiais
+    // Remove apenas espaços e unidades, mantém números e vírgula
     let cleaned = input.replace(/[^\d,]/g, '');
     
-    switch (inputType) {
-      case 'peso':
-        if (cleaned.includes(',')) {
-          const [intPart, decPart] = cleaned.split(',');
-          const intValue = parseInt(intPart) || 0;
-          const decValue = parseFloat('0.' + (decPart || '0'));
-          return intValue + decValue;
-        } else {
-          // Se não tem vírgula, interpretar como kg
-          return parseInt(cleaned) || 0;
-        }
-        
-      case 'altura':
-      case 'temperatura':
-        if (cleaned.includes(',')) {
-          return parseFloat(cleaned.replace(',', '.')) || 0;
-        }
-        return parseInt(cleaned) || 0;
-        
-      default:
-        return parseInt(cleaned) || 0;
-    }
+    return cleaned;
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
     
-    // Bloquear letras e caracteres especiais (exceto vírgula)
-    if (/[a-zA-Z!@#$%^&*()_+\-=\[\]{};':"\\|<>\?]/.test(input)) {
-      return;
-    }
+    // Remove a unidade da entrada para processar apenas o valor
+    const inputWithoutUnit = input.replace(new RegExp(` ${getUnit()}$`), '');
     
-    const formatted = formatValue(input, type);
+    const formatted = formatValue(inputWithoutUnit, type);
     setDisplayValue(formatted);
     
-    const interpretedValue = interpretValue(formatted, type);
-    onChange(interpretedValue.toString());
+    // Passar o valor limpo para o onChange
+    const cleanValue = interpretValue(formatted);
+    onChange(cleanValue);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
