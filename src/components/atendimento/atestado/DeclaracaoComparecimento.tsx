@@ -183,7 +183,7 @@ export const DeclaracaoComparecimento = () => {
                 id="acompanhante"
                 value={nomeAcompanhante}
                 onChange={(e) => setNomeAcompanhante(e.target.value)}
-                placeholder="Digite o nome do acompanhante (opcional)"
+                placeholder="Adicione o nome do acompanhante (opcional)"
               />
             </div>
           </div>

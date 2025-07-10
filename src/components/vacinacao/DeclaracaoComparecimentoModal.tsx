@@ -181,7 +181,7 @@ export const DeclaracaoComparecimentoModal = ({ isOpen, onClose }: DeclaracaoCom
                   id="nomeAcompanhante"
                   value={nomeAcompanhante}
                   onChange={(e) => setNomeAcompanhante(e.target.value)}
-                  placeholder="Digite o nome do acompanhante"
+                  placeholder="Adicione o nome do acompanhante"
                 />
               </div>
             )}

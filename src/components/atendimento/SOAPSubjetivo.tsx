@@ -149,13 +149,13 @@ export const SOAPSubjetivo = () => {
                       role="combobox"
                       aria-expanded={open}
                       className={cn(
-                        "w-full justify-between h-12 px-4 bg-white hover:bg-gray-50 transition-colors",
-                        !searchTerm && "text-gray-500"
+                        "w-full justify-between h-11 px-4",
+                        !searchTerm && "text-muted-foreground"
                       )}
                     >
                       <div className="flex items-center gap-3">
-                        <Search className="h-4 w-4 text-gray-400" />
-                        <span>{searchTerm || "Buscar por código ou descrição..."}</span>
+                        <Search className="h-4 w-4 text-muted-foreground" />
+                        <span>{searchTerm || "Pesquise ou selecione por código ou descrição..."}</span>
                       </div>
                       <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -163,7 +163,7 @@ export const SOAPSubjetivo = () => {
                   <PopoverContent className="w-full p-0" align="start">
                     <Command>
                       <CommandInput 
-                        placeholder="Digite pelo menos 2 caracteres (ex: A03 ou Febre)" 
+                        placeholder="Pesquise ou selecione pelo menos 2 caracteres (ex: A03 ou Febre)" 
                         value={searchTerm}
                         onValueChange={setSearchTerm}
                         className="h-12"
@@ -172,7 +172,7 @@ export const SOAPSubjetivo = () => {
                         <CommandEmpty>
                           {searchTerm.length < 2 
                             ? "Digite pelo menos 2 caracteres para buscar"
-                            : "Nenhum resultado encontrado."
+                            : "Nenhum resultado encontrado"
                           }
                         </CommandEmpty>
                         <CommandGroup>
@@ -181,13 +181,13 @@ export const SOAPSubjetivo = () => {
                               key={item.code}
                               value={item.code}
                               onSelect={() => handleCiap2Select(item.code, item.display)}
-                              className="flex items-center gap-3 p-4 hover:bg-blue-50"
+                              className="flex items-center gap-3 p-4 hover:bg-muted"
                             >
                               <div className="flex items-center gap-3 flex-1">
-                                <div className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm font-medium">
+                                <Badge variant="outline" className="font-mono text-xs px-2 py-1">
                                   {item.code}
-                                </div>
-                                <div className="text-gray-900">{item.display}</div>
+                                </Badge>
+                                <div className="text-foreground">{item.display}</div>
                               </div>
                             </CommandItem>
                           ))}
@@ -200,23 +200,23 @@ export const SOAPSubjetivo = () => {
                 {/* Selected CIAPs */}
                 {selectedCiaps.length > 0 && (
                   <div className="space-y-3">
-                    <div className="text-sm font-medium text-gray-700">Selecionados:</div>
+                    <div className="text-sm font-medium text-foreground">Selecionados:</div>
                     <div className="flex flex-wrap gap-2">
                       {selectedCiaps.map((ciap) => (
                         <div
                           key={ciap.code}
-                          className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2"
+                          className="flex items-center gap-2 bg-muted border rounded-lg px-3 py-2"
                         >
-                          <div className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">
+                          <Badge variant="outline" className="font-mono text-xs">
                             {ciap.code}
-                          </div>
-                          <span className="text-sm text-blue-900">{ciap.display}</span>
+                          </Badge>
+                          <span className="text-sm text-muted-foreground">{ciap.display}</span>
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => removeCiap(ciap.code)}
-                            className="h-5 w-5 p-0 hover:bg-blue-200 rounded-full"
+                            className="h-5 w-5 p-0 hover:bg-muted/80 rounded-full"
                           >
                             <X className="h-3 w-3" />
                           </Button>
@@ -226,7 +226,7 @@ export const SOAPSubjetivo = () => {
                   </div>
                 )}
 
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Campo opcional - busque por código (ex: A03) ou descrição (ex: Febre)
                 </p>
               </div>

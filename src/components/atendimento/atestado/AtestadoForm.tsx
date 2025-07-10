@@ -201,7 +201,7 @@ Atesto, para os fins de licença maternidade, que ${nomeCompleto}, CPF ${cpf}, n
                 onChange={(e) => setTextoLivre(e.target.value)}
                 maxLength={4000}
                 rows={8}
-                placeholder="Digite o texto do atestado..."
+                placeholder="Adicione o texto do atestado..."
               />
               <div className="text-sm text-muted-foreground mt-1">
                 {textoLivre.length}/4000 caracteres

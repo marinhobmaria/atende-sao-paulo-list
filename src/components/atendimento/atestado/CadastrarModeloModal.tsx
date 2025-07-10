@@ -111,7 +111,7 @@ export const CadastrarModeloModal = ({ open, onClose, onSave }: CadastrarModeloM
               value={nome}
               onChange={(e) => setNome(e.target.value.slice(0, 41))}
               maxLength={41}
-              placeholder="Digite o nome do modelo"
+              placeholder="Adicione o nome do modelo"
             />
             <div className="text-sm text-muted-foreground mt-1">
               {nome.length}/41 caracteres
@@ -126,7 +126,7 @@ export const CadastrarModeloModal = ({ open, onClose, onSave }: CadastrarModeloM
               onChange={(e) => setConteudo(e.target.value.slice(0, 4000))}
               maxLength={4000}
               rows={8}
-              placeholder="Digite o conteúdo do modelo"
+              placeholder="Adicione o conteúdo do modelo"
             />
             <div className="text-sm text-muted-foreground mt-1">
               {conteudo.length}/4000 caracteres

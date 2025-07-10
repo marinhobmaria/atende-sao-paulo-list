@@ -368,7 +368,7 @@ export const PrescricaoMedicamento = ({ ultimoPeso }: PrescricaoMedicamentoProps
                       <Label htmlFor="medicamento">Princípio ativo/medicamento *</Label>
                       <Input
                         id="medicamento"
-                        placeholder="Digite para buscar medicamento..."
+                        placeholder="Pesquise ou selecione para buscar medicamento..."
                         value={formData.principioAtivo}
                         onChange={(e) => setFormData({...formData, principioAtivo: e.target.value})}
                       />

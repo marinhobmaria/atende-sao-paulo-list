@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Search } from "lucide-react";
 
 const serviceTypes = [
   "ADMINISTRAÇÃO DE MEDICAMENTO",
@@ -46,27 +46,30 @@ export const ServiceTypeSearch = ({ value, onChange }: ServiceTypeSearchProps) =
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="w-full justify-between text-left font-normal"
+          className="w-full justify-between text-left font-normal h-11 px-4"
         >
-          <div className="flex flex-wrap gap-1">
-            {value.length === 0 ? (
-              <span className="text-muted-foreground">Selecione os serviços</span>
-            ) : value.length <= 2 ? (
-              value.map((service) => (
-                <Badge key={service} variant="secondary" className="text-xs">
-                  {service}
-                </Badge>
-              ))
-            ) : (
-              <>
-                <Badge variant="secondary" className="text-xs">
-                  {value[0]}
-                </Badge>
-                <Badge variant="secondary" className="text-xs">
-                  +{value.length - 1} mais
-                </Badge>
-              </>
-            )}
+          <div className="flex items-center gap-3">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <div className="flex flex-wrap gap-1">
+              {value.length === 0 ? (
+                <span className="text-muted-foreground">Pesquise ou selecione os serviços</span>
+              ) : value.length <= 2 ? (
+                value.map((service) => (
+                  <Badge key={service} variant="secondary" className="text-xs">
+                    {service}
+                  </Badge>
+                ))
+              ) : (
+                <>
+                  <Badge variant="secondary" className="text-xs">
+                    {value[0]}
+                  </Badge>
+                  <Badge variant="secondary" className="text-xs">
+                    +{value.length - 1} mais
+                  </Badge>
+                </>
+              )}
+            </div>
           </div>
           <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
@@ -101,7 +104,7 @@ export const ServiceTypeSearch = ({ value, onChange }: ServiceTypeSearchProps) =
           {serviceTypes.map((serviceType) => (
             <div
               key={serviceType}
-              className="flex items-center space-x-2 p-3 hover:bg-gray-50 cursor-pointer"
+              className="flex items-center space-x-2 p-3 hover:bg-muted cursor-pointer"
               onClick={() => handleServiceTypeToggle(serviceType)}
             >
               <Checkbox
@@ -116,8 +119,8 @@ export const ServiceTypeSearch = ({ value, onChange }: ServiceTypeSearchProps) =
         </div>
         
         {value.length > 0 && (
-          <div className="p-3 border-t bg-gray-50">
-            <div className="text-xs text-gray-600">
+          <div className="p-3 border-t bg-muted">
+            <div className="text-xs text-muted-foreground">
               {value.length} serviço{value.length !== 1 ? 's' : ''} selecionado{value.length !== 1 ? 's' : ''}
             </div>
           </div>

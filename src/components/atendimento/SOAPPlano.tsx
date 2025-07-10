@@ -314,7 +314,7 @@ export const SOAPPlano = () => {
                 
                 <div className="relative">
                   <Input
-                    placeholder="Digite o código ou descrição CIAP-2..."
+                    placeholder="Pesquise ou selecione o código ou descrição CIAP-2..."
                     value={ciapSearch}
                     onChange={(e) => {
                       setCiapSearch(e.target.value);
@@ -384,7 +384,7 @@ export const SOAPPlano = () => {
                 
                 <div className="relative">
                   <Input
-                    placeholder="Digite o código ou descrição SIGTAP..."
+                    placeholder="Pesquise ou selecione o código ou descrição SIGTAP..."
                     value={sigtapSearch}
                     onChange={(e) => {
                       setSigtapSearch(e.target.value);
@@ -472,7 +472,7 @@ export const SOAPPlano = () => {
               Adicionar Comentário
             </h3>
             <Textarea
-              placeholder="Digite seu comentário..."
+              placeholder="Adicione seu comentário..."
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
               className="mb-4"

@@ -83,14 +83,14 @@ export const SearchableSelect = ({
                   variant="outline"
                   role="combobox"
                   className={cn(
-                    "w-full justify-between h-9 px-3 bg-white hover:bg-gray-50 border-gray-300",
-                    !searchTerm && "text-gray-500"
+                    "w-full justify-between h-11 px-4",
+                    !searchTerm && "text-muted-foreground"
                   )}
                   onClick={() => setShowResults(!showResults)}
                 >
-                  <div className="flex items-center gap-2">
-                    <Search className="h-4 w-4 text-gray-400" />
-                    <span className="text-sm">{searchTerm || placeholder}</span>
+                  <div className="flex items-center gap-3">
+                    <Search className="h-4 w-4 text-muted-foreground" />
+                    <span>{searchTerm || placeholder}</span>
                   </div>
                   <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -98,7 +98,7 @@ export const SearchableSelect = ({
               <PopoverContent className="w-full p-0" align="start">
                 <Command>
                   <CommandInput 
-                    placeholder={placeholder}
+                    placeholder="Pesquise ou selecione por código ou descrição"
                     value={searchTerm}
                     onValueChange={setSearchTerm}
                     className="h-9"

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, User, Calendar } from "lucide-react";
+import { ChevronDown, User, Calendar, Search } from "lucide-react";
 
 // Mock citizen data with birth dates for age calculation and mother names
 const mockCitizens = [
@@ -113,11 +113,14 @@ export const CitizenOnlySearch = ({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="w-full justify-between text-left font-normal h-12"
+          className="w-full justify-between text-left font-normal h-11 px-4"
         >
-          <span className={value ? "text-foreground" : "text-muted-foreground"}>
-            {value || "Selecione um munícipe"}
-          </span>
+          <div className="flex items-center gap-3">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <span className={value ? "text-foreground" : "text-muted-foreground"}>
+              {value || "Pesquise ou selecione um munícipe"}
+            </span>
+          </div>
           <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -125,7 +128,7 @@ export const CitizenOnlySearch = ({
       <PopoverContent className="w-96 p-0" align="start">
         <div className="p-3 border-b">
           <Input
-            placeholder="Buscar por nome, CPF, CNS ou data de nascimento..."
+            placeholder="Pesquise ou selecione por nome, CPF, CNS ou data de nascimento..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="text-sm"
