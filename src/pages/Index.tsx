@@ -5,6 +5,7 @@ import { AttendanceHeader } from "@/components/attendance/AttendanceHeader";
 import { AddCitizen } from "@/components/attendance/AddCitizen";
 import { StatusCounters } from "@/components/attendance/StatusCounters";
 import { PasswordCaller } from "@/components/attendance/PasswordCaller";
+import { QueueControls } from "@/components/attendance/QueueControls";
 import { PageLayout } from "@/components/layout/PageLayout";
 
 // Mock data for queue counts - in a real app this would come from a store/context
@@ -32,6 +33,24 @@ const Index = () => {
     const patientNumber = `A${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`;
     setCurrentCall(patientNumber);
     console.log(`Chamando paciente: ${patientName} - Senha: ${patientNumber}`);
+  };
+
+  const handleCallNext = () => {
+    // Lógica para chamar o próximo paciente da fila
+    // Em uma implementação real, isso buscaria o próximo paciente da lista
+    console.log("Chamando próximo paciente da fila...");
+  };
+
+  const handleAddToQueue = () => {
+    // Abre o formulário de adicionar paciente
+    setShowAddCitizen(true);
+  };
+
+  const handleRefreshQueue = () => {
+    // Lógica para atualizar a fila
+    // Em uma implementação real, isso faria uma nova requisição aos dados
+    console.log("Atualizando fila...");
+    window.location.reload(); // Temporário para demonstração
   };
 
   return (
@@ -82,6 +101,15 @@ const Index = () => {
           onCallPatient={handleCallPatient}
         />
       </div>
+
+      {/* Controles da Fila - Painel Lateral Fixo */}
+      <QueueControls
+        onCallNext={handleCallNext}
+        onAddToQueue={handleAddToQueue} 
+        onRefreshQueue={handleRefreshQueue}
+        waitingCount={statusCounts.waiting}
+        averageWaitTime={36}
+      />
 
       {/* Fixed Password Caller */}
       <PasswordCaller />
