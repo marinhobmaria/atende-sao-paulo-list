@@ -54,8 +54,8 @@ export function AppSidebar() {
           </div>
           {!isCollapsed && (
             <div>
-              <h2 className="font-semibold text-lg">Sistema</h2>
-              <p className="text-xs text-muted-foreground">Saúde Municipal</p>
+              <h2 className="font-semibold text-lg">Saúde Simples</h2>
+              <p className="text-xs text-muted-foreground">Sistema de Gestão</p>
             </div>
           )}
         </div>

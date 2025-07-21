@@ -3,12 +3,11 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home } from "lucide-react";
 import { EscutaInicialForm } from "@/components/escuta-inicial/EscutaInicialForm";
 import { CitizenCompactInfo } from "@/components/escuta-inicial/CitizenCompactInfo";
 import { FinalizacaoAtendimentoModal } from "@/components/finalizacao/FinalizacaoAtendimentoModal";
 import { FolhaRostoTab } from "@/components/folha-rosto/FolhaRostoTab";
+import { PageLayout } from "@/components/layout/PageLayout";
 import { toast } from "@/hooks/use-toast";
 
 const EscutaInicial = () => {
@@ -103,74 +102,59 @@ const EscutaInicial = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Breadcrumb */}
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/" className="flex items-center gap-2">
-                <Home className="h-4 w-4" />
-                Home
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Lista de Atendimento</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Escuta Inicial</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+    <PageLayout breadcrumbItems={[
+      { title: "Lista de Atendimento", href: "/" }, 
+      { title: "Escuta Inicial" }
+    ]}>
+      <div className="p-6">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Informações compactas do cidadão */}
+          <CitizenCompactInfo 
+            cidadao={cidadao}
+            onBack={() => navigate("/")}
+          />
 
-        {/* Informações compactas do cidadão */}
-        <CitizenCompactInfo 
-          cidadao={cidadao}
-          onBack={() => navigate("/")}
-        />
+          {/* Tabs Container */}
+          <Card className="shadow-lg">
+            <CardContent className="p-6">
+              <Tabs defaultValue="escuta-inicial" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="folha-rosto">Folha Rosto</TabsTrigger>
+                  <TabsTrigger value="escuta-inicial">Escuta Inicial</TabsTrigger>
+                  <TabsTrigger value="agendamentos">Agendamentos</TabsTrigger>
+                </TabsList>
 
-        {/* Tabs Container */}
-        <Card className="shadow-lg">
-          <CardContent className="p-6">
-            <Tabs defaultValue="escuta-inicial" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="folha-rosto">Folha Rosto</TabsTrigger>
-                <TabsTrigger value="escuta-inicial">Escuta Inicial</TabsTrigger>
-                <TabsTrigger value="agendamentos">Agendamentos</TabsTrigger>
-              </TabsList>
+                <TabsContent value="folha-rosto" className="mt-6">
+                  <FolhaRostoTab cidadao={cidadao} />
+                </TabsContent>
 
-              <TabsContent value="folha-rosto" className="mt-6">
-                <FolhaRostoTab cidadao={cidadao} />
-              </TabsContent>
+                <TabsContent value="escuta-inicial" className="mt-6">
+                  <EscutaInicialForm
+                    onSubmit={handleFinalizarEscuta}
+                    onCancel={handleCancelar}
+                    isLoading={isLoading}
+                  />
+                </TabsContent>
 
-              <TabsContent value="escuta-inicial" className="mt-6">
-                <EscutaInicialForm
-                  onSubmit={handleFinalizarEscuta}
-                  onCancel={handleCancelar}
-                  isLoading={isLoading}
-                />
-              </TabsContent>
+                <TabsContent value="agendamentos" className="mt-6">
+                  <div className="text-center py-8 text-gray-500">
+                    <p>Conteúdo dos Agendamentos será implementado aqui</p>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
 
-              <TabsContent value="agendamentos" className="mt-6">
-                <div className="text-center py-8 text-gray-500">
-                  <p>Conteúdo dos Agendamentos será implementado aqui</p>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-
-        {/* Modal de Finalização */}
-        <FinalizacaoAtendimentoModal
-          isOpen={showFinalizacao}
-          onClose={() => setShowFinalizacao(false)}
-          onSave={handleFinalizarAtendimento}
-          isLoading={isFinalizando}
-        />
+          {/* Modal de Finalização */}
+          <FinalizacaoAtendimentoModal
+            isOpen={showFinalizacao}
+            onClose={() => setShowFinalizacao(false)}
+            onSave={handleFinalizarAtendimento}
+            isLoading={isFinalizando}
+          />
+        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

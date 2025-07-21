@@ -3,13 +3,13 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { Home, AlertCircle, CheckCircle } from "lucide-react";
+import { AlertCircle, CheckCircle } from "lucide-react";
 import { SOAPContainer } from "@/components/atendimento/SOAPContainer";
 import { CitizenCompactInfo } from "@/components/escuta-inicial/CitizenCompactInfo";
 import { FinalizacaoAtendimentoModal } from "@/components/finalizacao/FinalizacaoAtendimentoModal";
 import { FolhaRostoTab } from "@/components/folha-rosto/FolhaRostoTab";
+import { PageLayout } from "@/components/layout/PageLayout";
 import { toast } from "@/hooks/use-toast";
 
 const Atendimento = () => {
@@ -71,130 +71,115 @@ const Atendimento = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Breadcrumb */}
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/" className="flex items-center gap-2">
-                <Home className="h-4 w-4" />
-                Home
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Lista de Atendimento</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Atendimento</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+    <PageLayout breadcrumbItems={[
+      { title: "Lista de Atendimento", href: "/" }, 
+      { title: "Atendimento" }
+    ]}>
+      <div className="p-6">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Informações compactas do cidadão */}
+          <CitizenCompactInfo 
+            cidadao={cidadao}
+            onBack={() => navigate("/")}
+          />
 
-        {/* Informações compactas do cidadão */}
-        <CitizenCompactInfo 
-          cidadao={cidadao}
-          onBack={() => navigate("/")}
-        />
+          {/* Tabs Container */}
+          <Card className="shadow-lg">
+            <CardContent className="p-6">
+              <Tabs defaultValue="soap" className="w-full">
+                <TabsList className="grid w-full grid-cols-5">
+                  <TabsTrigger value="folha-rosto">Folha Rosto</TabsTrigger>
+                  <TabsTrigger value="soap">SOAP</TabsTrigger>
+                  <TabsTrigger value="vacinacao">Vacinação</TabsTrigger>
+                  <TabsTrigger value="historico">Histórico</TabsTrigger>
+                  <TabsTrigger value="agendamentos">Agendamentos</TabsTrigger>
+                </TabsList>
 
-        {/* Tabs Container */}
-        <Card className="shadow-lg">
-          <CardContent className="p-6">
-            <Tabs defaultValue="soap" className="w-full">
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="folha-rosto">Folha Rosto</TabsTrigger>
-                <TabsTrigger value="soap">SOAP</TabsTrigger>
-                <TabsTrigger value="vacinacao">Vacinação</TabsTrigger>
-                <TabsTrigger value="historico">Histórico</TabsTrigger>
-                <TabsTrigger value="agendamentos">Agendamentos</TabsTrigger>
-              </TabsList>
+                <TabsContent value="folha-rosto" className="mt-6">
+                  <FolhaRostoTab cidadao={cidadao} />
+                </TabsContent>
 
-              <TabsContent value="folha-rosto" className="mt-6">
-                <FolhaRostoTab cidadao={cidadao} />
-              </TabsContent>
+                <TabsContent value="soap" className="mt-6">
+                  <SOAPContainer onFinalizarAtendimento={() => setShowConfirmFinalizacao(true)} />
+                </TabsContent>
 
-              <TabsContent value="soap" className="mt-6">
-                <SOAPContainer onFinalizarAtendimento={() => setShowConfirmFinalizacao(true)} />
-              </TabsContent>
-
-              <TabsContent value="vacinacao" className="mt-6">
-                <div className="space-y-4">
-                  <p className="text-muted-foreground">
-                    Registro de vacinas aplicadas e cartão de vacinação.
-                  </p>
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Vacinas Pendentes</h4>
-                    <p className="text-sm text-muted-foreground">Nenhuma vacina pendente encontrada.</p>
+                <TabsContent value="vacinacao" className="mt-6">
+                  <div className="space-y-4">
+                    <p className="text-muted-foreground">
+                      Registro de vacinas aplicadas e cartão de vacinação.
+                    </p>
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Vacinas Pendentes</h4>
+                      <p className="text-sm text-muted-foreground">Nenhuma vacina pendente encontrada.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Histórico de Vacinação</h4>
+                      <p className="text-sm text-muted-foreground">Histórico de vacinas aplicadas anteriormente.</p>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Histórico de Vacinação</h4>
-                    <p className="text-sm text-muted-foreground">Histórico de vacinas aplicadas anteriormente.</p>
+                </TabsContent>
+
+                <TabsContent value="historico" className="mt-6">
+                  <div className="space-y-4">
+                    <p className="text-muted-foreground">
+                      Histórico completo de atendimentos anteriores do cidadão.
+                    </p>
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Atendimentos Recentes</h4>
+                      <p className="text-sm text-muted-foreground">Nenhum atendimento anterior registrado.</p>
+                    </div>
                   </div>
+                </TabsContent>
+
+                <TabsContent value="agendamentos" className="mt-6">
+                  <div className="space-y-4">
+                    <p className="text-muted-foreground">
+                      Consultas e procedimentos agendados para o cidadão.
+                    </p>
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Próximos Agendamentos</h4>
+                      <p className="text-sm text-muted-foreground">Nenhum agendamento futuro encontrado.</p>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+
+          {/* Modal de Confirmação de Finalização */}
+          {showConfirmFinalizacao && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <AlertCircle className="h-6 w-6 text-orange-500" />
+                  <h3 className="text-lg font-semibold">Confirmar Finalização</h3>
                 </div>
-              </TabsContent>
-
-              <TabsContent value="historico" className="mt-6">
-                <div className="space-y-4">
-                  <p className="text-muted-foreground">
-                    Histórico completo de atendimentos anteriores do cidadão.
-                  </p>
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Atendimentos Recentes</h4>
-                    <p className="text-sm text-muted-foreground">Nenhum atendimento anterior registrado.</p>
-                  </div>
+                <p className="text-gray-600 mb-6">
+                  Tem certeza que deseja finalizar este atendimento? Esta ação não poderá ser desfeita.
+                </p>
+                <div className="flex gap-2 justify-end">
+                  <Button variant="outline" onClick={() => setShowConfirmFinalizacao(false)}>
+                    Cancelar
+                  </Button>
+                  <Button onClick={handleConfirmarFinalizacao} className="bg-green-600 hover:bg-green-700">
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Sim, finalizar
+                  </Button>
                 </div>
-              </TabsContent>
-
-              <TabsContent value="agendamentos" className="mt-6">
-                <div className="space-y-4">
-                  <p className="text-muted-foreground">
-                    Consultas e procedimentos agendados para o cidadão.
-                  </p>
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Próximos Agendamentos</h4>
-                    <p className="text-sm text-muted-foreground">Nenhum agendamento futuro encontrado.</p>
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-
-        {/* Modal de Confirmação de Finalização */}
-        {showConfirmFinalizacao && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-              <div className="flex items-center gap-3 mb-4">
-                <AlertCircle className="h-6 w-6 text-orange-500" />
-                <h3 className="text-lg font-semibold">Confirmar Finalização</h3>
-              </div>
-              <p className="text-gray-600 mb-6">
-                Tem certeza que deseja finalizar este atendimento? Esta ação não poderá ser desfeita.
-              </p>
-              <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={() => setShowConfirmFinalizacao(false)}>
-                  Cancelar
-                </Button>
-                <Button onClick={handleConfirmarFinalizacao} className="bg-green-600 hover:bg-green-700">
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Sim, finalizar
-                </Button>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Modal de Finalização */}
-        <FinalizacaoAtendimentoModal
-          isOpen={showFinalizacao}
-          onClose={() => setShowFinalizacao(false)}
-          onSave={handleFinalizarAtendimento}
-          isLoading={isFinalizando}
-        />
+          {/* Modal de Finalização */}
+          <FinalizacaoAtendimentoModal
+            isOpen={showFinalizacao}
+            onClose={() => setShowFinalizacao(false)}
+            onSave={handleFinalizarAtendimento}
+            isLoading={isFinalizando}
+          />
+        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 
