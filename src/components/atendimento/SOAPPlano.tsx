@@ -162,7 +162,7 @@ export const SOAPPlano = () => {
           </p>
           
           <Tabs defaultValue="plano-cuidado" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="plano-cuidado" className="flex items-center gap-2">
                 <Stethoscope className="h-4 w-4" />
                 Plano de Cuidado
@@ -171,13 +171,21 @@ export const SOAPPlano = () => {
                 <Pill className="h-4 w-4" />
                 Prescrição
               </TabsTrigger>
-              <TabsTrigger value="atestados" className="flex items-center gap-2">
+              <TabsTrigger value="exames" className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
-                Atestados
+                Exames Solicitados
               </TabsTrigger>
-              <TabsTrigger value="declaracao" className="flex items-center gap-2">
+              <TabsTrigger value="encaminhamentos" className="flex items-center gap-2">
+                <UserPlus className="h-4 w-4" />
+                Encaminhamentos
+              </TabsTrigger>
+              <TabsTrigger value="agendamentos" className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Agendamentos
+              </TabsTrigger>
+              <TabsTrigger value="documentos" className="flex items-center gap-2">
                 <ClipboardCheck className="h-4 w-4" />
-                Declaração de Comparecimento
+                Atestados e Declarações
               </TabsTrigger>
             </TabsList>
             
@@ -253,209 +261,6 @@ export const SOAPPlano = () => {
                 </div>
               </div>
 
-              {/* Exames Solicitados - OPCIONAL */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    <Label className="text-base font-medium">Exames Solicitados</Label>
-                    <Badge variant="secondary" className="text-xs">Opcional</Badge>
-                  </div>
-                  <Button onClick={adicionarExame} size="sm" className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    Adicionar Exame
-                  </Button>
-                </div>
-                
-                {exames.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Nenhum exame solicitado. Clique em "Adicionar Exame" para começar.
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {exames.map((exame) => (
-                      <Card key={exame.id} className="p-4">
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <h4 className="font-medium">Exame #{exames.indexOf(exame) + 1}</h4>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removerExame(exame.id)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="space-y-2">
-                              <Label>Tipo de Exame</Label>
-                              <Input
-                                placeholder="Ex: Hemograma completo"
-                                value={exame.tipo}
-                                onChange={(e) => atualizarExame(exame.id, 'tipo', e.target.value)}
-                              />
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <Label>Motivo</Label>
-                              <Input
-                                placeholder="Motivo da solicitação"
-                                value={exame.motivo}
-                                onChange={(e) => atualizarExame(exame.id, 'motivo', e.target.value)}
-                              />
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <Label>Urgência</Label>
-                              <Select
-                                value={exame.urgencia}
-                                onValueChange={(value) => atualizarExame(exame.id, 'urgencia', value)}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecione a urgência" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="normal">Normal</SelectItem>
-                                  <SelectItem value="urgente">Urgente</SelectItem>
-                                  <SelectItem value="muito-urgente">Muito Urgente</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Encaminhamentos - OPCIONAL */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <UserPlus className="h-5 w-5" />
-                    <Label className="text-base font-medium">Encaminhamentos</Label>
-                    <Badge variant="secondary" className="text-xs">Opcional</Badge>
-                  </div>
-                  <Button onClick={adicionarEncaminhamento} size="sm" className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    Adicionar Encaminhamento
-                  </Button>
-                </div>
-                
-                {encaminhamentos.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Nenhum encaminhamento realizado. Clique em "Adicionar Encaminhamento" para começar.
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {encaminhamentos.map((encaminhamento) => (
-                      <Card key={encaminhamento.id} className="p-4">
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <h4 className="font-medium">Encaminhamento #{encaminhamentos.indexOf(encaminhamento) + 1}</h4>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removerEncaminhamento(encaminhamento.id)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="space-y-2">
-                              <Label>Destino</Label>
-                              <Input
-                                placeholder="Ex: Cardiologia, UPA, etc."
-                                value={encaminhamento.destino}
-                                onChange={(e) => atualizarEncaminhamento(encaminhamento.id, 'destino', e.target.value)}
-                              />
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <Label>Motivo</Label>
-                              <Input
-                                placeholder="Motivo do encaminhamento"
-                                value={encaminhamento.motivo}
-                                onChange={(e) => atualizarEncaminhamento(encaminhamento.id, 'motivo', e.target.value)}
-                              />
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <Label>Urgência</Label>
-                              <Select
-                                value={encaminhamento.urgencia}
-                                onValueChange={(value) => atualizarEncaminhamento(encaminhamento.id, 'urgencia', value)}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecione a urgência" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="normal">Normal</SelectItem>
-                                  <SelectItem value="urgente">Urgente</SelectItem>
-                                  <SelectItem value="muito-urgente">Muito Urgente</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Agendamento de Retorno - OPCIONAL */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  <Label className="text-base font-medium">Agendamento de Retorno</Label>
-                  <Badge variant="secondary" className="text-xs">Opcional</Badge>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Data Sugerida para Retorno</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !retornoData && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {retornoData ? format(retornoData, "PPP", { locale: ptBR }) : "Selecione uma data"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={retornoData}
-                          onSelect={setRetornoData}
-                          disabled={(date) => date < new Date()}
-                          initialFocus
-                          className="pointer-events-auto"
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>Motivo do Retorno</Label>
-                    <Input
-                      placeholder="Ex: Reavaliação, controle, resultado de exames..."
-                      value={retornoMotivo}
-                      onChange={(e) => setRetornoMotivo(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
 
               {/* Resumo de Validação */}
               {Object.keys(errors).length > 0 && (
@@ -599,14 +404,229 @@ export const SOAPPlano = () => {
               </div>
             </TabsContent>
             
-            {/* ABA 3: ATESTADOS */}
-            <TabsContent value="atestados" className="mt-6">
-              <AtestadoSection />
+            {/* ABA 3: EXAMES SOLICITADOS */}
+            <TabsContent value="exames" className="mt-6 space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    <Label className="text-base font-medium">Exames Solicitados</Label>
+                    <Badge variant="secondary" className="text-xs">Opcional</Badge>
+                  </div>
+                  <Button onClick={adicionarExame} size="sm" className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Adicionar Exame
+                  </Button>
+                </div>
+                
+                {exames.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Nenhum exame solicitado. Clique em "Adicionar Exame" para começar.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {exames.map((exame) => (
+                      <Card key={exame.id} className="p-4">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-medium">Exame #{exames.indexOf(exame) + 1}</h4>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removerExame(exame.id)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <Label>Tipo de Exame</Label>
+                              <Input
+                                placeholder="Ex: Hemograma completo"
+                                value={exame.tipo}
+                                onChange={(e) => atualizarExame(exame.id, 'tipo', e.target.value)}
+                              />
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <Label>Motivo</Label>
+                              <Input
+                                placeholder="Motivo da solicitação"
+                                value={exame.motivo}
+                                onChange={(e) => atualizarExame(exame.id, 'motivo', e.target.value)}
+                              />
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <Label>Urgência</Label>
+                              <Select
+                                value={exame.urgencia}
+                                onValueChange={(value) => atualizarExame(exame.id, 'urgencia', value)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecione a urgência" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="normal">Normal</SelectItem>
+                                  <SelectItem value="urgente">Urgente</SelectItem>
+                                  <SelectItem value="muito-urgente">Muito Urgente</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
             </TabsContent>
             
-            {/* ABA 4: DECLARAÇÃO DE COMPARECIMENTO */}
-            <TabsContent value="declaracao" className="mt-6">
-              <DeclaracaoComparecimento />
+            {/* ABA 4: ENCAMINHAMENTOS */}
+            <TabsContent value="encaminhamentos" className="mt-6 space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <UserPlus className="h-5 w-5" />
+                    <Label className="text-base font-medium">Encaminhamentos</Label>
+                    <Badge variant="secondary" className="text-xs">Opcional</Badge>
+                  </div>
+                  <Button onClick={adicionarEncaminhamento} size="sm" className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Adicionar Encaminhamento
+                  </Button>
+                </div>
+                
+                {encaminhamentos.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Nenhum encaminhamento realizado. Clique em "Adicionar Encaminhamento" para começar.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {encaminhamentos.map((encaminhamento) => (
+                      <Card key={encaminhamento.id} className="p-4">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-medium">Encaminhamento #{encaminhamentos.indexOf(encaminhamento) + 1}</h4>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removerEncaminhamento(encaminhamento.id)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <Label>Destino</Label>
+                              <Input
+                                placeholder="Ex: Cardiologia, UPA, etc."
+                                value={encaminhamento.destino}
+                                onChange={(e) => atualizarEncaminhamento(encaminhamento.id, 'destino', e.target.value)}
+                              />
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <Label>Motivo</Label>
+                              <Input
+                                placeholder="Motivo do encaminhamento"
+                                value={encaminhamento.motivo}
+                                onChange={(e) => atualizarEncaminhamento(encaminhamento.id, 'motivo', e.target.value)}
+                              />
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <Label>Urgência</Label>
+                              <Select
+                                value={encaminhamento.urgencia}
+                                onValueChange={(value) => atualizarEncaminhamento(encaminhamento.id, 'urgencia', value)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecione a urgência" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="normal">Normal</SelectItem>
+                                  <SelectItem value="urgente">Urgente</SelectItem>
+                                  <SelectItem value="muito-urgente">Muito Urgente</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+            
+            {/* ABA 5: AGENDAMENTOS */}
+            <TabsContent value="agendamentos" className="mt-6 space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  <Label className="text-base font-medium">Agendamento de Retorno</Label>
+                  <Badge variant="secondary" className="text-xs">Opcional</Badge>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Data Sugerida para Retorno</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !retornoData && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {retornoData ? format(retornoData, "PPP", { locale: ptBR }) : "Selecione uma data"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={retornoData}
+                          onSelect={setRetornoData}
+                          disabled={(date) => date < new Date()}
+                          initialFocus
+                          className="pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Motivo do Retorno</Label>
+                    <Input
+                      placeholder="Ex: Reavaliação, controle, resultado de exames..."
+                      value={retornoMotivo}
+                      onChange={(e) => setRetornoMotivo(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+            
+            {/* ABA 6: ATESTADOS E DECLARAÇÕES */}
+            <TabsContent value="documentos" className="mt-6">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Atestados</h3>
+                  <AtestadoSection />
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Declaração de Comparecimento</h3>
+                  <DeclaracaoComparecimento />
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </CardContent>
