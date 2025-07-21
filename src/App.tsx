@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
 import EscutaInicial from "./pages/EscutaInicial";
 import Atendimento from "./pages/Atendimento";
 import Vacinacao from "./pages/Vacinacao";
@@ -20,6 +21,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/escuta-inicial" element={<EscutaInicial />} />
           <Route path="/atendimento" element={<Atendimento />} />
           <Route path="/vacinacao" element={<Vacinacao />} />

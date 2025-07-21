@@ -1,5 +1,5 @@
 
-import { Home, Users, Calendar, Settings } from "lucide-react";
+import { BarChart3, UserCheck, Stethoscope, Users } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -16,24 +16,24 @@ import {
 
 const navigationItems = [
   {
-    title: "Atendimentos",
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: BarChart3,
+  },
+  {
+    title: "Fila de Atendimento",
     url: "/",
-    icon: Home,
+    icon: UserCheck,
   },
   {
-    title: "Munícipes",
-    url: "/municipes",
+    title: "Escuta Inicial",
+    url: "/escuta-inicial",
+    icon: Stethoscope,
+  },
+  {
+    title: "Atendimento",
+    url: "/atendimento",
     icon: Users,
-  },
-  {
-    title: "Agendamentos", 
-    url: "/agendamentos",
-    icon: Calendar,
-  },
-  {
-    title: "Configurações",
-    url: "/configuracoes",
-    icon: Settings,
   },
 ];
 
