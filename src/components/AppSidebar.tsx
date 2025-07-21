@@ -1,5 +1,5 @@
 
-import { BarChart3, UserCheck, Settings, LogOut } from "lucide-react";
+import { BarChart3, UserCheck } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -11,7 +11,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
 
@@ -28,18 +27,6 @@ const navigationItems = [
   },
 ];
 
-const footerItems = [
-  {
-    title: "Configurações",
-    url: "/configuracoes",
-    icon: Settings,
-  },
-  {
-    title: "Sair",
-    url: "/sair",
-    icon: LogOut,
-  },
-];
 
 export function AppSidebar() {
   const { state } = useSidebar();
@@ -89,24 +76,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
-      <SidebarFooter className="p-4">
-        <SidebarMenu>
-          {footerItems.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild tooltip={isCollapsed ? item.title : undefined}>
-                <NavLink
-                  to={item.url}
-                  className="flex items-center gap-2 w-full hover:bg-accent hover:text-accent-foreground text-muted-foreground"
-                >
-                  <item.icon className="h-4 w-4" />
-                  {!isCollapsed && <span>{item.title}</span>}
-                </NavLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarFooter>
     </Sidebar>
   );
 }
