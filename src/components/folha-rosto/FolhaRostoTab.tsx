@@ -1,13 +1,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Stethoscope, Heart, Activity, Thermometer, Pill, Syringe, AlertTriangle, ChevronDown } from "lucide-react";
+import { Syringe, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { PatientDetails } from "./PatientDetails";
 import { MeasurementCharts } from "./charts/MeasurementCharts";
-import { ClinicalTimeline } from "./timeline/ClinicalTimeline";
 
 interface FolhaRostoTabProps {
   cidadao: {
@@ -36,17 +32,15 @@ export const FolhaRostoTab = ({ cidadao }: FolhaRostoTabProps) => {
   };
 
   return (
-    <div className="flex gap-6 h-full">
-      {/* Main Content - Left Side */}
-      <div className="flex-1 space-y-6 pr-4">
-        {/* Dados Pessoais Detalhados */}
-        <PatientDetails cidadao={cidadao} />
+    <div className="space-y-6">
+      {/* Dados Pessoais Detalhados */}
+      <PatientDetails cidadao={cidadao} />
 
-        {/* Gráficos de Medições */}
-        <MeasurementCharts patientId={cidadao.id} />
+      {/* Gráficos de Medições */}
+      <MeasurementCharts patientId={cidadao.id} />
 
-        {/* Grid com resumo clínico */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Grid com resumo clínico */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column */}
           <div className="space-y-4">
             {/* Vacinação */}
@@ -211,18 +205,6 @@ export const FolhaRostoTab = ({ cidadao }: FolhaRostoTabProps) => {
                 <p className="text-sm text-muted-foreground">IG Cronológica: 25 semanas e 1 dia</p>
               </CardContent>
             </Card>
-          </div>
-        </div>
-      </div>
-
-      {/* Timeline - Right Side - Fixed */}
-      <div className="w-80 flex-shrink-0">
-        <div className="sticky top-4">
-          <ClinicalTimeline 
-            patientId={cidadao.id}
-            isFloating={false}
-            onEventClick={handleTimelineEventClick}
-          />
         </div>
       </div>
     </div>
