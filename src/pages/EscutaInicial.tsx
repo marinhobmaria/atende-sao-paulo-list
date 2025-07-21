@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,6 +8,9 @@ import { CitizenCompactInfo } from "@/components/escuta-inicial/CitizenCompactIn
 import { FinalizacaoAtendimentoModal } from "@/components/finalizacao/FinalizacaoAtendimentoModal";
 import { FolhaRostoTab } from "@/components/folha-rosto/FolhaRostoTab";
 import { PageLayout } from "@/components/layout/PageLayout";
+import { usePatientStatus } from "@/hooks/usePatientStatus";
+import { useAuditLog } from "@/hooks/useAuditLog";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { toast } from "@/hooks/use-toast";
 
 const EscutaInicial = () => {
@@ -18,6 +21,10 @@ const EscutaInicial = () => {
   const [showFinalizacao, setShowFinalizacao] = useState(false);
   const [isFinalizando, setIsFinalizando] = useState(false);
   const [escutaData, setEscutaData] = useState<any>(null);
+  
+  const { logAction } = useAuditLog();
+  const { currentUser, canStartInitialListening } = useUserPermissions();
+  const patientStatus = usePatientStatus(cidadaoId || "1", "waiting");
 
   // Mock data do cidadão baseado na imagem de referência
   const cidadao = {
@@ -37,11 +44,40 @@ const EscutaInicial = () => {
     photo: "https://images.unsplash.com/photo-1494790108755-2616b812e672?w=150&h=150&fit=crop&crop=face"
   };
 
+  // Initialize patient status when component mounts
+  useEffect(() => {
+    if (canStartInitialListening()) {
+      patientStatus.transitionTo(
+        'initial-listening', 
+        'Escuta inicial iniciada',
+        currentUser?.id,
+        currentUser?.name
+      );
+    }
+  }, []);
+
   const handleFinalizarEscuta = async (data: any) => {
     setIsLoading(true);
     try {
       console.log("Dados da escuta inicial:", data);
       setEscutaData(data);
+      
+      // Log escuta inicial completion
+      logAction(
+        'Escuta inicial concluída',
+        { 
+          patientId: cidadao.id,
+          desfecho: data.desfecho,
+          classificacaoRisco: data.classificacaoRisco,
+          ciap2: data.ciap2
+        },
+        'escuta-inicial',
+        'success',
+        cidadao.id,
+        cidadao.name,
+        currentUser?.id,
+        currentUser?.name
+      );
       
       toast({
         title: "Escuta inicial registrada",
@@ -50,6 +86,17 @@ const EscutaInicial = () => {
 
       setShowFinalizacao(true);
     } catch (error) {
+      logAction(
+        'Erro na escuta inicial',
+        { error: error.message, patientId: cidadao.id },
+        'escuta-inicial',
+        'error',
+        cidadao.id,
+        cidadao.name,
+        currentUser?.id,
+        currentUser?.name
+      );
+      
       toast({
         title: "Erro",
         description: "Não foi possível registrar a escuta inicial.",
@@ -133,6 +180,8 @@ const EscutaInicial = () => {
                     onSubmit={handleFinalizarEscuta}
                     onCancel={handleCancelar}
                     isLoading={isLoading}
+                    patientId={cidadao.id}
+                    patientName={cidadao.name}
                   />
                 </TabsContent>
 

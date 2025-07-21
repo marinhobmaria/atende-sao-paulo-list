@@ -1,15 +1,20 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, CheckCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle, AlertTriangle } from "lucide-react";
 import { SOAPContainer } from "@/components/atendimento/SOAPContainer";
 import { CitizenCompactInfo } from "@/components/escuta-inicial/CitizenCompactInfo";
 import { FinalizacaoAtendimentoModal } from "@/components/finalizacao/FinalizacaoAtendimentoModal";
 import { FolhaRostoTab } from "@/components/folha-rosto/FolhaRostoTab";
 import { PageLayout } from "@/components/layout/PageLayout";
+import { usePatientStatus } from "@/hooks/usePatientStatus";
+import { useAuditLog } from "@/hooks/useAuditLog";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { toast } from "@/hooks/use-toast";
 
 const Atendimento = () => {
@@ -19,6 +24,10 @@ const Atendimento = () => {
   const [showFinalizacao, setShowFinalizacao] = useState(false);
   const [showConfirmFinalizacao, setShowConfirmFinalizacao] = useState(false);
   const [isFinalizando, setIsFinalizando] = useState(false);
+  
+  const { logAction } = useAuditLog();
+  const { currentUser, canStartAttendance, canFinalizeAttendance } = useUserPermissions();
+  const patientStatus = usePatientStatus(cidadaoId || "1", "in-service");
 
   // Mock data do cidadão baseado na imagem de referência
   const cidadao = {
@@ -38,13 +47,69 @@ const Atendimento = () => {
     photo: "https://images.unsplash.com/photo-1494790108755-2616b812e672?w=150&h=150&fit=crop&crop=face"
   };
 
+  // Initialize patient status when component mounts
+  useEffect(() => {
+    if (canStartAttendance()) {
+      patientStatus.transitionTo(
+        'in-service', 
+        'Atendimento iniciado',
+        currentUser?.id,
+        currentUser?.name
+      );
+      
+      logAction(
+        'Atendimento iniciado',
+        { patientId: cidadao.id },
+        'atendimento',
+        'info',
+        cidadao.id,
+        cidadao.name,
+        currentUser?.id,
+        currentUser?.name
+      );
+    }
+  }, []);
+
   const handleFinalizarAtendimento = async (data: any) => {
+    if (!canFinalizeAttendance()) {
+      toast({
+        title: "Acesso negado",
+        description: "Você não tem permissão para finalizar atendimentos.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsFinalizando(true);
     try {
       console.log("Dados da finalização:", data);
       
+      // Transition patient status to completed
+      await patientStatus.transitionTo(
+        'completed', 
+        'Atendimento finalizado',
+        currentUser?.id,
+        currentUser?.name
+      );
+      
       // Simular processamento
       await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Log successful completion
+      logAction(
+        'Atendimento finalizado com sucesso',
+        { 
+          patientId: cidadao.id,
+          finalizationData: data,
+          duration: 'calculated_duration'
+        },
+        'atendimento',
+        'success',
+        cidadao.id,
+        cidadao.name,
+        currentUser?.id,
+        currentUser?.name
+      );
       
       toast({
         title: "Atendimento finalizado com sucesso",
@@ -55,6 +120,17 @@ const Atendimento = () => {
       setShowConfirmFinalizacao(false);
       navigate("/");
     } catch (error) {
+      logAction(
+        'Erro ao finalizar atendimento',
+        { error: error.message, patientId: cidadao.id },
+        'atendimento',
+        'error',
+        cidadao.id,
+        cidadao.name,
+        currentUser?.id,
+        currentUser?.name
+      );
+      
       toast({
         title: "Erro ao finalizar",
         description: "Não foi possível finalizar o atendimento. Tente novamente.",
@@ -70,6 +146,25 @@ const Atendimento = () => {
     setShowFinalizacao(true);
   };
 
+  // Check if user has permission to access attendance
+  if (!canStartAttendance()) {
+    return (
+      <PageLayout breadcrumbItems={[
+        { title: "Lista de Atendimento", href: "/" }, 
+        { title: "Atendimento" }
+      ]}>
+        <div className="p-4">
+          <Alert className="max-w-4xl mx-auto">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              Você não tem permissão para realizar atendimentos. Entre em contato com o administrador.
+            </AlertDescription>
+          </Alert>
+        </div>
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout breadcrumbItems={[
       { title: "Lista de Atendimento", href: "/" }, 
@@ -77,6 +172,20 @@ const Atendimento = () => {
     ]}>
       <div className="p-4">
         <div className="w-full space-y-4">
+          {/* Status and Permission Info */}
+          <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">{currentUser?.name}</Badge>
+              <span className="text-sm text-muted-foreground">•</span>
+              <Badge variant="outline">{currentUser?.profile}</Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge className="bg-green-600">
+                {patientStatus.currentStatusLabel}
+              </Badge>
+            </div>
+          </div>
+
           {/* Informações compactas do cidadão */}
           <CitizenCompactInfo 
             cidadao={cidadao}
