@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageLayout } from "@/components/layout/PageLayout";
-import { Users, Clock, CheckCircle, UserX, UserCheck, Timer, Calendar, RefreshCw } from "lucide-react";
+import { Users, Clock, CheckCircle, UserX, UserCheck, Timer, Calendar, RefreshCw, BarChart3 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { DashboardFilters } from "@/components/dashboard/DashboardFilters";
 import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
@@ -175,12 +175,14 @@ export default function Dashboard() {
   return (
     <PageLayout breadcrumbItems={[{ title: "Dashboard" }]}>
       <div className="p-6">
-        <div className="max-w-7xl mx-auto space-y-6">
+        <div className="max-w-7xl mx-auto space-y-8">
             {/* Header com relógio e controles */}
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
               <div>
-                <h1 className="text-3xl font-bold tracking-tight">Dashboard Médico</h1>
-                <p className="text-muted-foreground">
+                <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                  Dashboard Médico
+                </h1>
+                <p className="text-muted-foreground text-lg">
                   Gestão da fila de atendimento e visão geral do dia
                 </p>
               </div>
@@ -194,11 +196,11 @@ export default function Dashboard() {
                     })}
                   </div>
                 </div>
-                <Button onClick={handleManualRefresh} variant="outline" size="sm">
+                <Button onClick={handleManualRefresh} variant="outline" size="sm" className="hover-scale">
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Atualizar
                 </Button>
-                <Card className="min-w-[200px]">
+                <Card className="min-w-[200px] bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl font-mono font-bold text-primary">
                       {currentTime.toLocaleTimeString('pt-BR', { 
@@ -219,24 +221,38 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Acesso Rápido - MOVIDO PARA O TOPO */}
+            <div className="animate-fade-in">
+              <QuickActions />
+            </div>
+
             {/* Filtros */}
             <DashboardFilters onFiltersChange={handleFiltersChange} />
 
+            {/* Alertas Críticos - Movido para cima por prioridade UX */}
+            <div className="animate-fade-in">
+              <CriticalAlerts />
+            </div>
+
             {/* Cards principais de estatísticas */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {stats.map((stat) => (
-                <Card key={stat.title} className="relative overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
+              {stats.map((stat, index) => (
+                <Card 
+                  key={stat.title} 
+                  className="relative overflow-hidden hover-scale border-border/50 hover:border-border transition-all duration-300 group"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
+                    <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors">
                       {stat.title}
                     </CardTitle>
-                    <div className={`h-8 w-8 rounded-full ${stat.bgColor} flex items-center justify-center`}>
-                      <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                    <div className={`h-10 w-10 rounded-xl ${stat.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                      <stat.icon className={`h-5 w-5 ${stat.color}`} />
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold mb-1">{stat.value}</div>
-                    <p className="text-xs text-muted-foreground">
+                    <div className="text-3xl font-bold mb-2 text-foreground/90">{stat.value}</div>
+                    <p className="text-sm text-muted-foreground">
                       {stat.description}
                     </p>
                   </CardContent>
@@ -244,19 +260,25 @@ export default function Dashboard() {
               ))}
             </div>
 
-            {/* Cards adicionais */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {additionalStats.map((stat) => (
-                <Card key={stat.title}>
+            {/* Cards adicionais - KPIs importantes */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+              {additionalStats.map((stat, index) => (
+                <Card 
+                  key={stat.title} 
+                  className="hover-scale border-border/50 hover:border-border transition-all duration-300 group bg-gradient-to-br from-card to-card/50"
+                  style={{ animationDelay: `${(index + 4) * 100}ms` }}
+                >
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
+                    <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors">
                       {stat.title}
                     </CardTitle>
-                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                    <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <stat.icon className={`h-5 w-5 ${stat.color} group-hover:scale-110 transition-transform`} />
+                    </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold mb-1">{stat.value}</div>
-                    <p className="text-xs text-muted-foreground">
+                    <div className="text-2xl font-bold mb-2 text-foreground/90">{stat.value}</div>
+                    <p className="text-sm text-muted-foreground">
                       {stat.description}
                     </p>
                   </CardContent>
@@ -264,38 +286,44 @@ export default function Dashboard() {
               ))}
             </div>
 
-            {/* Atividade recente */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
+            {/* Atividade recente - Design melhorado */}
+            <Card className="animate-fade-in border-border/50 hover:border-border transition-all duration-300">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <Users className="h-5 w-5 text-primary" />
+                  </div>
                   Atividade Recente
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-base">
                   Últimos movimentos na fila de atendimento
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:border-border transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{activity.patient}</span>
+                  {recentActivity.map((activity, index) => (
+                    <div 
+                      key={activity.id} 
+                      className="flex items-center justify-between p-4 rounded-xl border border-border/30 hover:border-border hover:shadow-sm transition-all duration-200 hover-scale bg-gradient-to-r from-card to-card/50"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3">
+                          <span className="font-semibold text-foreground/90">{activity.patient}</span>
                           {activity.priority && (
-                            <Badge variant="outline" className="text-xs px-1.5 py-0.5 bg-risk-red/10 text-risk-red border-risk-red/20">
+                            <Badge variant="outline" className="text-xs px-2 py-1 bg-destructive/10 text-destructive border-destructive/20 font-medium">
                               Prioritário
                             </Badge>
                           )}
                         </div>
                         <Badge 
                           variant="outline" 
-                          className={`text-xs ${getBadgeVariant(activity.type)}`}
+                          className={`text-xs font-medium ${getBadgeVariant(activity.type)}`}
                         >
                           {activity.action}
                         </Badge>
                       </div>
-                      <div className="text-sm text-muted-foreground font-mono">
+                      <div className="text-sm text-muted-foreground font-mono bg-muted/30 px-3 py-1 rounded-full">
                         {activity.time}
                       </div>
                     </div>
@@ -304,75 +332,81 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Gráficos */}
-            <DashboardCharts />
+            {/* Gráficos - Analytics e Insights */}
+            <div className="animate-fade-in">
+              <DashboardCharts />
+            </div>
 
-            {/* Alertas Críticos */}
-            <CriticalAlerts />
-
-            {/* Acesso Rápido */}
-            <QuickActions />
-
-            {/* Resumo visual do dia */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Fluxo do Dia</CardTitle>
-                  <CardDescription>
+            {/* Resumo visual do dia - Design aprimorado */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
+              <Card className="hover-scale border-border/50 hover:border-border transition-all duration-300 bg-gradient-to-br from-success/5 to-success/10">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <div className="p-2 rounded-lg bg-success/10">
+                      <CheckCircle className="h-5 w-5 text-success" />
+                    </div>
+                    Fluxo do Dia
+                  </CardTitle>
+                  <CardDescription className="text-base">
                     Progresso dos atendimentos de hoje
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Atendidos</span>
-                      <span className="text-sm text-success">18/28 (64%)</span>
+                      <span className="text-base font-medium">Atendidos</span>
+                      <span className="text-base font-bold text-success">18/28 (64%)</span>
                     </div>
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div className="bg-success h-2 rounded-full" style={{ width: '64%' }}></div>
+                    <div className="w-full bg-muted/50 rounded-full h-3 overflow-hidden">
+                      <div className="bg-gradient-to-r from-success to-success/80 h-3 rounded-full transition-all duration-1000 animate-scale-in" style={{ width: '64%' }}></div>
                     </div>
-                    <div className="grid grid-cols-3 gap-4 text-center text-sm">
-                      <div>
-                        <div className="font-medium text-success">18</div>
-                        <div className="text-muted-foreground">Atendidos</div>
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div className="p-3 rounded-lg bg-success/10 border border-success/20">
+                        <div className="text-xl font-bold text-success">18</div>
+                        <div className="text-sm text-muted-foreground">Atendidos</div>
                       </div>
-                      <div>
-                        <div className="font-medium text-destructive">4</div>
-                        <div className="text-muted-foreground">Ausentes</div>
+                      <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                        <div className="text-xl font-bold text-destructive">4</div>
+                        <div className="text-sm text-muted-foreground">Ausentes</div>
                       </div>
-                      <div>
-                        <div className="font-medium text-warning">6</div>
-                        <div className="text-muted-foreground">Na fila</div>
+                      <div className="p-3 rounded-lg bg-warning/10 border border-warning/20">
+                        <div className="text-xl font-bold text-warning">6</div>
+                        <div className="text-sm text-muted-foreground">Na fila</div>
                       </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Indicadores de Performance</CardTitle>
-                  <CardDescription>
+              <Card className="hover-scale border-border/50 hover:border-border transition-all duration-300 bg-gradient-to-br from-primary/5 to-primary/10">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <BarChart3 className="h-5 w-5 text-primary" />
+                    </div>
+                    Indicadores de Performance
+                  </CardTitle>
+                  <CardDescription className="text-base">
                     Métricas importantes do atendimento
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Taxa de comparecimento</span>
-                      <span className="text-sm font-medium text-success">86%</span>
+                    <div className="flex justify-between items-center p-3 rounded-lg bg-card/50 border border-border/30">
+                      <span className="font-medium">Taxa de comparecimento</span>
+                      <span className="font-bold text-success text-lg">86%</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Tempo médio por consulta</span>
-                      <span className="text-sm font-medium">22 min</span>
+                    <div className="flex justify-between items-center p-3 rounded-lg bg-card/50 border border-border/30">
+                      <span className="font-medium">Tempo médio por consulta</span>
+                      <span className="font-bold text-primary text-lg">22 min</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Satisfação dos pacientes</span>
-                      <span className="text-sm font-medium text-success">4.8/5</span>
+                    <div className="flex justify-between items-center p-3 rounded-lg bg-card/50 border border-border/30">
+                      <span className="font-medium">Satisfação dos pacientes</span>
+                      <span className="font-bold text-success text-lg">4.8/5</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Atendimentos no prazo</span>
-                      <span className="text-sm font-medium text-success">92%</span>
+                    <div className="flex justify-between items-center p-3 rounded-lg bg-card/50 border border-border/30">
+                      <span className="font-medium">Atendimentos no prazo</span>
+                      <span className="font-bold text-success text-lg">92%</span>
                     </div>
                   </div>
                 </CardContent>
