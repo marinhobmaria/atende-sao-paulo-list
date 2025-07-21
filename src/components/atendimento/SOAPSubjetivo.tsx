@@ -1,12 +1,14 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Check, ChevronDown, MessageSquare, Search, X } from "lucide-react";
+import { Check, ChevronDown, MessageSquare, Search, X, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Mock data para CIAP-2
@@ -27,213 +29,287 @@ const mockCIAP2 = [
 ];
 
 export const SOAPSubjetivo = () => {
-  const [subjetivo, setSubjetivo] = useState("");
+  const [queixaPrincipal, setQueixaPrincipal] = useState("");
+  const [historiaDoenca, setHistoriaDoenca] = useState("");
+  const [sintomasAssociados, setSintomasAssociados] = useState("");
+  const [antecedentesPessoais, setAntecedentesPessoais] = useState("");
+  const [antecedentesFamiliares, setAntecedentesFamiliares] = useState("");
+  const [alergias, setAlergias] = useState("");
   const [selectedCiaps, setSelectedCiaps] = useState<Array<{code: string, display: string}>>([]);
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [errors, setErrors] = useState<{ subjetivo?: string }>({});
+  const [errors, setErrors] = useState<{ 
+    queixaPrincipal?: string;
+    historiaDoenca?: string;
+  }>({});
 
-  const handleSubjetivoChange = (value: string) => {
-    setSubjetivo(value);
+  const validateQueixaPrincipal = (value: string) => {
+    if (!value.trim()) return "Queixa principal é obrigatória";
+    if (value.length < 5) return "Mínimo 5 caracteres";
+    if (value.length > 200) return "Máximo 200 caracteres";
     
-    // Remove erro quando usuário começa a digitar
-    if (errors.subjetivo) {
-      setErrors(prev => ({ ...prev, subjetivo: undefined }));
+    const genericTerms = ["consulta", "rotina", "acompanhamento", "revisão"];
+    if (genericTerms.some(term => value.toLowerCase().includes(term))) {
+      return "Não pode ser genérico (consulta, rotina, etc.)";
     }
+    return "";
   };
 
-  const handleSubjetivoBlur = () => {
-    const trimmedValue = subjetivo.trim();
-    
-    if (trimmedValue === "" && subjetivo !== "") {
-      setErrors(prev => ({ ...prev, subjetivo: "Informe as impressões subjetivas do profissional e do cidadão." }));
-    } else if (trimmedValue.length > 4000) {
-      setErrors(prev => ({ ...prev, subjetivo: "O texto não pode exceder 4 000 caracteres." }));
-    }
+  const validateHistoriaDoenca = (value: string) => {
+    if (!value.trim()) return "História da doença atual é obrigatória";
+    if (value.length < 10) return "Mínimo 10 caracteres";
+    if (value.length > 1000) return "Máximo 1000 caracteres";
+    return "";
   };
 
-  const filteredCIAP2 = mockCIAP2.filter(item => {
-    if (searchTerm.length < 2) return [];
-    
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      (item.display.toLowerCase().includes(searchLower) ||
-      item.code.toLowerCase().startsWith(searchLower)) &&
-      !selectedCiaps.some(selected => selected.code === item.code)
-    );
-  });
+  const handleQueixaChange = (value: string) => {
+    setQueixaPrincipal(value);
+    const error = validateQueixaPrincipal(value);
+    setErrors(prev => ({ ...prev, queixaPrincipal: error }));
+  };
 
-  const handleCiap2Select = (code: string, display: string) => {
-    const newCiap = { code, display };
-    setSelectedCiaps(prev => [...prev, newCiap]);
+  const handleHistoriaChange = (value: string) => {
+    setHistoriaDoenca(value);
+    const error = validateHistoriaDoenca(value);
+    setErrors(prev => ({ ...prev, historiaDoenca: error }));
+  };
+
+  const filteredCiaps = mockCIAP2.filter(ciap =>
+    ciap.display.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    ciap.code.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleSelectCiap = (ciap: {code: string, display: string}) => {
+    if (!selectedCiaps.find(selected => selected.code === ciap.code)) {
+      setSelectedCiaps([...selectedCiaps, ciap]);
+    }
     setOpen(false);
     setSearchTerm("");
   };
 
   const removeCiap = (codeToRemove: string) => {
-    setSelectedCiaps(prev => prev.filter(c => c.code !== codeToRemove));
+    setSelectedCiaps(selectedCiaps.filter(ciap => ciap.code !== codeToRemove));
   };
+
+  const hasAlergias = alergias.trim().length > 0;
+  const isValid = !errors.queixaPrincipal && !errors.historiaDoenca && 
+                  queixaPrincipal.trim() && historiaDoenca.trim();
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-            <MessageSquare className="h-5 w-5 text-white" />
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-blue-600" />
+            Subjetivo - Impressões do Munícipe
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Registro das informações relatadas pelo paciente
+          </p>
+        </CardHeader>
+        
+        <CardContent className="space-y-6">
+          {/* Queixa Principal */}
+          <div className="space-y-2">
+            <Label htmlFor="queixa-principal" className="text-sm font-medium">
+              Queixa Principal *
+              <span className="text-xs text-muted-foreground ml-2">
+                ({queixaPrincipal.length}/200 caracteres)
+              </span>
+            </Label>
+            <Textarea
+              id="queixa-principal"
+              placeholder="Descreva o motivo principal da consulta conforme relato do paciente..."
+              value={queixaPrincipal}
+              onChange={(e) => handleQueixaChange(e.target.value)}
+              maxLength={200}
+              className={cn(
+                "min-h-[80px]",
+                errors.queixaPrincipal && "border-red-500 focus:ring-red-500"
+              )}
+            />
+            {errors.queixaPrincipal && (
+              <p className="text-sm text-red-600">{errors.queixaPrincipal}</p>
+            )}
           </div>
-          <div>
-            <h2 className="text-xl font-semibold text-blue-900">Subjetivo</h2>
-            <p className="text-sm text-blue-600">Registre as impressões subjetivas e motivo da consulta</p>
+
+          {/* História da Doença Atual */}
+          <div className="space-y-2">
+            <Label htmlFor="historia-doenca" className="text-sm font-medium">
+              História da Doença Atual *
+              <span className="text-xs text-muted-foreground ml-2">
+                ({historiaDoenca.length}/1000 caracteres)
+              </span>
+            </Label>
+            <Textarea
+              id="historia-doenca"
+              placeholder="Descrição detalhada da evolução dos sintomas, início, duração, fatores agravantes/aliviantes..."
+              value={historiaDoenca}
+              onChange={(e) => handleHistoriaChange(e.target.value)}
+              maxLength={1000}
+              className={cn(
+                "min-h-[120px]",
+                errors.historiaDoenca && "border-red-500 focus:ring-red-500"
+              )}
+            />
+            {errors.historiaDoenca && (
+              <p className="text-sm text-red-600">{errors.historiaDoenca}</p>
+            )}
           </div>
-        </div>
 
-        <div className="space-y-6">
-          {/* Campo Subjetivo */}
-          <Card className="shadow-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                Impressões Subjetivas
-              </CardTitle>
-              <p className="text-sm text-gray-600">
-                Descreva as queixas do paciente, histórico da doença atual e informações relatadas
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Textarea
-                  id="subjetivo"
-                  placeholder="Informe as informações subjetivas do profissional e as expressadas pelo cidadão"
-                  value={subjetivo}
-                  onChange={(e) => handleSubjetivoChange(e.target.value)}
-                  onBlur={handleSubjetivoBlur}
-                  className={cn(
-                    "min-h-[120px] resize-none transition-all",
-                    errors.subjetivo && "border-red-500 focus:border-red-500"
-                  )}
-                  maxLength={4000}
-                />
-                {errors.subjetivo && (
-                  <div className="flex items-center gap-2 text-red-600 text-sm">
-                    <div className="w-1 h-1 bg-red-500 rounded-full"></div>
-                    {errors.subjetivo}
-                  </div>
-                )}
-                <p className={cn(
-                  "text-xs transition-colors text-right",
-                  subjetivo.length > 3800 ? "text-red-500 font-medium" : "text-gray-500"
-                )}>
-                  {subjetivo.length}/4000 caracteres
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Sintomas Associados */}
+          <div className="space-y-2">
+            <Label htmlFor="sintomas-associados" className="text-sm font-medium">
+              Sintomas Associados
+            </Label>
+            <Textarea
+              id="sintomas-associados"
+              placeholder="Outros sintomas relatados pelo paciente (separar por vírgula)..."
+              value={sintomasAssociados}
+              onChange={(e) => setSintomasAssociados(e.target.value)}
+              className="min-h-[80px]"
+            />
+          </div>
 
-          {/* Campo CIAP-2 */}
-          <Card className="shadow-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                Motivo da Consulta (CIAP-2)
-              </CardTitle>
-              <p className="text-sm text-gray-600">
-                Classifique o motivo principal da consulta usando a codificação CIAP-2
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={open}
-                      className={cn(
-                        "w-full justify-between h-11 px-4",
-                        !searchTerm && "text-muted-foreground"
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Search className="h-4 w-4 text-muted-foreground" />
-                        <span>{searchTerm || "Pesquise ou selecione por código ou descrição..."}</span>
-                      </div>
-                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-full p-0" align="start">
-                    <Command>
-                      <CommandInput 
-                        placeholder="Pesquise ou selecione pelo menos 2 caracteres (ex: A03 ou Febre)" 
-                        value={searchTerm}
-                        onValueChange={setSearchTerm}
-                        className="h-12"
-                      />
-                      <CommandList>
-                        <CommandEmpty>
-                          {searchTerm.length < 2 
-                            ? "Digite pelo menos 2 caracteres para buscar"
-                            : "Nenhum resultado encontrado"
-                          }
-                        </CommandEmpty>
-                        <CommandGroup>
-                          {filteredCIAP2.map((item) => (
-                            <CommandItem
-                              key={item.code}
-                              value={item.code}
-                              onSelect={() => handleCiap2Select(item.code, item.display)}
-                              className="flex items-center gap-3 p-4 hover:bg-muted"
-                            >
-                              <div className="flex items-center gap-3 flex-1">
-                                <Badge variant="outline" className="font-mono text-xs px-2 py-1">
-                                  {item.code}
-                                </Badge>
-                                <div className="text-foreground">{item.display}</div>
-                              </div>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                
-                {/* Selected CIAPs */}
-                {selectedCiaps.length > 0 && (
-                  <div className="space-y-3">
-                    <div className="text-sm font-medium text-foreground">Selecionados:</div>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedCiaps.map((ciap) => (
-                        <div
+          {/* CIAP-2 Selection */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Códigos CIAP-2</Label>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  className="w-full justify-between"
+                >
+                  <Search className="mr-2 h-4 w-4" />
+                  Buscar código CIAP-2...
+                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0">
+                <Command>
+                  <CommandInput 
+                    placeholder="Buscar CIAP-2..." 
+                    value={searchTerm}
+                    onValueChange={setSearchTerm}
+                  />
+                  <CommandList>
+                    <CommandEmpty>Nenhum código encontrado.</CommandEmpty>
+                    <CommandGroup>
+                      {filteredCiaps.map((ciap) => (
+                        <CommandItem
                           key={ciap.code}
-                          className="flex items-center gap-2 bg-muted border rounded-lg px-3 py-2"
+                          onSelect={() => handleSelectCiap(ciap)}
                         >
-                          <Badge variant="outline" className="font-mono text-xs">
-                            {ciap.code}
-                          </Badge>
-                          <span className="text-sm text-muted-foreground">{ciap.display}</span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeCiap(ciap.code)}
-                            className="h-5 w-5 p-0 hover:bg-muted/80 rounded-full"
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedCiaps.find(selected => selected.code === ciap.code)
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                          <div>
+                            <div className="font-medium">{ciap.code}</div>
+                            <div className="text-sm text-muted-foreground">{ciap.display}</div>
+                          </div>
+                        </CommandItem>
                       ))}
-                    </div>
-                  </div>
-                )}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
 
-                <p className="text-xs text-muted-foreground">
-                  Campo opcional - busque por código (ex: A03) ou descrição (ex: Febre)
-                </p>
+            {/* Selected CIAP-2 codes */}
+            {selectedCiaps.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {selectedCiaps.map((ciap) => (
+                  <Badge key={ciap.code} variant="secondary" className="pr-1">
+                    <span className="mr-1">{ciap.code} - {ciap.display}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-4 w-4 p-0 hover:bg-transparent"
+                      onClick={() => removeCiap(ciap.code)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </Badge>
+                ))}
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+            )}
+          </div>
+
+          {/* Antecedentes Pessoais */}
+          <div className="space-y-2">
+            <Label htmlFor="antecedentes-pessoais" className="text-sm font-medium">
+              Antecedentes Pessoais
+            </Label>
+            <Textarea
+              id="antecedentes-pessoais"
+              placeholder="Doenças prévias, cirurgias, hábitos, medicamentos em uso..."
+              value={antecedentesPessoais}
+              onChange={(e) => setAntecedentesPessoais(e.target.value)}
+              className="min-h-[80px]"
+            />
+          </div>
+
+          {/* Antecedentes Familiares */}
+          <div className="space-y-2">
+            <Label htmlFor="antecedentes-familiares" className="text-sm font-medium">
+              Antecedentes Familiares
+            </Label>
+            <Textarea
+              id="antecedentes-familiares"
+              placeholder="Doenças familiares relevantes..."
+              value={antecedentesFamiliares}
+              onChange={(e) => setAntecedentesFamiliares(e.target.value)}
+              className="min-h-[80px]"
+            />
+          </div>
+
+          {/* Alergias */}
+          <div className="space-y-2">
+            <Label htmlFor="alergias" className="text-sm font-medium">
+              Alergias
+            </Label>
+            <Textarea
+              id="alergias"
+              placeholder="Substâncias, medicamentos, alimentos que causam reações alérgicas..."
+              value={alergias}
+              onChange={(e) => setAlergias(e.target.value)}
+              className="min-h-[80px]"
+            />
+            
+            {hasAlergias && (
+              <Alert className="border-red-200 bg-red-50">
+                <AlertTriangle className="h-4 w-4 text-red-600" />
+                <AlertDescription className="text-red-800">
+                  <strong>Atenção:</strong> Paciente possui alergias registradas. Verificar antes de prescrever medicamentos.
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+
+          {/* Status Summary */}
+          <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+            <div className="flex items-center gap-2">
+              <div className={cn(
+                "w-3 h-3 rounded-full",
+                isValid ? "bg-green-500" : "bg-red-500"
+              )} />
+              <span className="text-sm font-medium">
+                {isValid ? "Seção completa" : "Campos obrigatórios pendentes"}
+              </span>
+            </div>
+            <Badge variant={isValid ? "default" : "destructive"}>
+              {isValid ? "Válido" : "Incompleto"}
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
