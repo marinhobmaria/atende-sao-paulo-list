@@ -1,496 +1,589 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { AtestadoSection } from "./atestado/AtestadoSection";
-import { DeclaracaoComparecimento } from "./atestado/DeclaracaoComparecimento";
-import { PrescricaoMedicamento } from "./prescricao/PrescricaoMedicamento";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { 
-  FileText, 
-  ClipboardCheck, 
-  Bold, 
-  Italic, 
-  Underline, 
-  Strikethrough,
-  Undo,
-  Redo,
-  MessageCircle,
-  Trash2,
-  Plus,
-  Eye,
-  Info,
-  Pill
+  Plus, 
+  Trash2, 
+  Calendar as CalendarIcon,
+  Pill,
+  FileText,
+  UserPlus,
+  AlertCircle,
+  Clock
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-interface CiapEntry {
+interface Medicamento {
   id: string;
-  code: string;
-  display: string;
-  comment?: string;
+  medicamento: string;
+  dose: string;
+  frequencia: string;
+  via: string;
+  duracao: string;
+  instrucoes: string;
 }
 
-interface SigtapEntry {
+interface Exame {
   id: string;
-  code: string;
-  display: string;
-  comment?: string;
+  tipo: string;
+  motivo: string;
+  urgencia: string;
 }
 
-// Mock data para CIAP-2
-const mockCiapData = [
-  { code: "A01", display: "Dor generalizada/múltipla" },
-  { code: "A02", display: "Calafrios" },
-  { code: "A03", display: "Febre" },
-  { code: "A04", display: "Fraqueza/cansaço geral" },
-  { code: "A05", display: "Sentir-se doente" },
-  { code: "A98", display: "Consulta de rotina" },
-  { code: "P01", display: "Sentimentos de ansiedade/nervosismo/tensão" },
-  { code: "P02", display: "Reação aguda ao stress" },
-  { code: "P03", display: "Sentimentos depressivos" },
-];
+interface Encaminhamento {
+  id: string;
+  destino: string;
+  motivo: string;
+  urgencia: string;
+}
 
-// Mock data para SIGTAP
-const mockSigtapData = [
-  { code: "0301010021", display: "Consulta médica em atenção básica" },
-  { code: "0301100276", display: "Curativo especial" },
-  { code: "0301010030", display: "Consulta de enfermagem em atenção básica" },
-  { code: "0702010019", display: "Aferição de pressão arterial" },
-  { code: "0702010027", display: "Verificação de sinais vitais" },
-];
+interface PlanoData {
+  conduta: string;
+  orientacoes: string;
+  medicamentos: Medicamento[];
+  exames: Exame[];
+  encaminhamentos: Encaminhamento[];
+  retornoData?: Date;
+  retornoMotivo: string;
+}
 
 export const SOAPPlano = () => {
-  const [planoTexto, setPlanoTexto] = useState("");
-  const [cidadaoObservacao, setCidadaoObservacao] = useState(false);
-  const [ciapEntries, setCiapEntries] = useState<CiapEntry[]>([]);
-  const [sigtapEntries, setSigtapEntries] = useState<SigtapEntry[]>([]);
-  const [ciapSearch, setCiapSearch] = useState("");
-  const [sigtapSearch, setSigtapSearch] = useState("");
-  const [showCiapSuggestions, setShowCiapSuggestions] = useState(false);
-  const [showSigtapSuggestions, setShowSigtapSuggestions] = useState(false);
-  const [editingComment, setEditingComment] = useState<{type: 'ciap' | 'sigtap', id: string} | null>(null);
-  const [commentText, setCommentText] = useState("");
+  const [conduta, setConduta] = useState("");
+  const [orientacoes, setOrientacoes] = useState("");
+  const [medicamentos, setMedicamentos] = useState<Medicamento[]>([]);
+  const [exames, setExames] = useState<Exame[]>([]);
+  const [encaminhamentos, setEncaminhamentos] = useState<Encaminhamento[]>([]);
+  const [retornoData, setRetornoData] = useState<Date>();
+  const [retornoMotivo, setRetornoMotivo] = useState("");
 
-  // Funções de formatação de texto
-  const handleTextFormat = (format: string) => {
-    console.log(`Aplicando formatação: ${format}`);
-    // Aqui seria implementada a lógica de formatação do texto
-  };
+  // Validações
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
 
-  // Filtrar sugestões CIAP-2
-  const filteredCiap = mockCiapData.filter(item =>
-    item.code.toLowerCase().includes(ciapSearch.toLowerCase()) ||
-    item.display.toLowerCase().includes(ciapSearch.toLowerCase())
-  );
+  // Validar campos obrigatórios
+  const validateFields = () => {
+    const newErrors: {[key: string]: string} = {};
 
-  // Filtrar sugestões SIGTAP
-  const filteredSigtap = mockSigtapData.filter(item =>
-    item.code.toLowerCase().includes(sigtapSearch.toLowerCase()) ||
-    item.display.toLowerCase().includes(sigtapSearch.toLowerCase())
-  );
-
-  // Adicionar entrada CIAP-2
-  const addCiapEntry = (item: { code: string; display: string }) => {
-    const newEntry: CiapEntry = {
-      id: Date.now().toString(),
-      code: item.code,
-      display: item.display
-    };
-    setCiapEntries([...ciapEntries, newEntry]);
-    setCiapSearch("");
-    setShowCiapSuggestions(false);
-  };
-
-  // Adicionar entrada SIGTAP
-  const addSigtapEntry = (item: { code: string; display: string }) => {
-    const newEntry: SigtapEntry = {
-      id: Date.now().toString(),
-      code: item.code,
-      display: item.display
-    };
-    setSigtapEntries([...sigtapEntries, newEntry]);
-    setSigtapSearch("");
-    setShowSigtapSuggestions(false);
-  };
-
-  // Remover entrada
-  const removeCiapEntry = (id: string) => {
-    setCiapEntries(ciapEntries.filter(entry => entry.id !== id));
-  };
-
-  const removeSigtapEntry = (id: string) => {
-    setSigtapEntries(sigtapEntries.filter(entry => entry.id !== id));
-  };
-
-  // Abrir modal de comentário
-  const openCommentModal = (type: 'ciap' | 'sigtap', id: string, currentComment?: string) => {
-    setEditingComment({ type, id });
-    setCommentText(currentComment || "");
-  };
-
-  // Salvar comentário
-  const saveComment = () => {
-    if (!editingComment) return;
-
-    if (editingComment.type === 'ciap') {
-      setCiapEntries(entries => 
-        entries.map(entry => 
-          entry.id === editingComment.id 
-            ? { ...entry, comment: commentText }
-            : entry
-        )
-      );
-    } else {
-      setSigtapEntries(entries => 
-        entries.map(entry => 
-          entry.id === editingComment.id 
-            ? { ...entry, comment: commentText }
-            : entry
-        )
-      );
+    if (conduta.trim().length < 10) {
+      newErrors.conduta = "Conduta deve ter pelo menos 10 caracteres";
     }
 
-    setEditingComment(null);
-    setCommentText("");
+    if (orientacoes.trim().length < 10) {
+      newErrors.orientacoes = "Orientações devem ter pelo menos 10 caracteres";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  useEffect(() => {
+    validateFields();
+  }, [conduta, orientacoes]);
+
+  // Funções para medicamentos
+  const adicionarMedicamento = () => {
+    const novoMedicamento: Medicamento = {
+      id: Date.now().toString(),
+      medicamento: "",
+      dose: "",
+      frequencia: "",
+      via: "",
+      duracao: "",
+      instrucoes: ""
+    };
+    setMedicamentos([...medicamentos, novoMedicamento]);
+  };
+
+  const atualizarMedicamento = (id: string, campo: keyof Medicamento, valor: string) => {
+    setMedicamentos(medicamentos.map(med => 
+      med.id === id ? { ...med, [campo]: valor } : med
+    ));
+  };
+
+  const removerMedicamento = (id: string) => {
+    setMedicamentos(medicamentos.filter(med => med.id !== id));
+  };
+
+  // Funções para exames
+  const adicionarExame = () => {
+    const novoExame: Exame = {
+      id: Date.now().toString(),
+      tipo: "",
+      motivo: "",
+      urgencia: "normal"
+    };
+    setExames([...exames, novoExame]);
+  };
+
+  const atualizarExame = (id: string, campo: keyof Exame, valor: string) => {
+    setExames(exames.map(exame => 
+      exame.id === id ? { ...exame, [campo]: valor } : exame
+    ));
+  };
+
+  const removerExame = (id: string) => {
+    setExames(exames.filter(exame => exame.id !== id));
+  };
+
+  // Funções para encaminhamentos
+  const adicionarEncaminhamento = () => {
+    const novoEncaminhamento: Encaminhamento = {
+      id: Date.now().toString(),
+      destino: "",
+      motivo: "",
+      urgencia: "normal"
+    };
+    setEncaminhamentos([...encaminhamentos, novoEncaminhamento]);
+  };
+
+  const atualizarEncaminhamento = (id: string, campo: keyof Encaminhamento, valor: string) => {
+    setEncaminhamentos(encaminhamentos.map(enc => 
+      enc.id === id ? { ...enc, [campo]: valor } : enc
+    ));
+  };
+
+  const removerEncaminhamento = (id: string) => {
+    setEncaminhamentos(encaminhamentos.filter(enc => enc.id !== id));
   };
 
   return (
     <div className="space-y-6">
+      {/* Conduta/Plano Terapêutico - OBRIGATÓRIO */}
       <Card>
         <CardHeader>
-          <CardTitle>Plano</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Conduta/Plano Terapêutico
+            <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground mb-6">
-            Plano terapêutico, condutas a serem tomadas, prescrições e orientações ao paciente.
-          </p>
-          
-          <Tabs defaultValue="plano-cuidado" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="plano-cuidado" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Plano de Cuidado
-              </TabsTrigger>
-              <TabsTrigger value="prescricao" className="flex items-center gap-2">
-                <Pill className="h-4 w-4" />
-                Prescrição de Medicamento
-              </TabsTrigger>
-              <TabsTrigger value="atestados" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Atestados
-              </TabsTrigger>
-              <TabsTrigger value="declaracao" className="flex items-center gap-2">
-                <ClipboardCheck className="h-4 w-4" />
-                Declaração de Comparecimento
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="plano-cuidado" className="mt-6 space-y-6">
-              {/* Campo de texto livre com formatação */}
-              <div className="space-y-3">
-                <Label htmlFor="plano-texto" className="text-base font-medium">
-                  Plano de Cuidado
-                </Label>
-                
-                {/* Barra de formatação */}
-                <div className="flex items-center gap-1 p-2 border rounded-md bg-gray-50">
-                  <ToggleGroup type="multiple" className="gap-1">
-                    <ToggleGroupItem 
-                      value="bold" 
-                      onClick={() => handleTextFormat('bold')}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Bold className="h-4 w-4" />
-                    </ToggleGroupItem>
-                    <ToggleGroupItem 
-                      value="italic" 
-                      onClick={() => handleTextFormat('italic')}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Italic className="h-4 w-4" />
-                    </ToggleGroupItem>
-                    <ToggleGroupItem 
-                      value="underline" 
-                      onClick={() => handleTextFormat('underline')}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Underline className="h-4 w-4" />
-                    </ToggleGroupItem>
-                    <ToggleGroupItem 
-                      value="strikethrough" 
-                      onClick={() => handleTextFormat('strikethrough')}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Strikethrough className="h-4 w-4" />
-                    </ToggleGroupItem>
-                  </ToggleGroup>
-                  
-                  <div className="w-px h-6 bg-gray-300 mx-2" />
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleTextFormat('undo')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Undo className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleTextFormat('redo')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Redo className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <Textarea
-                  id="plano-texto"
-                  placeholder="Descreva o plano de cuidado para o paciente..."
-                  value={planoTexto}
-                  onChange={(e) => setPlanoTexto(e.target.value)}
-                  className="min-h-[120px] resize-y"
-                  maxLength={4000}
-                />
-                <div className="text-sm text-gray-500 text-right">
-                  {planoTexto.length}/4000 caracteres
-                </div>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="conduta">
+              Descrição da conduta médica, procedimentos e intervenções
+            </Label>
+            <Textarea
+              id="conduta"
+              placeholder="Descreva a conduta médica, procedimentos e intervenções a serem realizados..."
+              value={conduta}
+              onChange={(e) => setConduta(e.target.value)}
+              className={cn(
+                "min-h-[120px] resize-y",
+                errors.conduta && "border-red-500"
+              )}
+              maxLength={2000}
+            />
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-muted-foreground">
+                {conduta.length}/2000 caracteres (mínimo 10)
               </div>
-
-              {/* Toggle Cidadão em Observação */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Label htmlFor="observacao" className="text-base font-medium">
-                      Cidadão em Observação
-                    </Label>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className="h-4 w-4 text-gray-400" />
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-xs">
-                          <p>
-                            Ao ativar esta opção, o cidadão será mantido em observação clínica 
-                            até que o atendimento seja encerrado. A observação será vinculada a este profissional.
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                  <Switch
-                    id="observacao"
-                    checked={cidadaoObservacao}
-                    onCheckedChange={setCidadaoObservacao}
-                  />
-                </div>
-                
-                {cidadaoObservacao && (
-                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                    <div className="flex items-center gap-2">
-                      <Eye className="h-4 w-4 text-yellow-600" />
-                      <span className="text-sm font-medium text-yellow-800">
-                        Paciente em observação clínica
-                      </span>
-                    </div>
-                    <p className="text-sm text-yellow-700 mt-1">
-                      O campo de plano de cuidado torna-se obrigatório para pacientes em observação.
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Campo CIAP-2 */}
-              <div className="space-y-3">
-                <Label className="text-base font-medium">
-                  CIAP-2 - Intervenção ou procedimento clínico
-                </Label>
-                
-                <div className="relative">
-                  <Input
-                    placeholder="Pesquise ou selecione o código ou descrição CIAP-2..."
-                    value={ciapSearch}
-                    onChange={(e) => {
-                      setCiapSearch(e.target.value);
-                      setShowCiapSuggestions(e.target.value.length > 0);
-                    }}
-                    onFocus={() => setShowCiapSuggestions(ciapSearch.length > 0)}
-                  />
-                  
-                  {showCiapSuggestions && filteredCiap.length > 0 && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                      {filteredCiap.map((item) => (
-                        <button
-                          key={item.code}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                          onClick={() => addCiapEntry(item)}
-                        >
-                          <div className="font-medium text-sm">{item.code}</div>
-                          <div className="text-gray-600 text-xs">{item.display}</div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Lista de entradas CIAP-2 */}
-                {ciapEntries.length > 0 && (
-                  <div className="space-y-2">
-                    {ciapEntries.map((entry) => (
-                      <div key={entry.id} className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                        <div className="flex-1">
-                          <div className="font-medium text-sm">
-                            {entry.display} - {entry.code}
-                          </div>
-                          {entry.comment && (
-                            <div className="text-xs text-gray-600 mt-1">
-                              Comentário: {entry.comment}
-                            </div>
-                          )}
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openCommentModal('ciap', entry.id, entry.comment)}
-                          className="h-8 w-8 p-0"
-                        >
-                          <MessageCircle className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeCiapEntry(entry.id)}
-                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Campo SIGTAP */}
-              <div className="space-y-3">
-                <Label className="text-base font-medium">
-                  SIGTAP - Procedimento SUS realizado
-                </Label>
-                
-                <div className="relative">
-                  <Input
-                    placeholder="Pesquise ou selecione o código ou descrição SIGTAP..."
-                    value={sigtapSearch}
-                    onChange={(e) => {
-                      setSigtapSearch(e.target.value);
-                      setShowSigtapSuggestions(e.target.value.length > 0);
-                    }}
-                    onFocus={() => setShowSigtapSuggestions(sigtapSearch.length > 0)}
-                  />
-                  
-                  {showSigtapSuggestions && filteredSigtap.length > 0 && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                      {filteredSigtap.map((item) => (
-                        <button
-                          key={item.code}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                          onClick={() => addSigtapEntry(item)}
-                        >
-                          <div className="font-medium text-sm">{item.code}</div>
-                          <div className="text-gray-600 text-xs">{item.display}</div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Lista de entradas SIGTAP */}
-                {sigtapEntries.length > 0 && (
-                  <div className="space-y-2">
-                    {sigtapEntries.map((entry) => (
-                      <div key={entry.id} className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-md">
-                        <div className="flex-1">
-                          <div className="font-medium text-sm">
-                            {entry.display} - {entry.code}
-                          </div>
-                          {entry.comment && (
-                            <div className="text-xs text-gray-600 mt-1">
-                              Comentário: {entry.comment}
-                            </div>
-                          )}
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openCommentModal('sigtap', entry.id, entry.comment)}
-                          className="h-8 w-8 p-0"
-                        >
-                          <MessageCircle className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeSigtapEntry(entry.id)}
-                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="prescricao" className="mt-6">
-              <PrescricaoMedicamento 
-                ultimoPeso={{ valor: 70, data: "15/12/2024" }}
-              />
-            </TabsContent>
-            
-            <TabsContent value="atestados" className="mt-6">
-              <AtestadoSection />
-            </TabsContent>
-            
-            <TabsContent value="declaracao" className="mt-6">
-              <DeclaracaoComparecimento />
-            </TabsContent>
-          </Tabs>
+              {errors.conduta && (
+                <span className="text-sm text-red-500 flex items-center gap-1">
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.conduta}
+                </span>
+              )}
+            </div>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Modal de comentário */}
-      {editingComment && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96 max-w-[90vw]">
-            <h3 className="text-lg font-semibold mb-4">
-              Adicionar Comentário
-            </h3>
+      {/* Orientações ao Paciente - OBRIGATÓRIO */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <UserPlus className="h-5 w-5" />
+            Orientações ao Paciente
+            <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="orientacoes">
+              Recomendações, cuidados, sinais de alerta e restrições
+            </Label>
             <Textarea
-              placeholder="Adicione seu comentário..."
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              className="mb-4"
-              rows={4}
+              id="orientacoes"
+              placeholder="Descreva as orientações ao paciente: recomendações, cuidados, sinais de alerta, restrições..."
+              value={orientacoes}
+              onChange={(e) => setOrientacoes(e.target.value)}
+              className={cn(
+                "min-h-[120px] resize-y",
+                errors.orientacoes && "border-red-500"
+              )}
+              maxLength={2000}
             />
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setEditingComment(null)}
-              >
-                Cancelar
-              </Button>
-              <Button onClick={saveComment}>
-                Salvar
-              </Button>
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-muted-foreground">
+                {orientacoes.length}/2000 caracteres (mínimo 10)
+              </div>
+              {errors.orientacoes && (
+                <span className="text-sm text-red-500 flex items-center gap-1">
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.orientacoes}
+                </span>
+              )}
             </div>
           </div>
-        </div>
+        </CardContent>
+      </Card>
+
+      {/* Prescrições - OPCIONAL */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Pill className="h-5 w-5" />
+              Prescrições
+              <Badge variant="secondary" className="text-xs">Opcional</Badge>
+            </CardTitle>
+            <Button onClick={adicionarMedicamento} size="sm" className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Adicionar Medicamento
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {medicamentos.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Nenhum medicamento prescrito. Clique em "Adicionar Medicamento" para começar.
+            </div>
+          ) : (
+            medicamentos.map((medicamento) => (
+              <Card key={medicamento.id} className="p-4">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium">Medicamento #{medicamentos.indexOf(medicamento) + 1}</h4>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removerMedicamento(medicamento.id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Medicamento</Label>
+                      <Input
+                        placeholder="Nome do medicamento"
+                        value={medicamento.medicamento}
+                        onChange={(e) => atualizarMedicamento(medicamento.id, 'medicamento', e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Dose</Label>
+                      <Input
+                        placeholder="Ex: 500mg"
+                        value={medicamento.dose}
+                        onChange={(e) => atualizarMedicamento(medicamento.id, 'dose', e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Frequência</Label>
+                      <Select
+                        value={medicamento.frequencia}
+                        onValueChange={(value) => atualizarMedicamento(medicamento.id, 'frequencia', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione a frequência" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1x-dia">1x ao dia</SelectItem>
+                          <SelectItem value="2x-dia">2x ao dia</SelectItem>
+                          <SelectItem value="3x-dia">3x ao dia</SelectItem>
+                          <SelectItem value="4x-dia">4x ao dia</SelectItem>
+                          <SelectItem value="6-6h">6 em 6 horas</SelectItem>
+                          <SelectItem value="8-8h">8 em 8 horas</SelectItem>
+                          <SelectItem value="12-12h">12 em 12 horas</SelectItem>
+                          <SelectItem value="sos">Se necessário</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Via</Label>
+                      <Select
+                        value={medicamento.via}
+                        onValueChange={(value) => atualizarMedicamento(medicamento.id, 'via', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Via de administração" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="oral">Oral</SelectItem>
+                          <SelectItem value="sublingual">Sublingual</SelectItem>
+                          <SelectItem value="topica">Tópica</SelectItem>
+                          <SelectItem value="intramuscular">Intramuscular</SelectItem>
+                          <SelectItem value="endovenosa">Endovenosa</SelectItem>
+                          <SelectItem value="inalatoria">Inalatória</SelectItem>
+                          <SelectItem value="nasal">Nasal</SelectItem>
+                          <SelectItem value="ocular">Ocular</SelectItem>
+                          <SelectItem value="auricular">Auricular</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Duração</Label>
+                      <Input
+                        placeholder="Ex: 7 dias"
+                        value={medicamento.duracao}
+                        onChange={(e) => atualizarMedicamento(medicamento.id, 'duracao', e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Instruções</Label>
+                      <Input
+                        placeholder="Instruções especiais"
+                        value={medicamento.instrucoes}
+                        onChange={(e) => atualizarMedicamento(medicamento.id, 'instrucoes', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Exames Solicitados - OPCIONAL */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Exames Solicitados
+              <Badge variant="secondary" className="text-xs">Opcional</Badge>
+            </CardTitle>
+            <Button onClick={adicionarExame} size="sm" className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Adicionar Exame
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {exames.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Nenhum exame solicitado. Clique em "Adicionar Exame" para começar.
+            </div>
+          ) : (
+            exames.map((exame) => (
+              <Card key={exame.id} className="p-4">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium">Exame #{exames.indexOf(exame) + 1}</h4>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removerExame(exame.id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label>Tipo de Exame</Label>
+                      <Input
+                        placeholder="Ex: Hemograma completo"
+                        value={exame.tipo}
+                        onChange={(e) => atualizarExame(exame.id, 'tipo', e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Motivo</Label>
+                      <Input
+                        placeholder="Motivo da solicitação"
+                        value={exame.motivo}
+                        onChange={(e) => atualizarExame(exame.id, 'motivo', e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Urgência</Label>
+                      <Select
+                        value={exame.urgencia}
+                        onValueChange={(value) => atualizarExame(exame.id, 'urgencia', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione a urgência" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="normal">Normal</SelectItem>
+                          <SelectItem value="urgente">Urgente</SelectItem>
+                          <SelectItem value="muito-urgente">Muito Urgente</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Encaminhamentos - OPCIONAL */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <UserPlus className="h-5 w-5" />
+              Encaminhamentos
+              <Badge variant="secondary" className="text-xs">Opcional</Badge>
+            </CardTitle>
+            <Button onClick={adicionarEncaminhamento} size="sm" className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Adicionar Encaminhamento
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {encaminhamentos.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Nenhum encaminhamento realizado. Clique em "Adicionar Encaminhamento" para começar.
+            </div>
+          ) : (
+            encaminhamentos.map((encaminhamento) => (
+              <Card key={encaminhamento.id} className="p-4">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium">Encaminhamento #{encaminhamentos.indexOf(encaminhamento) + 1}</h4>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removerEncaminhamento(encaminhamento.id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label>Destino</Label>
+                      <Input
+                        placeholder="Ex: Cardiologia, UPA, etc."
+                        value={encaminhamento.destino}
+                        onChange={(e) => atualizarEncaminhamento(encaminhamento.id, 'destino', e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Motivo</Label>
+                      <Input
+                        placeholder="Motivo do encaminhamento"
+                        value={encaminhamento.motivo}
+                        onChange={(e) => atualizarEncaminhamento(encaminhamento.id, 'motivo', e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Urgência</Label>
+                      <Select
+                        value={encaminhamento.urgencia}
+                        onValueChange={(value) => atualizarEncaminhamento(encaminhamento.id, 'urgencia', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione a urgência" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="normal">Normal</SelectItem>
+                          <SelectItem value="urgente">Urgente</SelectItem>
+                          <SelectItem value="muito-urgente">Muito Urgente</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Agendamento de Retorno - OPCIONAL */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            Agendamento de Retorno
+            <Badge variant="secondary" className="text-xs">Opcional</Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Data Sugerida para Retorno</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !retornoData && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {retornoData ? format(retornoData, "PPP", { locale: ptBR }) : "Selecione uma data"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={retornoData}
+                    onSelect={setRetornoData}
+                    disabled={(date) => date < new Date()}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Motivo do Retorno</Label>
+              <Input
+                placeholder="Ex: Reavaliação, controle, resultado de exames..."
+                value={retornoMotivo}
+                onChange={(e) => setRetornoMotivo(e.target.value)}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Resumo de Validação */}
+      {Object.keys(errors).length > 0 && (
+        <Alert className="border-red-200 bg-red-50">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">
+            Existem campos obrigatórios que precisam ser preenchidos corretamente:
+            <ul className="mt-2 list-disc list-inside">
+              {Object.entries(errors).map(([field, error]) => (
+                <li key={field}>{error}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   );
