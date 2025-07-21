@@ -420,46 +420,67 @@ export function AddPatientModal({ open, onOpenChange, onPatientAdded }: AddPatie
       </div>
 
       {/* Resultados da busca */}
-      {searchResults.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Pacientes Encontrados
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {searchResults.map((patient) => (
-              <div
-                key={patient.id}
-                className="p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
-                onClick={() => handleAddExistingPatient(patient)}
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-medium">{patient.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Nascimento: {new Date(patient.birthDate).toLocaleDateString('pt-BR')}
-                    </p>
-                    {patient.motherName && (
-                      <p className="text-sm text-muted-foreground">
-                        Mãe: {patient.motherName}
-                      </p>
-                    )}
-                    {patient.lastVisit && (
-                      <p className="text-xs text-muted-foreground">
-                        Última visita: {new Date(patient.lastVisit).toLocaleDateString('pt-BR')}
-                      </p>
-                    )}
+      {searchTerm.length >= 2 && (
+        <>
+          {searchResults.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Pacientes Encontrados
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {searchResults.map((patient) => (
+                  <div
+                    key={patient.id}
+                    className="p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+                    onClick={() => handleAddExistingPatient(patient)}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium">{patient.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Nascimento: {new Date(patient.birthDate).toLocaleDateString('pt-BR')}
+                        </p>
+                        {patient.motherName && (
+                          <p className="text-sm text-muted-foreground">
+                            Mãe: {patient.motherName}
+                          </p>
+                        )}
+                        {patient.lastVisit && (
+                          <p className="text-xs text-muted-foreground">
+                            Última visita: {new Date(patient.lastVisit).toLocaleDateString('pt-BR')}
+                          </p>
+                        )}
+                      </div>
+                      <Button size="sm" disabled={isLoading}>
+                        {isLoading ? "Adicionando..." : "Adicionar à Fila"}
+                      </Button>
+                    </div>
                   </div>
-                  <Button size="sm" disabled={isLoading}>
-                    {isLoading ? "Adicionando..." : "Adicionar à Fila"}
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+                ))}
+              </CardContent>
+            </Card>
+          ) : (
+            /* Nenhum resultado encontrado */
+            <Card className="border-dashed border-2 border-muted-foreground/25">
+              <CardContent className="text-center py-8">
+                <Users className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                <h3 className="text-lg font-medium text-muted-foreground mb-2">
+                  Nenhum paciente encontrado
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Não encontramos nenhum paciente com "{searchTerm}" em nossos registros.
+                </p>
+                <Button onClick={handleSearchAndRegister} className="w-full max-w-sm">
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Cadastrar Munícipe
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </>
       )}
 
       {/* Opção para cadastrar novo */}
