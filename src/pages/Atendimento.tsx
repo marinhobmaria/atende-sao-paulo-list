@@ -209,7 +209,11 @@ const Atendimento = () => {
                 </TabsContent>
 
                 <TabsContent value="soap" className="mt-6">
-                  <SOAPContainer onFinalizarAtendimento={() => setShowConfirmFinalizacao(true)} />
+                  <SOAPContainer 
+                    onFinalizarAtendimento={() => setShowConfirmFinalizacao(true)}
+                    patientId={cidadao.id}
+                    patientName={cidadao.name}
+                  />
                 </TabsContent>
 
                 <TabsContent value="vacinacao" className="mt-6">
