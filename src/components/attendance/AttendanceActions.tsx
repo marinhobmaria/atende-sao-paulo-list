@@ -213,8 +213,9 @@ export const AttendanceActions = ({ attendance, onStatusChange }: AttendanceActi
       {/* Menu Mais Opções compacto */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="h-7 px-2">
+          <Button variant="outline" size="sm" className="h-7 px-2" title="Mais opções">
             <MoreHorizontal className="w-3 h-3" />
+            <span className="hidden lg:inline ml-1 text-xs">Mais opções</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="bg-white border shadow-lg">

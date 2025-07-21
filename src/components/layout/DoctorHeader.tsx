@@ -28,7 +28,12 @@ export const DoctorHeader = () => {
     <div className="flex h-16 items-center justify-between border-b px-6 bg-gradient-to-r from-background to-background/95 backdrop-blur-sm">
       <div className="flex items-center gap-4">
         <div className="h-6 w-px bg-border" />
-        <span className="text-sm text-muted-foreground font-medium">Sistema de Saúde</span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground font-medium">Campanha Julho Verde</span>
+          <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+            Campanha
+          </span>
+        </div>
       </div>
       
       <div className="flex items-center gap-3">
