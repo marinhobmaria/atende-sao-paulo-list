@@ -44,8 +44,8 @@ const Vacinacao = () => {
       { title: "Lista de Atendimento", href: "/" }, 
       { title: "Vacinação" }
     ]}>
-      <div className="p-6">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <div className="p-4">
+        <div className="w-full space-y-4">
           {/* Informações compactas do cidadão */}
           <CitizenCompactInfo 
             cidadao={cidadao}

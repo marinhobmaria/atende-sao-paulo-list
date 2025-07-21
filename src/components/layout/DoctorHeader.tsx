@@ -1,7 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { User, Settings, LogOut, Maximize, Minimize } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { User, Settings, LogOut, Maximize, Minimize, Bell } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export const DoctorHeader = () => {
@@ -37,6 +38,50 @@ export const DoctorHeader = () => {
       </div>
       
       <div className="flex items-center gap-3">
+        {/* Notificações */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 w-9 p-0 relative"
+              title="Notificações"
+            >
+              <Bell className="h-4 w-4" />
+              <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-red-500 hover:bg-red-500">
+                5
+              </Badge>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80" align="end">
+            <div className="space-y-3">
+              <h4 className="font-medium text-sm border-b pb-2">Notificações (5)</h4>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                <div className="p-2 hover:bg-accent rounded-md cursor-pointer">
+                  <p className="text-sm font-medium">Nova consulta agendada</p>
+                  <p className="text-xs text-muted-foreground">João Silva - 14:30</p>
+                </div>
+                <div className="p-2 hover:bg-accent rounded-md cursor-pointer">
+                  <p className="text-sm font-medium">Exame alterado</p>
+                  <p className="text-xs text-muted-foreground">Maria Santos - Glicemia</p>
+                </div>
+                <div className="p-2 hover:bg-accent rounded-md cursor-pointer">
+                  <p className="text-sm font-medium">Receita médica vencendo</p>
+                  <p className="text-xs text-muted-foreground">Pedro Costa - Hipertensão</p>
+                </div>
+                <div className="p-2 hover:bg-accent rounded-md cursor-pointer">
+                  <p className="text-sm font-medium">Vacina disponível</p>
+                  <p className="text-xs text-muted-foreground">Ana Oliveira - COVID-19</p>
+                </div>
+                <div className="p-2 hover:bg-accent rounded-md cursor-pointer">
+                  <p className="text-sm font-medium">Retorno agendado</p>
+                  <p className="text-xs text-muted-foreground">Carlos Lima - Cardiologia</p>
+                </div>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+
         <Button
           variant="ghost"
           size="sm"
@@ -74,6 +119,10 @@ export const DoctorHeader = () => {
                 <p className="text-xs text-muted-foreground">CRM: 12345-SP</p>
               </div>
               <div className="space-y-1">
+                <Button variant="ghost" size="sm" className="w-full justify-start gap-2">
+                  <User className="h-4 w-4" />
+                  Meu Perfil
+                </Button>
                 <Button variant="ghost" size="sm" className="w-full justify-start gap-2">
                   <Settings className="h-4 w-4" />
                   Configurações
