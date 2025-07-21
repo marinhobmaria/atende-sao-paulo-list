@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, User, Calendar, Search } from "lucide-react";
+import { ChevronDown, User, Calendar, Search, UserPlus } from "lucide-react";
 
 // Mock citizen data with birth dates for age calculation and mother names
 const mockCitizens = [
@@ -180,9 +180,21 @@ export const CitizenOnlySearch = ({
           })}
         </div>
         
-        {filteredCitizens.length === 0 && (
-          <div className="p-3 text-center text-sm text-gray-500">
-            Nenhum munícipe encontrado
+        {filteredCitizens.length === 0 && value.trim() && (
+          <div className="p-4 text-center space-y-3">
+            <p className="text-sm text-gray-500 mb-3">Nenhum munícipe encontrado</p>
+            <Button 
+              onClick={() => {
+                console.log("Abrir modal de cadastro para:", value);
+                // Pode integrar com o modal de cadastro existente
+              }}
+              variant="outline"
+              size="sm"
+              className="w-full"
+            >
+              <UserPlus className="h-4 w-4 mr-2" />
+              Cadastrar Munícipe
+            </Button>
           </div>
         )}
       </PopoverContent>

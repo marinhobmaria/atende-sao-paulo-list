@@ -2,8 +2,9 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, User, Calendar } from "lucide-react";
+import { Search, User, Calendar, UserPlus } from "lucide-react";
 
 // Mock citizen data with birth dates for age calculation and mother names
 const mockCitizens = [
@@ -233,8 +234,20 @@ export const CitizenSearch = ({
               })}
             </div>
           ) : value.trim() && (
-            <div className="p-4 text-center">
-              <p className="text-gray-500">Nenhum munícipe encontrado</p>
+            <div className="p-6 text-center space-y-4">
+              <p className="text-gray-500 mb-4">Nenhum munícipe encontrado</p>
+              <Button 
+                onClick={() => {
+                  // Abrir modal de cadastro - aqui você pode integrar com o modal existente
+                  console.log("Abrir modal de cadastro para:", value);
+                  // Pode chamar um callback ou dispatch de evento para abrir o modal
+                }}
+                variant="outline"
+                className="w-full max-w-xs"
+              >
+                <UserPlus className="h-4 w-4 mr-2" />
+                Cadastrar Munícipe
+              </Button>
             </div>
           )}
         </div>
