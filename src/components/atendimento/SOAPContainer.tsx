@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { SOAPSubjetivo } from './SOAPSubjetivo';
 import { SOAPObjetivo } from './SOAPObjetivo';
 import { SOAPAvaliacao } from './SOAPAvaliacao';
@@ -15,7 +15,18 @@ import { SOAPAntecedentes } from './SOAPAntecedentes';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { useAuditLog } from '@/hooks/useAuditLog';
 import { useUserPermissions } from '@/hooks/useUserPermissions';
-import { CheckCircle, AlertTriangle, Save, History, RefreshCw } from 'lucide-react';
+import { 
+  CheckCircle, 
+  AlertTriangle, 
+  Save, 
+  History, 
+  RefreshCw,
+  User,
+  Target, 
+  Stethoscope,
+  ClipboardList,
+  FileText
+} from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface SOAPData {
@@ -58,7 +69,7 @@ export const SOAPContainer = ({
   patientId = "1", 
   patientName = "Paciente" 
 }: SOAPContainerProps) => {
-  const [activeSection, setActiveSection] = useState<string>("antecedentes");
+  const [openSections, setOpenSections] = useState<string[]>(["antecedentes"]);
   const [completedSections, setCompletedSections] = useState<string[]>([]);
   const [soapData, setSoapData] = useState<SOAPData>({});
   const [isValidForFinalization, setIsValidForFinalization] = useState(false);
@@ -219,60 +230,78 @@ export const SOAPContainer = ({
     {
       id: "antecedentes",
       title: "Antecedentes",
+      subtitle: "Impressões do Munícipe",
       component: SOAPAntecedentes,
       required: false,
+      icon: User,
       description: "Histórico médico e dados prévios"
     },
     {
       id: "subjetivo", 
       title: "Subjetivo",
+      subtitle: "Impressões do Munícipe",
       component: SOAPSubjetivo,
       required: true,
+      icon: () => <span className="text-sm">🗣️</span>,
       description: "Queixa principal e história atual"
     },
     {
       id: "objetivo",
-      title: "Objetivo", 
+      title: "Objetivo",
+      subtitle: "Exame Físico e Dados", 
       component: SOAPObjetivo,
       required: true,
+      icon: () => <span className="text-sm">🔍</span>,
       description: "Sinais vitais e exame físico"
     },
     {
       id: "avaliacao",
       title: "Avaliação",
+      subtitle: "Diagnóstico e Análise",
       component: SOAPAvaliacao,
       required: true,
+      icon: () => <span className="text-sm">🎯</span>,
       description: "Diagnóstico e hipóteses"
     },
     {
       id: "plano",
       title: "Plano",
+      subtitle: "Tratamento e Conduta",
       component: SOAPPlano,
       required: true,
+      icon: () => <span className="text-sm">📋</span>,
       description: "Conduta e prescrições"
     }
   ];
 
   const getSectionStatus = (sectionId: string, required: boolean) => {
     const isCompleted = completedSections.includes(sectionId);
-    const isActive = activeSection === sectionId;
     
     if (isCompleted) return "completed";
-    if (isActive) return "active";
     if (required) return "required";
     return "optional";
   };
 
-  const getSectionColor = (status: string) => {
-    switch (status) {
-      case "completed": return "bg-green-100 text-green-800 border-green-300";
-      case "active": return "bg-blue-100 text-blue-800 border-blue-300";
-      case "required": return "bg-red-50 text-red-700 border-red-200";
-      default: return "bg-gray-50 text-gray-600 border-gray-200";
-    }
+  const handleAccordionChange = (values: string[]) => {
+    setOpenSections(values);
   };
 
-  const ActiveComponent = sections.find(s => s.id === activeSection)?.component || SOAPAntecedentes;
+  const getSectionIcon = (IconComponent: any, status: string) => {
+    if (typeof IconComponent === 'function' && IconComponent.toString().includes('span')) {
+      return <IconComponent />;
+    }
+    
+    const baseClasses = "h-4 w-4";
+    
+    switch (status) {
+      case "completed":
+        return <CheckCircle className={`${baseClasses} text-green-600`} />;
+      case "required":
+        return <IconComponent className={`${baseClasses} text-primary`} />;
+      default:
+        return <IconComponent className={`${baseClasses} text-muted-foreground`} />;
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -285,10 +314,10 @@ export const SOAPContainer = ({
               </div>
               <div>
                 <CardTitle className="text-2xl font-semibold text-emerald-900">
-                  SOAP - Evolução Clínica
+                  Atendimento SOAP - {patientName}
                 </CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  {patientName} • {currentUser?.name}
+                  Registro de atendimento médico
                 </p>
               </div>
             </div>
@@ -342,44 +371,60 @@ export const SOAPContainer = ({
               </Alert>
             )}
           </div>
+
+          <div className="text-sm text-muted-foreground mt-2">
+            Preencha as seções do SOAP (Subjetivo, Objetivo, Avaliação, Plano) clicando nas seções abaixo:
+          </div>
         </CardHeader>
 
-        <CardContent className="space-y-6">
-          {/* Section Navigation */}
-          <div className="grid grid-cols-5 gap-2">
+        <CardContent>
+          {/* SOAP Accordion */}
+          <Accordion 
+            type="multiple" 
+            value={openSections} 
+            onValueChange={handleAccordionChange}
+            className="space-y-2"
+          >
             {sections.map((section) => {
               const status = getSectionStatus(section.id, section.required);
+              const SectionComponent = section.component;
+              
               return (
-                <Button
-                  key={section.id}
-                  variant="outline"
-                  onClick={() => setActiveSection(section.id)}
-                  className={`flex flex-col items-center p-3 h-auto ${getSectionColor(status)}`}
+                <AccordionItem 
+                  key={section.id} 
+                  value={section.id}
+                  className="border rounded-lg overflow-hidden"
                 >
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium">{section.title}</span>
-                    {section.required && status !== "completed" && (
-                      <span className="text-red-500">*</span>
-                    )}
-                    {status === "completed" && (
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                    )}
-                  </div>
-                  <span className="text-xs text-center">{section.description}</span>
-                </Button>
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
+                    <div className="flex items-center gap-3 w-full">
+                      {getSectionIcon(section.icon, status)}
+                      <div className="flex-1 text-left">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-primary">
+                            {section.title} - {section.subtitle}
+                          </span>
+                          {section.required && status !== "completed" && (
+                            <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
+                          )}
+                          {status === "completed" && (
+                            <Badge variant="default" className="text-xs bg-green-600">Completo</Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <div className="border-t pt-4">
+                      <SectionComponent />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
               );
             })}
-          </div>
-
-          <Separator />
-
-          {/* Active Section Content */}
-          <div className="min-h-96">
-            <ActiveComponent />
-          </div>
+          </Accordion>
 
           {/* Action Buttons */}
-          <div className="flex justify-between items-center pt-4 border-t">
+          <div className="flex justify-between items-center pt-6 border-t mt-6">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               {autoSave.hasUnsavedChanges && (
                 <Badge variant="secondary">Alterações não salvas</Badge>

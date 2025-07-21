@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, Fragment } from "react";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { DoctorHeader } from "./DoctorHeader";
@@ -38,9 +38,9 @@ export const PageLayout = ({ children, breadcrumbItems = [] }: PageLayoutProps) 
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   {breadcrumbItems.map((item, index) => (
-                    <>
-                      <BreadcrumbSeparator key={`sep-${index}`} />
-                      <BreadcrumbItem key={index}>
+                    <Fragment key={`breadcrumb-${index}`}>
+                      <BreadcrumbSeparator />
+                      <BreadcrumbItem>
                         {item.href ? (
                           <BreadcrumbLink href={item.href} className="hover:text-foreground transition-colors">
                             {item.title}
@@ -51,7 +51,7 @@ export const PageLayout = ({ children, breadcrumbItems = [] }: PageLayoutProps) 
                           </BreadcrumbPage>
                         )}
                       </BreadcrumbItem>
-                    </>
+                    </Fragment>
                   ))}
                 </BreadcrumbList>
               </Breadcrumb>
