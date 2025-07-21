@@ -1,5 +1,5 @@
 
-import { BarChart3, UserCheck } from "lucide-react";
+import { BarChart3, UserCheck, PanelLeftClose, PanelLeft } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -11,8 +11,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 
 const navigationItems = [
   {
@@ -29,22 +31,37 @@ const navigationItems = [
 
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
 
   return (
     <Sidebar className="border-r" collapsible="icon">
       <SidebarHeader className="p-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">S</span>
-          </div>
-          {!isCollapsed && (
-            <div>
-              <h2 className="font-semibold text-lg">Saúde Simples</h2>
-              <p className="text-xs text-muted-foreground">Sistema de Gestão</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">S</span>
             </div>
-          )}
+            {!isCollapsed && (
+              <div>
+                <h2 className="font-semibold text-lg">Saúde Simples</h2>
+                <p className="text-xs text-muted-foreground">Sistema de Gestão</p>
+              </div>
+            )}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleSidebar}
+            className="h-8 w-8 p-0"
+            title={isCollapsed ? "Expandir menu" : "Recolher menu"}
+          >
+            {isCollapsed ? (
+              <PanelLeft className="h-4 w-4" />
+            ) : (
+              <PanelLeftClose className="h-4 w-4" />
+            )}
+          </Button>
         </div>
       </SidebarHeader>
 

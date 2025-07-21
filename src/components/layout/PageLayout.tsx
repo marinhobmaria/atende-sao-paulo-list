@@ -26,26 +26,8 @@ export const PageLayout = ({ children, breadcrumbItems = [] }: PageLayoutProps) 
             {/* Doctor Header */}
             <DoctorHeader />
 
-            {/* Header with Sidebar Trigger */}
+            {/* Header with Breadcrumb */}
             <header className="flex h-14 items-center gap-4 border-b px-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-              {/* Mobile toggle */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-9 w-9 p-0 lg:hidden hover:bg-accent/50"
-                asChild
-              >
-                <SidebarTrigger>
-                  <Menu className="h-4 w-4" />
-                  <span className="sr-only">Toggle Menu</span>
-                </SidebarTrigger>
-              </Button>
-              
-              {/* Desktop toggle - more prominent */}
-              <div className="hidden lg:block">
-                <SidebarTrigger className="hover:bg-accent/50 p-2 rounded-md transition-colors" />
-              </div>
-              
               {/* Breadcrumb */}
               <Breadcrumb>
                 <BreadcrumbList>

@@ -29,9 +29,9 @@ export const DoctorHeader = () => {
       <div className="flex items-center gap-4">
         <div className="h-6 w-px bg-border" />
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground font-medium">Campanha Julho Verde</span>
+          <span className="text-sm text-muted-foreground font-medium">Julho Verde</span>
           <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
-            Campanha
+            🌿 Campanha
           </span>
         </div>
       </div>
