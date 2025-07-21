@@ -45,63 +45,62 @@ export const ClinicalTimeline = ({ patientId, isFloating = false, onEventClick }
     {
       id: '1',
       type: 'consultation',
-      title: 'Consulta Médica',
-      description: 'Dor de cabeça - N01 (CIAP2)',
-      date: new Date('2024-06-15T14:30:00'),
-      priority: 'high',
-      professional: 'Dr. João Silva',
-      unit: 'UBS Central',
-      details: { cid: 'N01', duration: 30 }
+      title: 'Consulta especialidade Oftalmologia',
+      description: 'Consulta especializada',
+      date: new Date('2024-06-19T14:30:00'),
+      priority: 'medium',
+      professional: 'Dr. Especialista',
+      unit: 'Hospital Central'
     },
     {
       id: '2',
-      type: 'measurement',
-      title: 'Medições de Rotina',
-      description: 'PA: 120/80 mmHg, Peso: 70kg, Altura: 175cm',
-      date: new Date('2024-06-15T08:30:00'),
+      type: 'vaccination',
+      title: 'Vacina campanha COVID-19',
+      description: '4ª dose - Reforço',
+      date: new Date('2024-06-19T10:00:00'),
       priority: 'medium',
-      professional: 'Enf. Maria Santos',
+      professional: 'Enfermeira Ana',
       unit: 'UBS Central'
     },
     {
       id: '3',
-      type: 'vaccination',
-      title: 'Vacinação COVID-19',
-      description: '3ª dose - Pfizer',
-      date: new Date('2024-03-15T10:00:00'),
+      type: 'exam',
+      title: 'Procedimento',
+      description: 'Exame laboratorial de rotina',
+      date: new Date('2024-06-15T08:00:00'),
       priority: 'medium',
-      professional: 'Tec. Ana Costa',
-      unit: 'UBS Central'
+      professional: 'Lab. Central',
+      unit: 'Lab. Central'
     },
     {
       id: '4',
-      type: 'prescription',
-      title: 'Prescrição Médica',
-      description: 'Atenolol 50mg, Metformina 850mg',
-      date: new Date('2024-06-15T14:45:00'),
+      type: 'consultation',
+      title: 'Escuta inicial',
+      description: 'Atendimento de enfermagem',
+      date: new Date('2024-06-12T09:30:00'),
       priority: 'medium',
-      professional: 'Dr. João Silva',
+      professional: 'Enf. Maria',
       unit: 'UBS Central'
     },
     {
       id: '5',
-      type: 'allergy',
-      title: 'Alergia Registrada',
-      description: 'Dipirona - Urticária (Moderada)',
-      date: new Date('2024-01-20T09:00:00'),
-      priority: 'high',
-      professional: 'Dr. Carlos Lima',
-      unit: 'Hospital Municipal'
+      type: 'measurement',
+      title: 'Medições de Rotina',
+      description: 'PA: 120/80 mmHg, Peso: 70kg',
+      date: new Date('2024-06-10T08:30:00'),
+      priority: 'medium',
+      professional: 'Tec. Carlos',
+      unit: 'UBS Central'
     },
     {
       id: '6',
-      type: 'exam',
-      title: 'Exames Laboratoriais',
-      description: 'Hemograma completo, Glicemia de jejum',
-      date: new Date('2024-05-10T07:00:00'),
+      type: 'prescription',
+      title: 'Prescrição',
+      description: 'Renovação de medicamentos',
+      date: new Date('2024-06-08T15:00:00'),
       priority: 'medium',
-      professional: 'Lab. Central',
-      unit: 'Lab. Central'
+      professional: 'Dr. Silva',
+      unit: 'UBS Central'
     }
   ];
 
@@ -170,13 +169,25 @@ export const ClinicalTimeline = ({ patientId, isFloating = false, onEventClick }
   const sortedEvents = filteredEvents.sort((a, b) => b.date.getTime() - a.date.getTime());
 
   const today = new Date();
-  const isToday = (date: Date) => {
-    return date.toDateString() === today.toDateString();
+  const getDaysAgo = (date: Date) => {
+    const today = new Date();
+    const diffTime = today.getTime() - date.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'hoje';
+    if (diffDays === 1) return '1 dia atrás';
+    if (diffDays <= 30) return `${diffDays} dias atrás`;
+    if (diffDays <= 365) return `${Math.floor(diffDays / 30)} meses atrás`;
+    return `${Math.floor(diffDays / 365)} anos atrás`;
   };
 
-  const isRecent = (date: Date) => {
-    const daysDiff = (today.getTime() - date.getTime()) / (1000 * 3600 * 24);
-    return daysDiff <= 7;
+  const getEventBadgeText = (type: string) => {
+    switch (type) {
+      case 'consultation': return 'Consulta';
+      case 'exam': return 'Procedimento';
+      case 'vaccination': return 'Vacina';
+      default: return type;
+    }
   };
 
   const timelineContent = (
@@ -185,7 +196,7 @@ export const ClinicalTimeline = ({ patientId, isFloating = false, onEventClick }
         <div className="flex items-center justify-between">
           <CardTitle className="text-base flex items-center gap-2">
             <Calendar className="h-4 w-4" />
-            Timeline Clínica
+            Timeline
           </CardTitle>
           {isFloating && (
             <Button
@@ -197,89 +208,46 @@ export const ClinicalTimeline = ({ patientId, isFloating = false, onEventClick }
             </Button>
           )}
         </div>
-        {!isCollapsed && (
-          <div className="flex flex-wrap gap-1 mt-2">
-            <Button
-              variant={selectedFilter === 'all' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSelectedFilter('all')}
-            >
-              Todos
-            </Button>
-            <Button
-              variant={selectedFilter === 'consultation' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSelectedFilter('consultation')}
-            >
-              Consultas
-            </Button>
-            <Button
-              variant={selectedFilter === 'measurement' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSelectedFilter('measurement')}
-            >
-              Medições
-            </Button>
-            <Button
-              variant={selectedFilter === 'vaccination' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSelectedFilter('vaccination')}
-            >
-              Vacinas
-            </Button>
-          </div>
+        {!isCollapsed && !isFloating && (
+          <p className="text-sm text-muted-foreground mt-2">
+            Histórico de eventos do paciente
+          </p>
         )}
       </CardHeader>
 
       {!isCollapsed && (
         <CardContent className="pt-0">
           <ScrollArea className={`${isFloating ? 'h-[400px]' : 'h-[600px]'} pr-4`}>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {sortedEvents.map((event, index) => (
                 <div
                   key={event.id}
-                  className={`
-                    relative border-l-4 pl-4 pb-4 cursor-pointer transition-all hover:shadow-md rounded-r-lg p-3
-                    ${getEventColor(event.type, event.priority)}
-                    ${isToday(event.date) ? 'ring-2 ring-primary ring-opacity-50' : ''}
-                    ${isRecent(event.date) ? 'shadow-sm' : 'opacity-80'}
-                  `}
+                  className="flex items-start gap-3 cursor-pointer hover:bg-muted/50 p-2 rounded-lg transition-colors"
                   onClick={() => onEventClick?.(event)}
                 >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      {getEventIcon(event.type)}
-                      <h4 className="font-medium text-sm">{event.title}</h4>
-                      {getPriorityBadge(event.priority)}
-                      {isToday(event.date) && (
-                        <Badge variant="default" className="text-xs bg-primary">Hoje</Badge>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <p className="text-xs text-muted-foreground mb-2">{event.description}</p>
-                  
-                  <div className="text-xs text-muted-foreground space-y-1">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {format(event.date, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                    </div>
-                    {event.professional && (
-                      <div>
-                        <strong>Profissional:</strong> {event.professional}
-                      </div>
-                    )}
-                    {event.unit && (
-                      <div>
-                        <strong>Unidade:</strong> {event.unit}
-                      </div>
+                  <div className="flex flex-col items-center">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    {index < sortedEvents.length - 1 && (
+                      <div className="w-px h-16 bg-border mt-2"></div>
                     )}
                   </div>
-
-                  {/* Connecting line to next event */}
-                  {index < sortedEvents.length - 1 && (
-                    <div className="absolute left-0 top-full w-0.5 h-3 bg-border"></div>
-                  )}
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant="secondary" className="text-xs">
+                        {getDaysAgo(event.date)}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {getEventBadgeText(event.type)}
+                      </Badge>
+                    </div>
+                    
+                    <h4 className="font-medium text-sm mb-1">{event.title}</h4>
+                    
+                    {event.description && (
+                      <p className="text-xs text-muted-foreground mb-2">{event.description}</p>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

@@ -36,15 +36,9 @@ export const FolhaRostoTab = ({ cidadao }: FolhaRostoTabProps) => {
   };
 
   return (
-    <div className="relative">
-      {/* Timeline Flutuante */}
-      <ClinicalTimeline 
-        patientId={cidadao.id}
-        isFloating={true}
-        onEventClick={handleTimelineEventClick}
-      />
-
-      <div className="space-y-6">
+    <div className="flex gap-6 h-full">
+      {/* Main Content - Left Side */}
+      <div className="flex-1 space-y-6 pr-4">
         {/* Dados Pessoais Detalhados */}
         <PatientDetails cidadao={cidadao} />
 
@@ -55,60 +49,70 @@ export const FolhaRostoTab = ({ cidadao }: FolhaRostoTabProps) => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column */}
           <div className="space-y-4">
-            {/* Escuta Inicial */}
+            {/* Vacinação */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Stethoscope className="h-4 w-4 text-primary" />
-                  Escuta inicial
-                  <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                    Risco intermediário
-                  </Badge>
+                  <Syringe className="h-4 w-4 text-purple-600" />
+                  Vacinação
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium text-foreground">Motivo da Consulta:</p>
-                  <p className="text-sm text-muted-foreground">FEBRE – A03 (CIAP2)</p>
+              <CardContent className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2">
+                    <Syringe className="w-3 h-3 text-purple-600" />
+                    COVID-19 - 3ª DOSE
+                  </span>
+                  <span>15/03/2024</span>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">Intervenções e/ou procedimentos clínicos:</p>
-                  <div className="bg-muted p-2 rounded text-sm text-muted-foreground max-h-20 overflow-y-auto">
-                    Verificação de sinais vitais<br />
-                    Avaliação inicial de sintomas<br />
-                    Orientações sobre hidratação
+                <div className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2">
+                    <Syringe className="w-3 h-3 text-purple-600" />
+                    Influenza - DOSE ÚNICA
+                  </span>
+                  <span>01/04/2024</span>
+                </div>
+                <div className="bg-orange-50 border border-orange-200 p-2 rounded mt-3">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs text-orange-800">
+                      Existem vacinas atrasadas ou não registradas! Confira o cartão de vacinação do cidadão.
+                    </p>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Realizado hoje às 20:15 por: Consultoria Prontuário | Enfermeiro
-                </p>
               </CardContent>
             </Card>
 
-            {/* Últimos Contatos */}
+            {/* Alergias/Reações adversas */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base">Últimos contatos</CardTitle>
+                <CardTitle className="text-base">Alergias/Reações adversas</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex items-center justify-between p-2 bg-muted rounded">
-                  <div>
-                    <p className="text-sm font-medium">Consulta médica | 15/06/2024 - 14:30</p>
-                    <p className="text-xs text-muted-foreground">Dor de cabeça – N01 (CIAP2)</p>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="p-2 bg-red-50 border border-red-200 rounded">
+                    <p className="text-sm font-medium text-red-800">Dipirona</p>
+                    <p className="text-xs text-red-600">Medicamento - Urticária (Moderada)</p>
                   </div>
-                  <Badge variant="destructive" className="text-xs">
-                    Urgência
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between p-2 bg-muted rounded">
-                  <div>
-                    <p className="text-sm font-medium">Escuta inicial | 10/06/2024 - 09:45</p>
-                    <p className="text-xs text-muted-foreground">Febre – A03 (CIAP2)</p>
+                  <div className="p-2 bg-yellow-50 border border-yellow-200 rounded">
+                    <p className="text-sm font-medium text-yellow-800">Leite</p>
+                    <p className="text-xs text-yellow-600">Alimento - Intolerância (Leve)</p>
                   </div>
-                  <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">
-                    Risco intermediário
-                  </Badge>
+                  <div className="p-2 bg-red-50 border border-red-200 rounded">
+                    <p className="text-sm font-medium text-red-800">Mofo</p>
+                    <p className="text-xs text-red-600">Ambiental - Alergia respiratória (Leve)</p>
+                  </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Antecedentes */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Antecedentes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">Remoção do apêndice</p>
               </CardContent>
             </Card>
           </div>
@@ -121,48 +125,104 @@ export const FolhaRostoTab = ({ cidadao }: FolhaRostoTabProps) => {
                 <CardTitle className="text-base">Lista de problemas/condições</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">Hipertensão arterial (K86)</p>
-                      <p className="text-xs text-muted-foreground">Início: 15/01/2023 | Há 520 dias</p>
-                      <p className="text-xs text-muted-foreground">Última atualização: 10/06/2024</p>
+                      <p className="text-sm font-medium">Hipertensão sem complicações (K87)</p>
+                      <p className="text-xs text-muted-foreground">Início: 10/10/2010 | Há mais de 10 anos</p>
+                      <p className="text-xs text-muted-foreground">Última atualização: 10/10/2020</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">Diabetes mellitus (T90)</p>
-                      <p className="text-xs text-muted-foreground">Início: 20/03/2022 | Há 826 dias</p>
-                      <p className="text-xs text-muted-foreground">Última atualização: 05/06/2024</p>
+                      <p className="text-sm font-medium">Diabético não insulino-dependente (D-19)</p>
+                      <p className="text-xs text-muted-foreground">Início: 10/10/2010 | Há mais de 10 anos</p>
+                      <p className="text-xs text-muted-foreground">Última atualização: 10/10/2020</p>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Medicamentos */}
+            {/* Resultado de exames */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Pill className="h-4 w-4 text-green-600" />
-                  MEDICAMENTOS
-                  <span className="text-sm font-normal text-muted-foreground">Em uso:</span>
-                </CardTitle>
+                <CardTitle className="text-base">Resultado de exames</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div>
-                  <p className="text-sm font-medium">Atenolol 50 mg</p>
-                  <p className="text-xs text-muted-foreground">1 dose, a cada 12 horas</p>
+                  <p className="text-sm font-medium">Hemoglobina glicada</p>
+                  <p className="text-xs text-muted-foreground">Realizado em 10/10/2022</p>
+                  <p className="text-sm">5,6%</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium">Metformina 850 mg</p>
-                  <p className="text-xs text-muted-foreground">1 dose, a cada 8 horas</p>
+                  <p className="text-sm font-medium">HDL</p>
+                  <p className="text-xs text-muted-foreground">Realizado em 10/10/2022</p>
+                  <p className="text-sm">50 mg/dL</p>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Lembretes */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Lembretes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">Sem lembretes</p>
+              </CardContent>
+            </Card>
+
+            {/* Medicamentos */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Medicamentos</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div>
+                  <p className="text-sm font-medium">Prednisolona 3mg/mL</p>
+                  <p className="text-xs text-muted-foreground">7 ampolas, dose única</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Gatifloxacino 10 mg/mL</p>
+                  <p className="text-xs text-muted-foreground">7 ampolas, dose única</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Escuta inicial */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Escuta inicial</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">Não foi realizada Escuta inicial.</p>
+              </CardContent>
+            </Card>
+
+            {/* Pré-natal */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Pré-natal</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">IG Cronológica: 25 semanas e 1 dia</p>
+              </CardContent>
+            </Card>
           </div>
+        </div>
+      </div>
+
+      {/* Timeline - Right Side - Fixed */}
+      <div className="w-80 flex-shrink-0">
+        <div className="sticky top-4">
+          <ClinicalTimeline 
+            patientId={cidadao.id}
+            isFloating={false}
+            onEventClick={handleTimelineEventClick}
+          />
         </div>
       </div>
     </div>
