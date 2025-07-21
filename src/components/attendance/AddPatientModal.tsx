@@ -388,7 +388,7 @@ export function AddPatientModal({ open, onOpenChange, onPatientAdded }: AddPatie
     if (searchTerm.trim()) {
       setFormData(prev => ({
         ...prev,
-        fullName: searchTerm
+        fullName: searchTerm.trim()
       }));
     }
     setCurrentStep("register");
@@ -468,12 +468,16 @@ export function AddPatientModal({ open, onOpenChange, onPatientAdded }: AddPatie
               <CardContent className="text-center py-8">
                 <Users className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
                 <h3 className="text-lg font-medium text-muted-foreground mb-2">
-                  Nenhum paciente encontrado
+                  Nenhum munícipe encontrado
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Não encontramos nenhum paciente com "{searchTerm}" em nossos registros.
+                  Não encontramos nenhum munícipe com "{searchTerm}" em nossos registros.
                 </p>
-                <Button onClick={handleSearchAndRegister} className="w-full max-w-sm">
+                <Button 
+                  onClick={handleSearchAndRegister} 
+                  className="w-full max-w-sm bg-primary hover:bg-primary/90"
+                  size="lg"
+                >
                   <UserPlus className="h-4 w-4 mr-2" />
                   Cadastrar Munícipe
                 </Button>
