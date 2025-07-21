@@ -205,9 +205,10 @@ export const CitizenOnlySearch = ({
       <AddPatientModal
         open={showAddModal}
         onOpenChange={setShowAddModal}
+        skipSearch={true}
+        initialName={searchTerm}
         onPatientAdded={() => {
           console.log("Paciente cadastrado com sucesso");
-          // Pode atualizar a lista ou recarregar dados
         }}
       />
     </Popover>

@@ -15,6 +15,8 @@ interface AddPatientModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onPatientAdded?: () => void;
+  skipSearch?: boolean; // Nova prop para pular busca
+  initialName?: string; // Nome inicial se vier da busca
 }
 
 interface PatientFormData {
@@ -102,16 +104,16 @@ const documentTypes = [
 
 type ModalStep = "search" | "register" | "confirm";
 
-export function AddPatientModal({ open, onOpenChange, onPatientAdded }: AddPatientModalProps) {
+export function AddPatientModal({ open, onOpenChange, onPatientAdded, skipSearch = false, initialName = "" }: AddPatientModalProps) {
   const { toast } = useToast();
-  const [currentStep, setCurrentStep] = useState<ModalStep>("search");
+  const [currentStep, setCurrentStep] = useState<ModalStep>(skipSearch ? "register" : "search");
   const [isLoading, setIsLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(initialName);
   const [searchResults, setSearchResults] = useState<ExistingPatient[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<ExistingPatient | null>(null);
   const [duplicateWarning, setDuplicateWarning] = useState<ExistingPatient[]>([]);
   const [formData, setFormData] = useState<PatientFormData>({
-    fullName: "",
+    fullName: initialName,
     birthDate: "",
     gender: "",
     serviceType: "",
@@ -369,13 +371,13 @@ export function AddPatientModal({ open, onOpenChange, onPatientAdded }: AddPatie
   };
 
   const resetForm = () => {
-    setCurrentStep("search");
-    setSearchTerm("");
+    setCurrentStep(skipSearch ? "register" : "search");
+    setSearchTerm(initialName);
     setSearchResults([]);
     setSelectedPatient(null);
     setDuplicateWarning([]);
     setFormData({
-      fullName: "",
+      fullName: initialName,
       birthDate: "",
       gender: "",
       serviceType: "",

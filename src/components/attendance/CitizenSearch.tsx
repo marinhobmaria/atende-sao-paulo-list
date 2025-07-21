@@ -257,10 +257,10 @@ export const CitizenSearch = ({
       <AddPatientModal
         open={showAddModal}
         onOpenChange={setShowAddModal}
+        skipSearch={true}
+        initialName={value}
         onPatientAdded={() => {
-          // Atualizar lista após cadastro
           console.log("Paciente cadastrado com sucesso");
-          // Pode recarregar a busca ou atualizar estado
         }}
       />
     </div>
