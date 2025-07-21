@@ -1,11 +1,22 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageLayout } from "@/components/layout/PageLayout";
-import { Users, Clock, CheckCircle, UserX, UserCheck, Timer, Calendar } from "lucide-react";
+import { Users, Clock, CheckCircle, UserX, UserCheck, Timer, Calendar, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
+import { DashboardFilters } from "@/components/dashboard/DashboardFilters";
+import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
+import { CriticalAlerts } from "@/components/dashboard/CriticalAlerts";
+import { QuickActions } from "@/components/dashboard/QuickActions";
+import { Button } from "@/components/ui/button";
 
 export default function Dashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [filters, setFilters] = useState({
+    period: "today",
+    professional: "all",
+    serviceType: "all",
+  });
 
   // Atualiza o relógio a cada segundo
   useEffect(() => {
@@ -15,6 +26,30 @@ export default function Dashboard() {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Atualização automática dos dados a cada 2 minutos
+  useEffect(() => {
+    const updateTimer = setInterval(() => {
+      setLastUpdate(new Date());
+      // Aqui você faria a chamada para atualizar os dados do backend
+      console.log("Atualizando dados do dashboard...");
+    }, 120000); // 2 minutos
+
+    return () => clearInterval(updateTimer);
+  }, []);
+
+  const handleFiltersChange = (newFilters: any) => {
+    setFilters(newFilters);
+    setLastUpdate(new Date());
+    // Aqui você faria a chamada para o backend com os novos filtros
+    console.log("Aplicando filtros:", newFilters);
+  };
+
+  const handleManualRefresh = () => {
+    setLastUpdate(new Date());
+    // Aqui você faria a chamada para atualizar os dados do backend
+    console.log("Atualizando dados manualmente...");
+  };
 
   const stats = [
     {
@@ -141,33 +176,51 @@ export default function Dashboard() {
     <PageLayout breadcrumbItems={[{ title: "Dashboard" }]}>
       <div className="p-6">
         <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header com relógio */}
-            <div className="flex justify-between items-start">
+            {/* Header com relógio e controles */}
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">Dashboard Médico</h1>
                 <p className="text-muted-foreground">
                   Gestão da fila de atendimento e visão geral do dia
                 </p>
               </div>
-              <Card className="min-w-[200px]">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-mono font-bold text-primary">
-                    {currentTime.toLocaleTimeString('pt-BR', { 
+              <div className="flex items-center gap-4">
+                <div className="text-center">
+                  <div className="text-xs text-muted-foreground">Última atualização</div>
+                  <div className="text-sm font-medium">
+                    {lastUpdate.toLocaleTimeString('pt-BR', { 
                       hour: '2-digit', 
-                      minute: '2-digit', 
-                      second: '2-digit' 
+                      minute: '2-digit'
                     })}
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {currentTime.toLocaleDateString('pt-BR', { 
-                      weekday: 'long',
-                      day: '2-digit',
-                      month: 'long'
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
+                <Button onClick={handleManualRefresh} variant="outline" size="sm">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Atualizar
+                </Button>
+                <Card className="min-w-[200px]">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-mono font-bold text-primary">
+                      {currentTime.toLocaleTimeString('pt-BR', { 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        second: '2-digit' 
+                      })}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {currentTime.toLocaleDateString('pt-BR', { 
+                        weekday: 'long',
+                        day: '2-digit',
+                        month: 'long'
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
+
+            {/* Filtros */}
+            <DashboardFilters onFiltersChange={handleFiltersChange} />
 
             {/* Cards principais de estatísticas */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -250,6 +303,15 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Gráficos */}
+            <DashboardCharts />
+
+            {/* Alertas Críticos */}
+            <CriticalAlerts />
+
+            {/* Acesso Rápido */}
+            <QuickActions />
 
             {/* Resumo visual do dia */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
