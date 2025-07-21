@@ -51,6 +51,7 @@ export const AddCitizenForm = ({
     setSelectedAppointment(appointment);
     setProfessionalValue(appointment.professional);
     setTeamValue(appointment.team);
+    // Preenche automaticamente o tipo de serviço para demandas agendadas
     setSelectedServiceTypes(appointment.serviceType);
     setShowTodayAppointments(false);
   };

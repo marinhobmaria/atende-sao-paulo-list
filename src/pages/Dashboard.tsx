@@ -1,8 +1,9 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Clock, CheckCircle, UserX, UserCheck, Timer, Calendar } from "lucide-react";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Users, Clock, CheckCircle, UserX, UserCheck, Timer, Calendar, Home, User } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function Dashboard() {
@@ -139,11 +140,42 @@ export default function Dashboard() {
   };
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
-        <main className="flex-1 p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
+        
+        <SidebarInset className="flex-1">
+          {/* Doctor Header */}
+          <div className="flex h-12 items-center gap-3 border-b px-6 bg-background">
+            <div className="flex items-center gap-2">
+              <User className="h-5 w-5 text-primary" />
+              <span className="font-medium text-sm">Dr OM30</span>
+            </div>
+          </div>
+
+          {/* Header with Sidebar Trigger */}
+          <header className="flex h-14 items-center gap-2 border-b px-6">
+            <SidebarTrigger />
+            
+            {/* Breadcrumb */}
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/" className="flex items-center gap-2">
+                    <Home className="h-4 w-4" />
+                    Home
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </header>
+
+          <main className="p-6">
+            <div className="max-w-7xl mx-auto space-y-6">
             {/* Header com relógio */}
             <div className="flex justify-between items-start">
               <div>
@@ -319,8 +351,9 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </div>
-          </div>
-        </main>
+            </div>
+          </main>
+        </SidebarInset>
       </div>
     </SidebarProvider>
   );

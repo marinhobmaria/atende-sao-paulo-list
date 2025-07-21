@@ -9,7 +9,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Home } from "lucide-react";
+import { Home, User } from "lucide-react";
 
 // Mock data for queue counts - in a real app this would come from a store/context
 const mockQueueCount = 50;
@@ -45,6 +45,14 @@ const Index = () => {
           <AppSidebar />
           
           <SidebarInset className="flex-1">
+            {/* Doctor Header */}
+            <div className="flex h-12 items-center gap-3 border-b px-6 bg-background">
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5 text-primary" />
+                <span className="font-medium text-sm">Dr OM30</span>
+              </div>
+            </div>
+
             {/* Header with Sidebar Trigger */}
             <header className="flex h-14 items-center gap-2 border-b px-6">
               <SidebarTrigger />
