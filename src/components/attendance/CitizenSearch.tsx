@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Search, User, Calendar, UserPlus } from "lucide-react";
+import { AddPatientModal } from "./AddPatientModal";
 
 // Mock citizen data with birth dates for age calculation and mother names
 const mockCitizens = [
@@ -120,6 +121,7 @@ export const CitizenSearch = ({
   disabled = false
 }: CitizenSearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   const filteredCitizens = useMemo(() => {
@@ -238,9 +240,7 @@ export const CitizenSearch = ({
               <p className="text-gray-500 mb-4">Nenhum munícipe encontrado</p>
               <Button 
                 onClick={() => {
-                  // Abrir modal de cadastro - aqui você pode integrar com o modal existente
-                  console.log("Abrir modal de cadastro para:", value);
-                  // Pode chamar um callback ou dispatch de evento para abrir o modal
+                  setShowAddModal(true);
                 }}
                 variant="outline"
                 className="w-full max-w-xs"
@@ -252,6 +252,17 @@ export const CitizenSearch = ({
           )}
         </div>
       )}
+
+      {/* Modal de Cadastro */}
+      <AddPatientModal
+        open={showAddModal}
+        onOpenChange={setShowAddModal}
+        onPatientAdded={() => {
+          // Atualizar lista após cadastro
+          console.log("Paciente cadastrado com sucesso");
+          // Pode recarregar a busca ou atualizar estado
+        }}
+      />
     </div>
   );
 };

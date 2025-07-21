@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, User, Calendar, Search, UserPlus } from "lucide-react";
+import { AddPatientModal } from "./AddPatientModal";
 
 // Mock citizen data with birth dates for age calculation and mother names
 const mockCitizens = [
@@ -86,6 +87,7 @@ export const CitizenOnlySearch = ({
 }: CitizenOnlySearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const filteredCitizens = mockCitizens.filter(citizen => {
     const searchLower = searchTerm.toLowerCase();
@@ -180,13 +182,13 @@ export const CitizenOnlySearch = ({
           })}
         </div>
         
-        {filteredCitizens.length === 0 && value.trim() && (
+        {filteredCitizens.length === 0 && searchTerm.trim() && (
           <div className="p-4 text-center space-y-3">
             <p className="text-sm text-gray-500 mb-3">Nenhum munícipe encontrado</p>
             <Button 
               onClick={() => {
-                console.log("Abrir modal de cadastro para:", value);
-                // Pode integrar com o modal de cadastro existente
+                setShowAddModal(true);
+                setIsOpen(false); // Fechar popover
               }}
               variant="outline"
               size="sm"
@@ -198,6 +200,16 @@ export const CitizenOnlySearch = ({
           </div>
         )}
       </PopoverContent>
+
+      {/* Modal de Cadastro */}
+      <AddPatientModal
+        open={showAddModal}
+        onOpenChange={setShowAddModal}
+        onPatientAdded={() => {
+          console.log("Paciente cadastrado com sucesso");
+          // Pode atualizar a lista ou recarregar dados
+        }}
+      />
     </Popover>
   );
 };
