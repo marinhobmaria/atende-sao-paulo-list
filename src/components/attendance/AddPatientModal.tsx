@@ -20,16 +20,21 @@ interface AddPatientModalProps {
 interface PatientFormData {
   fullName: string;
   birthDate: string;
+  gender: string;
   serviceType: string;
   documentType: string;
   documentNumber: string;
   motherName: string;
+  address: string;
+  phone: string;
+  email: string;
   reason: string;
   isMinor: boolean;
   guardianName: string;
   guardianDocument: string;
   isPriority: boolean;
   priorityReason: string;
+  observations: string;
 }
 
 interface ExistingPatient {
@@ -83,6 +88,12 @@ const serviceTypes = [
   { value: "preferencial", label: "Atendimento Preferencial", priority: true, requiresDocument: false },
 ];
 
+const genderOptions = [
+  { value: "M", label: "Masculino" },
+  { value: "F", label: "Feminino" },
+  { value: "O", label: "Outro" },
+];
+
 const documentTypes = [
   { value: "cpf", label: "CPF" },
   { value: "cns", label: "CNS - Cartão Nacional de Saúde" },
@@ -102,16 +113,21 @@ export function AddPatientModal({ open, onOpenChange, onPatientAdded }: AddPatie
   const [formData, setFormData] = useState<PatientFormData>({
     fullName: "",
     birthDate: "",
+    gender: "",
     serviceType: "",
     documentType: "",
     documentNumber: "",
     motherName: "",
+    address: "",
+    phone: "",
+    email: "",
     reason: "",
     isMinor: false,
     guardianName: "",
     guardianDocument: "",
     isPriority: false,
     priorityReason: "",
+    observations: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -164,6 +180,8 @@ export function AddPatientModal({ open, onOpenChange, onPatientAdded }: AddPatie
       newErrors.fullName = "Nome completo é obrigatório";
     } else if (formData.fullName.trim().length < 3) {
       newErrors.fullName = "Nome deve ter pelo menos 3 caracteres";
+    } else if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(formData.fullName.trim())) {
+      newErrors.fullName = "Nome não pode conter números ou caracteres especiais";
     }
 
     if (!formData.birthDate) {
@@ -184,6 +202,31 @@ export function AddPatientModal({ open, onOpenChange, onPatientAdded }: AddPatie
       if (isActuallyMinor && !formData.isMinor) {
         setFormData(prev => ({ ...prev, isMinor: true }));
       }
+    }
+
+    if (!formData.gender) {
+      newErrors.gender = "Sexo é obrigatório";
+    }
+
+    if (!formData.motherName.trim()) {
+      newErrors.motherName = "Nome da mãe é obrigatório";
+    } else if (formData.motherName.trim().length < 3) {
+      newErrors.motherName = "Nome da mãe deve ter pelo menos 3 caracteres";
+    }
+
+    if (!formData.address.trim()) {
+      newErrors.address = "Endereço é obrigatório";
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Telefone é obrigatório";
+    } else if (!/^\(\d{2}\)\s\d{4,5}-\d{4}$/.test(formData.phone)) {
+      newErrors.phone = "Formato: (11) 99999-9999";
+    }
+
+    // Validação de e-mail se informado
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Formato de e-mail inválido";
     }
 
     if (!formData.serviceType) {
@@ -334,16 +377,21 @@ export function AddPatientModal({ open, onOpenChange, onPatientAdded }: AddPatie
     setFormData({
       fullName: "",
       birthDate: "",
+      gender: "",
       serviceType: "",
       documentType: "",
       documentNumber: "",
       motherName: "",
+      address: "",
+      phone: "",
+      email: "",
       reason: "",
       isMinor: false,
       guardianName: "",
       guardianDocument: "",
       isPriority: false,
       priorityReason: "",
+      observations: "",
     });
     setErrors({});
   };
@@ -564,14 +612,84 @@ export function AddPatientModal({ open, onOpenChange, onPatientAdded }: AddPatie
           </div>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="gender">Sexo *</Label>
+            <Select value={formData.gender} onValueChange={(value) => handleInputChange("gender", value)}>
+              <SelectTrigger className={errors.gender ? "border-destructive" : ""}>
+                <SelectValue placeholder="Selecione o sexo" />
+              </SelectTrigger>
+              <SelectContent>
+                {genderOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.gender && (
+              <p className="text-sm text-destructive mt-1">{errors.gender}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="motherName">Nome da Mãe *</Label>
+            <Input
+              id="motherName"
+              value={formData.motherName}
+              onChange={(e) => handleInputChange("motherName", e.target.value)}
+              className={errors.motherName ? "border-destructive" : ""}
+              placeholder="Digite o nome da mãe"
+            />
+            {errors.motherName && (
+              <p className="text-sm text-destructive mt-1">{errors.motherName}</p>
+            )}
+          </div>
+        </div>
+
         <div>
-          <Label htmlFor="motherName">Nome da Mãe (recomendado)</Label>
+          <Label htmlFor="address">Endereço *</Label>
           <Input
-            id="motherName"
-            value={formData.motherName}
-            onChange={(e) => handleInputChange("motherName", e.target.value)}
-            placeholder="Digite o nome da mãe"
+            id="address"
+            value={formData.address}
+            onChange={(e) => handleInputChange("address", e.target.value)}
+            className={errors.address ? "border-destructive" : ""}
+            placeholder="Rua, número, bairro, cidade, UF"
           />
+          {errors.address && (
+            <p className="text-sm text-destructive mt-1">{errors.address}</p>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="phone">Telefone *</Label>
+            <Input
+              id="phone"
+              value={formData.phone}
+              onChange={(e) => handleInputChange("phone", e.target.value)}
+              className={errors.phone ? "border-destructive" : ""}
+              placeholder="(11) 99999-9999"
+            />
+            {errors.phone && (
+              <p className="text-sm text-destructive mt-1">{errors.phone}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="email">E-mail</Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+              className={errors.email ? "border-destructive" : ""}
+              placeholder="email@exemplo.com"
+            />
+            {errors.email && (
+              <p className="text-sm text-destructive mt-1">{errors.email}</p>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -703,6 +821,21 @@ export function AddPatientModal({ open, onOpenChange, onPatientAdded }: AddPatie
             placeholder="Descreva o motivo da consulta (opcional)"
             rows={3}
           />
+        </div>
+
+        <div>
+          <Label htmlFor="observations">Observações</Label>
+          <Textarea
+            id="observations"
+            value={formData.observations}
+            onChange={(e) => handleInputChange("observations", e.target.value)}
+            placeholder="Observações adicionais (até 500 caracteres)"
+            rows={3}
+            maxLength={500}
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            {formData.observations.length}/500 caracteres
+          </p>
         </div>
       </div>
 
