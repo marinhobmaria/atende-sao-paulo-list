@@ -61,8 +61,8 @@ export function QueueControls({
   };
 
   return (
-    <div className="fixed right-6 top-6 bottom-6 w-72 z-50">
-      <Card className="h-full flex flex-col shadow-lg border-border/50">
+    <div className="w-72">
+      <Card className="sticky top-6 shadow-lg border-border/50">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Phone className="h-5 w-5 text-primary" />
@@ -70,7 +70,7 @@ export function QueueControls({
           </CardTitle>
         </CardHeader>
         
-        <CardContent className="flex-1 space-y-4">
+        <CardContent className="space-y-4">
           {/* Botão Chamar Próximo */}
           <Button 
             onClick={handleCallNext}
@@ -118,11 +118,8 @@ export function QueueControls({
             </div>
           </div>
 
-          {/* Spacer para empurrar data/hora para baixo */}
-          <div className="flex-1"></div>
-
           {/* Data e Hora */}
-          <div className="text-center p-3 bg-muted/30 rounded-lg border border-border/30">
+          <div className="text-center p-3 bg-muted/30 rounded-lg border border-border/30 mt-6">
             <div className="flex items-center justify-center gap-2 mb-2">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">Hoje</span>

@@ -55,61 +55,63 @@ const Index = () => {
 
   return (
     <PageLayout breadcrumbItems={[{ title: "Fila de atendimento" }]}>
-      {/* Main Content */}
-      <div className="p-6 space-y-6 mr-[320px]">
-        {/* Header with search and add citizen button */}
-        <AttendanceHeader
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          showAddCitizenButton={true}
-          onAddCitizenClick={() => setShowAddCitizen(!showAddCitizen)}
-        />
+      <div className="p-6 flex gap-6">
+        {/* Main Content */}
+        <div className="flex-1 space-y-6">
+          {/* Header with search and add citizen button */}
+          <AttendanceHeader
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            showAddCitizenButton={true}
+            onAddCitizenClick={() => setShowAddCitizen(!showAddCitizen)}
+          />
 
-        {/* Status Counters */}
-        <div className="flex items-center justify-center">
-          <StatusCounters
-            statusCounts={statusCounts}
+          {/* Status Counters */}
+          <div className="flex items-center justify-center">
+            <StatusCounters
+              statusCounts={statusCounts}
+              filters={filters}
+              setFilters={setFilters}
+              queueCount={mockQueueCount}
+            />
+          </div>
+
+          {/* Add Citizen Collapsible */}
+          {showAddCitizen && (
+            <AddCitizen
+              open={showAddCitizen}
+              onOpenChange={setShowAddCitizen}
+              queueCount={mockQueueCount}
+              waitingCount={mockWaitingCount}
+              statusCounts={statusCounts}
+              filters={filters}
+              setFilters={setFilters}
+              isCollapsible={true}
+            />
+          )}
+
+          {/* Attendance List */}
+          <AttendanceList
+            searchTerm={searchTerm}
+            showMyAttendances={showMyAttendances}
+            setShowMyAttendances={setShowMyAttendances}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
             filters={filters}
             setFilters={setFilters}
-            queueCount={mockQueueCount}
+            onCallPatient={handleCallPatient}
           />
         </div>
 
-        {/* Add Citizen Collapsible */}
-        {showAddCitizen && (
-          <AddCitizen
-            open={showAddCitizen}
-            onOpenChange={setShowAddCitizen}
-            queueCount={mockQueueCount}
-            waitingCount={mockWaitingCount}
-            statusCounts={statusCounts}
-            filters={filters}
-            setFilters={setFilters}
-            isCollapsible={true}
-          />
-        )}
-
-        {/* Attendance List */}
-        <AttendanceList
-          searchTerm={searchTerm}
-          showMyAttendances={showMyAttendances}
-          setShowMyAttendances={setShowMyAttendances}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          filters={filters}
-          setFilters={setFilters}
-          onCallPatient={handleCallPatient}
+        {/* Controles da Fila - Painel Lateral */}
+        <QueueControls
+          onCallNext={handleCallNext}
+          onAddToQueue={handleAddToQueue} 
+          onRefreshQueue={handleRefreshQueue}
+          waitingCount={statusCounts.waiting}
+          averageWaitTime={36}
         />
       </div>
-
-      {/* Controles da Fila - Painel Lateral Fixo */}
-      <QueueControls
-        onCallNext={handleCallNext}
-        onAddToQueue={handleAddToQueue} 
-        onRefreshQueue={handleRefreshQueue}
-        waitingCount={statusCounts.waiting}
-        averageWaitTime={36}
-      />
 
       {/* Fixed Password Caller */}
       <PasswordCaller />
