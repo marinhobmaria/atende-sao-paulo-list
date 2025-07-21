@@ -1,13 +1,76 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Baby, Heart, Users } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
+import { Baby, Heart, Users, Stethoscope, Activity, Thermometer } from 'lucide-react';
 
-export const SOAPObjetivo = () => {
+interface SOAPObjetivoProps {
+  data?: any;
+  onChange?: (data: any) => void;
+}
+
+export const SOAPObjetivo = ({ data = {}, onChange }: SOAPObjetivoProps) => {
   const [showPrenatalModal, setShowPrenatalModal] = useState(false);
+  const [formData, setFormData] = useState({
+    // Sinais Vitais
+    pressaoArterial: data.pressaoArterial || '',
+    frequenciaCardiaca: data.frequenciaCardiaca || '',
+    frequenciaRespiratoria: data.frequenciaRespiratoria || '',
+    temperatura: data.temperatura || '',
+    saturacaoOxigenio: data.saturacaoOxigenio || '',
+    
+    // Exame Físico
+    exameGeralEstado: data.exameGeralEstado || '',
+    exameGeralAparencia: data.exameGeralAparencia || '',
+    exameCardiovascular: data.exameCardiovascular || '',
+    exameRespiratorio: data.exameRespiratorio || '',
+    exameAbdominal: data.exameAbdominal || '',
+    exameNeurologico: data.exameNeurologico || '',
+    exameMusculoesqueletico: data.exameMusculoesqueletico || '',
+    exameOutros: data.exameOutros || '',
+    
+    // Resultados de Exames
+    resultadosLaboratoriais: data.resultadosLaboratoriais || '',
+    resultadosImagem: data.resultadosImagem || '',
+    outrosResultados: data.outrosResultados || '',
+    
+    // Observações Gerais
+    observacoesObjetivas: data.observacoesObjetivas || ''
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    const updatedData = { ...formData, [field]: value };
+    setFormData(updatedData);
+    onChange?.(updatedData);
+  };
+
+  useEffect(() => {
+    setFormData({
+      pressaoArterial: data.pressaoArterial || '',
+      frequenciaCardiaca: data.frequenciaCardiaca || '',
+      frequenciaRespiratoria: data.frequenciaRespiratoria || '',
+      temperatura: data.temperatura || '',
+      saturacaoOxigenio: data.saturacaoOxigenio || '',
+      exameGeralEstado: data.exameGeralEstado || '',
+      exameGeralAparencia: data.exameGeralAparencia || '',
+      exameCardiovascular: data.exameCardiovascular || '',
+      exameRespiratorio: data.exameRespiratorio || '',
+      exameAbdominal: data.exameAbdominal || '',
+      exameNeurologico: data.exameNeurologico || '',
+      exameMusculoesqueletico: data.exameMusculoesqueletico || '',
+      exameOutros: data.exameOutros || '',
+      resultadosLaboratoriais: data.resultadosLaboratoriais || '',
+      resultadosImagem: data.resultadosImagem || '',
+      outrosResultados: data.outrosResultados || '',
+      observacoesObjetivas: data.observacoesObjetivas || ''
+    });
+  }, [data]);
 
   return (
     <Card>
@@ -262,11 +325,233 @@ export const SOAPObjetivo = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Conteúdo adicional do SOAP Objetivo */}
-        <div className="border-t pt-4">
-          <p className="text-sm text-gray-500">
-            Demais funcionalidades do SOAP Objetivo serão exibidas aqui...
-          </p>
+        <Separator className="my-6" />
+
+        {/* Sinais Vitais */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Activity className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-semibold">Sinais Vitais</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="pressaoArterial">Pressão Arterial (mmHg)</Label>
+              <Input
+                id="pressaoArterial"
+                placeholder="Ex: 120/80"
+                value={formData.pressaoArterial}
+                onChange={(e) => handleInputChange('pressaoArterial', e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="frequenciaCardiaca">Frequência Cardíaca (bpm)</Label>
+              <Input
+                id="frequenciaCardiaca"
+                type="number"
+                placeholder="Ex: 80"
+                value={formData.frequenciaCardiaca}
+                onChange={(e) => handleInputChange('frequenciaCardiaca', e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="frequenciaRespiratoria">Frequência Respiratória (rpm)</Label>
+              <Input
+                id="frequenciaRespiratoria"
+                type="number"
+                placeholder="Ex: 16"
+                value={formData.frequenciaRespiratoria}
+                onChange={(e) => handleInputChange('frequenciaRespiratoria', e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="temperatura">Temperatura (°C)</Label>
+              <Input
+                id="temperatura"
+                type="number"
+                step="0.1"
+                placeholder="Ex: 36.5"
+                value={formData.temperatura}
+                onChange={(e) => handleInputChange('temperatura', e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="saturacaoOxigenio">Saturação de O₂ (%)</Label>
+              <Input
+                id="saturacaoOxigenio"
+                type="number"
+                placeholder="Ex: 98"
+                value={formData.saturacaoOxigenio}
+                onChange={(e) => handleInputChange('saturacaoOxigenio', e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+
+        <Separator className="my-6" />
+
+        {/* Exame Físico */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Stethoscope className="w-5 h-5 text-green-600" />
+            <h3 className="text-lg font-semibold">Exame Físico</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="exameGeralEstado">Estado Geral</Label>
+              <Textarea
+                id="exameGeralEstado"
+                placeholder="Ex: Bom estado geral, consciente, orientado..."
+                value={formData.exameGeralEstado}
+                onChange={(e) => handleInputChange('exameGeralEstado', e.target.value)}
+                rows={3}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="exameGeralAparencia">Aparência Geral</Label>
+              <Textarea
+                id="exameGeralAparencia"
+                placeholder="Ex: Hidratado, corado, anictérico..."
+                value={formData.exameGeralAparencia}
+                onChange={(e) => handleInputChange('exameGeralAparencia', e.target.value)}
+                rows={3}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="exameCardiovascular">Sistema Cardiovascular</Label>
+              <Textarea
+                id="exameCardiovascular"
+                placeholder="Ex: Ritmo cardíaco regular, ausência de sopros..."
+                value={formData.exameCardiovascular}
+                onChange={(e) => handleInputChange('exameCardiovascular', e.target.value)}
+                rows={3}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="exameRespiratorio">Sistema Respiratório</Label>
+              <Textarea
+                id="exameRespiratorio"
+                placeholder="Ex: Murmúrio vesicular presente bilateralmente..."
+                value={formData.exameRespiratorio}
+                onChange={(e) => handleInputChange('exameRespiratorio', e.target.value)}
+                rows={3}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="exameAbdominal">Exame Abdominal</Label>
+              <Textarea
+                id="exameAbdominal"
+                placeholder="Ex: Abdome plano, indolor à palpação..."
+                value={formData.exameAbdominal}
+                onChange={(e) => handleInputChange('exameAbdominal', e.target.value)}
+                rows={3}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="exameNeurologico">Exame Neurológico</Label>
+              <Textarea
+                id="exameNeurologico"
+                placeholder="Ex: Reflexos presentes e simétricos..."
+                value={formData.exameNeurologico}
+                onChange={(e) => handleInputChange('exameNeurologico', e.target.value)}
+                rows={3}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="exameMusculoesqueletico">Sistema Musculoesquelético</Label>
+              <Textarea
+                id="exameMusculoesqueletico"
+                placeholder="Ex: Força muscular preservada, amplitude de movimento normal..."
+                value={formData.exameMusculoesqueletico}
+                onChange={(e) => handleInputChange('exameMusculoesqueletico', e.target.value)}
+                rows={3}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="exameOutros">Outros Sistemas</Label>
+              <Textarea
+                id="exameOutros"
+                placeholder="Ex: Pele íntegra, mucosas hidratadas..."
+                value={formData.exameOutros}
+                onChange={(e) => handleInputChange('exameOutros', e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+        </div>
+
+        <Separator className="my-6" />
+
+        {/* Resultados de Exames */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Thermometer className="w-5 h-5 text-purple-600" />
+            <h3 className="text-lg font-semibold">Resultados de Exames</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="resultadosLaboratoriais">Exames Laboratoriais</Label>
+              <Textarea
+                id="resultadosLaboratoriais"
+                placeholder="Ex: Hemograma: Hb 12,5 g/dL, Leucócitos 8.500..."
+                value={formData.resultadosLaboratoriais}
+                onChange={(e) => handleInputChange('resultadosLaboratoriais', e.target.value)}
+                rows={4}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="resultadosImagem">Exames de Imagem</Label>
+              <Textarea
+                id="resultadosImagem"
+                placeholder="Ex: Radiografia de tórax: sem alterações..."
+                value={formData.resultadosImagem}
+                onChange={(e) => handleInputChange('resultadosImagem', e.target.value)}
+                rows={4}
+              />
+            </div>
+            
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="outrosResultados">Outros Resultados</Label>
+              <Textarea
+                id="outrosResultados"
+                placeholder="Ex: ECG, espirometria, outros testes..."
+                value={formData.outrosResultados}
+                onChange={(e) => handleInputChange('outrosResultados', e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+        </div>
+
+        <Separator className="my-6" />
+
+        {/* Observações Gerais */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Observações Objetivas Gerais</h3>
+          <div className="space-y-2">
+            <Label htmlFor="observacoesObjetivas">Observações Adicionais</Label>
+            <Textarea
+              id="observacoesObjetivas"
+              placeholder="Registre observações objetivas adicionais relevantes para o atendimento..."
+              value={formData.observacoesObjetivas}
+              onChange={(e) => handleInputChange('observacoesObjetivas', e.target.value)}
+              rows={4}
+            />
+          </div>
         </div>
       </CardContent>
     </Card>
